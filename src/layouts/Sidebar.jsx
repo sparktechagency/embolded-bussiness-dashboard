@@ -97,7 +97,8 @@ const Sidebar = () => {
           <img
             src={"/icons/dashboard_logo.png"}
             title="company logo"
-            className=" cursor-pointer"
+
+            className=" cursor-pointer w-20 h-20"
           />
         </div>
         <h3 className="font-medium text-[18px] select-none leading-[21px]">
