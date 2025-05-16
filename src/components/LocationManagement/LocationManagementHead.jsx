@@ -1,13 +1,13 @@
 import LocationManagementBody from "./LocationManagementBody";
 
-const LocationManagementHead = ({ columns , data }) => {
- 
+const LocationManagementHead = ({ columns, data }) => {
+
 
   return (
     <div className="overflow-x-auto">
       <div className="min-w-[1200px] w-full bg-transparent rounded-lg shadow-md space-y-3">
         {/* Header */}
-        <div className={`grid grid-cols-9 text-center border-2 border-opacity-50 rounded-lg bg-surfacePrimary px-2 border-SurfacePrimary`}>
+        <div className={`grid grid-cols-9 text-center border-2 border-opacity-50 rounded-lg bg-surfacePrimary px-2 border-primary`}>
           {columns.map((column, index) => (
             <div key={index} className="py-3 font-semibold text-center">
               {column}
@@ -16,9 +16,9 @@ const LocationManagementHead = ({ columns , data }) => {
         </div>
 
         {/* Table Body */}
-        <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-SurfacePrimary">
+        <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
           {data.length > 0 ? (
-            data.map((item , index) => (
+            data.map((item, index) => (
               <LocationManagementBody item={item} key={item.id} list={index + 1} />
             ))
           ) : (

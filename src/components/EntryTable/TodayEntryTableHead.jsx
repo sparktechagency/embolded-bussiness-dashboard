@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import StatusFilter from "../StatusFilter";
 import TodayEntryTableBody from "./TodayEntryTableBody";
 
 
@@ -13,7 +12,7 @@ const TodayEntryTableHead = ({ columns }) => {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const searchValue = queryParams.get("search") || "";
-  
+
   const [isFetching, setIsFetching] = useState(false);
   const [currentPage, setCurrentPage] = useState(Number(queryParams.get("page")) || 1);
   const [selectedMonth, setSelectedMonth] = useState("All");
@@ -23,47 +22,47 @@ const TodayEntryTableHead = ({ columns }) => {
     {
       id: 1,
       SpotName: "Easy Park Spot ",
-      location:"Las-Vegas",
-      totalParkingSlot:22,
-      AvailableSlot:2,
-      bookedSlot:18,
-      billingType:["DAY", "Week"],
-      totalPrice:[25, 100],
-      status:"active"
+      location: "Las-Vegas",
+      totalParkingSlot: 22,
+      AvailableSlot: 2,
+      bookedSlot: 18,
+      billingType: ["DAY", "Week"],
+      totalPrice: [25, 100],
+      status: "active"
     },
     {
-        id: 2,
-        SpotName: "Easy Park Spot ",
-        location:"Las-Vegas",
-        totalParkingSlot:22,
-        AvailableSlot:2,
-        bookedSlot:18,
-        billingType:["DAY", "Week"],
-        totalPrice:[25, 100],
-        status:"active"
-      },
-      {
-        id: 3,
-        SpotName: "Easy Park Spot ",
-        location:"Las-Vegas",
-        totalParkingSlot:22,
-        AvailableSlot:2,
-        bookedSlot:18,
-        billingType:["DAY", "Week"],
-        totalPrice:[25, 100],
-        status:"active"
-      },
-      {
-        id: 4,
-        SpotName: "Easy Park Spot ",
-        location:"Las-Vegas",
-        totalParkingSlot:22,
-        AvailableSlot:2,
-        bookedSlot:18,
-        billingType:["DAY", "Week"],
-        totalPrice:[25, 100],
-        status:"active"
-      },
+      id: 2,
+      SpotName: "Easy Park Spot ",
+      location: "Las-Vegas",
+      totalParkingSlot: 22,
+      AvailableSlot: 2,
+      bookedSlot: 18,
+      billingType: ["DAY", "Week"],
+      totalPrice: [25, 100],
+      status: "active"
+    },
+    {
+      id: 3,
+      SpotName: "Easy Park Spot ",
+      location: "Las-Vegas",
+      totalParkingSlot: 22,
+      AvailableSlot: 2,
+      bookedSlot: 18,
+      billingType: ["DAY", "Week"],
+      totalPrice: [25, 100],
+      status: "active"
+    },
+    {
+      id: 4,
+      SpotName: "Easy Park Spot ",
+      location: "Las-Vegas",
+      totalParkingSlot: 22,
+      AvailableSlot: 2,
+      bookedSlot: 18,
+      billingType: ["DAY", "Week"],
+      totalPrice: [25, 100],
+      status: "active"
+    },
   ], []);
 
   // Items per page and pagination calculation
@@ -72,23 +71,23 @@ const TodayEntryTableHead = ({ columns }) => {
   // Filter data based on search value and month filter
   const filteredData = useMemo(() => {
     let result = [...demoData];
-    
+
     // Apply search filter
     if (searchValue) {
       const lowerCaseSearch = searchValue.toLowerCase();
-      result = result.filter(item => 
+      result = result.filter(item =>
         item.SpotName.toLowerCase().includes(lowerCaseSearch)
       );
     }
-    
+
     // Apply month filter
     if (selectedMonth !== "All") {
-      result = result.filter(item => 
-        item.startDate.includes(selectedMonth) || 
+      result = result.filter(item =>
+        item.startDate.includes(selectedMonth) ||
         item.endDate.includes(selectedMonth)
       );
     }
-    
+
     return result;
   }, [demoData, searchValue, selectedMonth]);
 
@@ -182,18 +181,18 @@ const TodayEntryTableHead = ({ columns }) => {
 
   const data = [
     {
-        id:1,
-        reservationID:"#123456",
-        userName: "Alice Johnson",
-        vehiclesType:"Car",
-        vecicles: 64656448,
-        parkingPlan: "5days",
-        checkinTime:"08:00PM",
-        startDate:"Feb 28,2025",
-        endDate:"Mar 07,2025",
-        price:50,
-        slot:2 ,
-        status: "waiting"
+      id: 1,
+      reservationID: "#123456",
+      userName: "Alice Johnson",
+      vehiclesType: "Car",
+      vecicles: 64656448,
+      parkingPlan: "5days",
+      checkinTime: "08:00PM",
+      startDate: "Feb 28,2025",
+      endDate: "Mar 07,2025",
+      price: 50,
+      slot: 2,
+      status: "waiting"
     }
   ]
 
@@ -207,20 +206,20 @@ const TodayEntryTableHead = ({ columns }) => {
     <div className="overflow-x-auto">
       <div className="min-w-[1200px] w-full bg-transparent rounded-lg shadow-md space-y-3">
         {/* Search and Filter */}
-       
+
 
         {/* Header */}
-        <div className="grid grid-cols-10 text-center border-2 border-opacity-50 rounded-lg bg-surfacePrimary px-2 border-SurfacePrimary">
+        <div className="grid grid-cols-10 text-center border-2 border-opacity-50 rounded-lg bg-surfacePrimary px-2 border-primary">
           {columns.map((column, index) => (
             <div key={index} className="py-3 font-semibold text-center">{column}</div>
           ))}
         </div>
 
         {/* Table Body */}
-        <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-SurfacePrimary">
+        <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
           {data.length > 0 ? (
             data.map((item) => (
-              <TodayEntryTableBody item={item} key={item.id} list={item.length + 1 } />
+              <TodayEntryTableBody item={item} key={item.id} list={item.length + 1} />
             ))
           ) : (
             <h3 className="py-10 text-center">No Data Available</h3>

@@ -1,13 +1,13 @@
-import { Form, Input, Modal, Upload, Select, Row, Col, Button } from 'antd';
-import { useState, useEffect } from 'react';
+import { Button, Col, Form, Input, Modal, Row, Select, Upload } from 'antd';
 import { Upload as UploadIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const { Option } = Select;
 
-const InstitutionFormModal = ({ 
+const InstitutionFormModal = ({
   mode = 'create', // 'create' or 'edit'
-  visible, 
-  onCancel, 
+  visible,
+  onCancel,
   onSubmit,
   initialValues = {}
 }) => {
@@ -17,10 +17,21 @@ const InstitutionFormModal = ({
   // Set form values when mode changes or initialValues update
   useEffect(() => {
     if (mode === 'edit' && visible) {
-      form.setFieldsValue(initialValues);
-      // You might also want to set fileList if there are existing files
+      form.setFieldsValue({
+        ...initialValues,
+        // Ensure geofencingLocation is undefined if empty
+        geofencingLocation: initialValues.geofencingLocation || undefined
+      });
     } else if (mode === 'create' && visible) {
-      form.resetFields();
+      form.setFieldsValue({
+        name: "",
+        address: "",
+        email: "",
+        phone: "",
+        website: "",
+        establishedYear: "",
+        geofencingLocation: undefined // This ensures placeholder shows
+      });
       setFileList([]);
     }
   }, [mode, visible, initialValues, form]);
@@ -66,16 +77,16 @@ const InstitutionFormModal = ({
   // Custom footer with centered buttons
   const modalFooter = (
     <div>
-      <Button 
-        style={{paddingLeft: "30px", paddingRight: "30px", fontSize: "16px", marginRight: 8}} 
+      <Button
+        style={{ paddingLeft: "30px", paddingRight: "30px", fontSize: "16px", marginRight: 8 }}
         onClick={handleCancel}
       >
         Cancel
       </Button>
-      <Button 
-        type="primary" 
-        style={{paddingLeft: "40px", paddingRight: "40px", fontSize: "16px"}} 
-        onClick={handleSubmit} 
+      <Button
+        type="primary"
+        style={{ paddingLeft: "40px", paddingRight: "40px", fontSize: "16px" }}
+        onClick={handleSubmit}
         className="bg-[#336C79]"
       >
         {mode === 'create' ? 'Create' : 'Update'}
@@ -83,56 +94,46 @@ const InstitutionFormModal = ({
     </div>
   );
 
-  const modalTitle = mode === 'create' 
-    ? 'Create New Institution' 
+  const modalTitle = mode === 'create'
+    ? 'Create New Institution'
     : 'Edit Institution';
 
   return (
     <Modal
-      title={<span style={{ fontWeight: "bold", color:"#336C79", paddingTop:"20px", paddbottom:"20px", fontSize:"20px" }}>{modalTitle}</span>}
+      title={<span style={{ fontWeight: "bold", color: "#336C79", paddingTop: "20px", paddbottom: "20px", fontSize: "20px" }}>{modalTitle}</span>}
       open={visible}
       onCancel={handleCancel}
       footer={modalFooter}
       closable={false}
       width={1000}
     >
-      <Form 
-        form={form} 
+      <Form
+        form={form}
         layout="vertical"
-        initialValues={mode === 'edit' ? initialValues : {
-          // Default empty values for create mode
-          name: "",
-          address: "",
-          email: "",
-          phone: "",
-          website: "",
-          establishedYear: "",
-          geofencingLocation: ""
-        }}
       >
         <Row gutter={24}>
           <Col span={8}>
-            <Form.Item 
-              name="name" 
-              label="Institution Name" 
+            <Form.Item
+              name="name"
+              label="Institution Name"
               rules={[{ required: true, message: 'Please input institution name!' }]}
             >
               <Input placeholder="Enter institution name" />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item 
-              name="address" 
-              label="Address" 
+            <Form.Item
+              name="address"
+              label="Address"
               rules={[{ required: true, message: 'Please input address!' }]}
             >
               <Input placeholder="Enter address" />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item 
-              name="email" 
-              label="Email" 
+            <Form.Item
+              name="email"
+              label="Email"
               rules={[
                 { required: true, message: 'Please input email!' },
                 { type: 'email', message: 'Please enter a valid email!' }
@@ -145,27 +146,27 @@ const InstitutionFormModal = ({
 
         <Row gutter={24}>
           <Col span={8}>
-            <Form.Item 
-              name="phone" 
-              label="Phone Number" 
+            <Form.Item
+              name="phone"
+              label="Phone Number"
               rules={[{ required: true, message: 'Please input phone number!' }]}
             >
               <Input placeholder="Enter phone number" />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item 
-              name="website" 
-              label="Institution Website Link" 
+            <Form.Item
+              name="website"
+              label="Institution Website Link"
               rules={[{ required: true, message: 'Please input website!' }]}
             >
               <Input placeholder="Enter website link" />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item 
-              name="establishedYear" 
-              label="Established Year" 
+            <Form.Item
+              name="establishedYear"
+              label="Established Year"
               rules={[{ required: true, message: 'Please input established year!' }]}
             >
               <Input placeholder="Enter year" />
@@ -175,9 +176,9 @@ const InstitutionFormModal = ({
 
         <Row gutter={24}>
           <Col span={8}>
-            <Form.Item 
-              name="geofencingLocation" 
-              label="Choose Geofencing Location" 
+            <Form.Item
+              name="geofencingLocation"
+              label="Choose Geofencing Location"
               rules={[{ required: true, message: 'Please select location!' }]}
             >
               <Select placeholder="Select a location">
@@ -189,9 +190,9 @@ const InstitutionFormModal = ({
             </Form.Item>
           </Col>
           <Col span={24}>
-            <Form.Item 
-              name="logo" 
-              label="Upload Logo" 
+            <Form.Item
+              name="logo"
+              label="Upload Logo"
               valuePropName="fileList"
               getValueFromEvent={normFile}
             >

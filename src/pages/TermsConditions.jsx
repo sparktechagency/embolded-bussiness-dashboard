@@ -16,15 +16,22 @@ const TermsConditions = () => {
   }
 
   return (
-    <section>
+    <section className="border p-4 rounded-lg mt-4 ">
       {/* Header Section */}
-      <div className="rounded py-[11px] pl-[16px]">
+      <div className="rounded">
         <div className="flex items-center gap-[20px]">
-          <h3 className="text-xl font-medium">Terms Of Service</h3>
+          <h3 className="text-xl font-medium text-primary">Terms Of Service</h3>
         </div>
       </div>
 
-     <h3 className="text-center pt-20">Terms and Condition here</h3>
+      <div className="flex justify-center h-[700px] items-center p-4">
+        {/* <div
+          className="mt-8"
+          dangerouslySetInnerHTML={{ __html: privacyContent }}
+        /> */}
+
+        <img src="/images/nodata.png" alt="no data" />
+      </div>
     </section>
   );
 };

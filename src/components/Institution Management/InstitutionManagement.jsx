@@ -1,6 +1,5 @@
 import { Button, Form, Input, message, Modal, Upload, Select, Row, Col } from 'antd';
 import { useState } from 'react';
-import { Upload as UploadIcon } from 'lucide-react';
 import DepertmentTableHead from './DepertmentTableHead';
 import InstitutionTableHead from './InstitutionTableHead';
 import InstitutionFormModal from './InstitutionFormModal';
@@ -72,25 +71,8 @@ function App() {
 
   // Handle institution creation
   const handleCreateInstitution = (values) => {
-    const newInstitution = {
-      key: (institutions.length + 1).toString(),
-      id: institutions.length + 1,
-      name: values.name,
-      email: values.email,
-      phone: values.phone,
-      establishedYear: values.establishedYear,
-      website: values.website,
-      address: values.address,
-      location: values.geofencingLocation || values.location,
-      totalDepartment: 0,
-      totalEmployee: 0,
-      status: 'Active'
-    };
-
-    setInstitutions([...institutions, newInstitution]);
-    setIsNewInstitutionModalVisible(false);
-    message.success('Institution created successfully');
-  };
+        console.log(values);
+  };  
 
   // Handle department creation
   const handleCreateDepartment = (values) => {
@@ -99,7 +81,7 @@ function App() {
       id: departments.length + 1,
       institution: values.institution,
       name: values.name,
-      totalEmployee: values.totalEmployee,
+      totalEmployee: values.totalEmployee || 0,
       status: 'Active'
     };
 
@@ -223,7 +205,7 @@ function App() {
         </div>
       </div>
 
-      <div className="bg-white rounded-md shadow">
+      <div className=" rounded-md">
         {activeTab === 'institution' ? (
           <InstitutionTableHead activeTab={activeTab} data={institutionData} columns={institutionColumns} />
         ) : (
@@ -236,14 +218,14 @@ function App() {
         mode="create"
         visible={isNewInstitutionModalVisible}
         onCancel={() => setIsNewInstitutionModalVisible(false)}
-        onCreate={handleCreateInstitution}
+        onSubmit={handleCreateInstitution} 
       />
 
       <DepartmentFormModal
-       mode="create"
+        mode="create"
         visible={isNewDepartmentModalVisible}
         onCancel={() => setIsNewDepartmentModalVisible(false)}
-        onCreate={handleCreateDepartment}
+        onSubmit={handleCreateDepartment} 
         institutions={institutions}
       />
     </div>

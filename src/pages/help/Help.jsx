@@ -27,16 +27,16 @@ const Help = () => {
 
     try {
           const response = await createContact(data).unwrap();
-          message.success(response?.message)
+          // message.success(response?.message)
     } catch (error) {
-          message.error("message not send some problem")
+          // message.error("message not send some problem")
     }
     // message.success('Message sent successfully!');
     form.resetFields();
   };
 
   const onFinishFailed = (errorInfo) => {
-    message.error('Failed:', errorInfo);
+    // message.error('Failed:', errorInfo);
   };
 
   // const onChange = (key) => {
@@ -44,13 +44,15 @@ const Help = () => {
   // };
 
   return (
-    <div className='w-full'>
-      <div className="flex mt-20">
+    <div className='w-full p-10'>
+      <div className="border border-primary rounded-md px-10 py-20">
         <div className='basis-[70%]'>
-          <div className='w-full max-w-[700px]'>
+          <div className='w-full mx-auto'>
             <h2 className='text-4xl font-bold'>Get In Touch</h2>
-            <p className='py-5 text-sm text-gray-600'>Likewise a range of activities enriches life, blending vigor with balance. The result is a lifestyle that`s not only dynamic but also deeply rewarding.</p>
-           
+           <div className='py-5 flex flex-col gap-2'>
+             <p className=' text-gray-600 text-sm'>Likewise, a range of activities enriches life, blending vigor with balance. The result is a </p>
+           <p className=' text-sm text-gray-600'>lifestyle that’s not only dynamic but also deeply rewarding.</p>
+           </div>
               <Form
                 form={form}
                 name="help_form"
@@ -120,7 +122,7 @@ const Help = () => {
                     loading={isLoading}
                     type="primary"
                     htmlType="submit"
-                    style={{ backgroundColor: "#E8505B", color: "white", width: "350px", height: "50px" }}
+                    className="w-4/12"
                     size='large'
                   >
                     Send message

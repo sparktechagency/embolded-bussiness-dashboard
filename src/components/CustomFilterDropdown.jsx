@@ -102,7 +102,9 @@ export default function CustomFilterDropdown({
           {selectedOption.icon && (
             <span className="mr-2">{selectedOption.icon}</span>
           )}
-          {selectedOption.label}
+          <div className='flex items-center gap-3'>
+            <img src="/icons/dropdown.png" className='w-5 h-5' alt="" /> <h3>{selectedOption.label}</h3>
+          </div>
         </div>
         
         <DownOutlined 

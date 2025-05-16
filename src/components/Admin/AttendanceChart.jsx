@@ -33,7 +33,7 @@ const AttendanceChart = () => {
   };
 
   return (
-    <div  className="bg-white border border-[#336C79]  rounded-lg p-6 shadow-sm w-full w-full">
+    <div  className="bg-white border border-[#336C79]  rounded-lg p-6 shadow-sm w-full">
       <h2 className="text-lg font-medium text-gray-800 mb-1">Attendance</h2>
       <div className="h-px w-12 bg-blue-500 mb-4"></div>
 

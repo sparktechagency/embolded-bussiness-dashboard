@@ -1,11 +1,10 @@
 import { Button, message, Select } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DepartmentFormModal from '../Institution Management/DepartmentFormModal';
-import InstitutionFormModal from '../Institution Management/InstitutionFormModal';
+import CustomFilterDropdown from '../CustomFilterDropdown';
 import EmployeTableHead from './EmployeTableHead';
-import RoleTableHead from './RoleTableHead';
 import RoleManageModal from './RoleManageModal';
+import RoleTableHead from './RoleTableHead';
 
 
 
@@ -179,10 +178,25 @@ function EmployeeManagement() {
     }
   ];
 
+
+ const departmentOptions = [
+    { value: 'All', label: 'All' },
+    { value: 'Clinical', label: 'Clinical' },
+    { value: 'SparkTech', label: 'Spark Tech' },
+    { value: 'Softvance', label: 'Softvance' },
+  ];
+
+   const institutionOptions = [
+    { value: 'All', label: 'All' },
+    { value: 'BrookwoodBaptistHealth', label: 'Brookwood Baptist Health' },
+    { value: ' USA Health ', label: 'USA Health ' },
+    { value: ' University of Alabama Hospital ', label: ' University of Alabama Hospital ' },
+  ];
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="mb-6 flex justify-between">
-        <div>
+    <div className="p-6 bg-gray-50 min-h-screen ">
+      <div className="mb-6 flex justify-between w-full">
+        <div className='w-full'>
           <Button
             type={activeTab === 'employee' ? 'primary' : 'default'}
             className={`mr-2 ${activeTab === 'employee' ? 'bg-[#336C79]' : ''}`}
@@ -198,22 +212,27 @@ function EmployeeManagement() {
             Role
           </Button>
         </div>
-        <div>
+        <div className='w-full'>
           {activeTab === 'employee' && (
 
-          <div className='flex items-center gap-3'>
-            
+            <div className='flex  items-center gap-3 w-full'>
 
+              <div className='w-4/12'>
+                <CustomFilterDropdown options={departmentOptions} />
+              </div>
+              <div className='w-4/12'>
+                <CustomFilterDropdown options={institutionOptions} />
+              </div>
 
-            <Button
-            type="primary"
-            className="bg-[#336C79]"
-            onClick={() => router("/employee-management/add-new-Employee")}
-          >
-            Add New Employee
-          </Button>
+              <Button
+                type="primary"
+                className="bg-[#336C79] w-4/12"
+                onClick={() => router("/employee-management/add-new-Employee")}
+              >
+                Add New Employee
+              </Button>
 
-          </div>
+            </div>
           )}
           {activeTab === 'role' && (
             <div className='flex items-center gap-3'>
@@ -222,7 +241,7 @@ function EmployeeManagement() {
                 className="bg-[#336C79]"
                 onClick={() => setIsNewInstitutionModalVisible(true)}
               >
-               Create New Role
+                Create New Role
               </Button>
             </div>
           )}

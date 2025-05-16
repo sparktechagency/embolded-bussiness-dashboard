@@ -13,9 +13,9 @@ export default function SubscriptionManagement() {
   
   
   return (
-    <div className="max-w-5xl mx-auto p-4 font-sans">
+    <div className="max-w-7xl p-4 font-sans">
       {/* Header with plan info */}
-      <div className="border border-gray-200 rounded-md p-4 mb-8">
+      <div className="border max-w-2xl border-gray-200 rounded-md p-4 mb-8">
         <div className="flex justify-between items-center mb-2">
           <div className="font-medium text-gray-700">Enterprise Plan</div>
           <Badge 
@@ -164,7 +164,7 @@ export default function SubscriptionManagement() {
             </div>
           </div>
           
-          <Button className="w-full bg-[#336C79] border-0 hover:bg-teal-500 text-white">Running Plan</Button>
+          <Button className="w-full bg-[#336C79] border text-white">Running Plan</Button>
         </div>
       </div>
     </div>

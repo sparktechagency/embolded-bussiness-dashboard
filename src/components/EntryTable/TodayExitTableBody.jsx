@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useMemo, useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 
 const TodayEntryTableBody = ({ item }) => {
@@ -46,13 +46,13 @@ const TodayEntryTableBody = ({ item }) => {
         <div className="flex items-center justify-center py-3">{item.checkinTime}</div>
         <div className="flex flex-col items-center justify-center py-3">
           <div className="flex items-center gap-1">
-            <span className="font-semibold">Start Date:</span> 
+            <span className="font-semibold">Start Date:</span>
             <span className="p-[2px] border border-primary rounded">
               {formatDate(item.startDate)}
             </span>
           </div>
           <div className="flex items-center gap-1 mt-1">
-            <span className="font-semibold text-start">End Date:</span> 
+            <span className="font-semibold text-start">End Date:</span>
             <span className="p-[2px] border border-primary rounded">
               {formatDate(item.endDate)}
             </span>
@@ -65,8 +65,8 @@ const TodayEntryTableBody = ({ item }) => {
           </span>
         </div>
         <div className="flex items-center justify-center py-3">{item.slot}</div>
-        <div className="flex items-center justify-center py-2 border-SurfacePrimary rounded border">{item.status}</div>
-        
+        <div className="flex items-center justify-center py-2 border-primary rounded border">{item.status}</div>
+
       </div>
 
       {/* Booking Details Modal */}
@@ -87,16 +87,16 @@ const TodayEntryTableBody = ({ item }) => {
               className="relative w-full max-w-md p-6 bg-white rounded-lg shadow-xl md:max-w-lg"
               onClick={(e) => e.stopPropagation()}
             >
-              <button 
-                onClick={handleModalClose} 
+              <button
+                onClick={handleModalClose}
                 className="absolute text-gray-500 top-3 right-3 hover:text-gray-800"
                 aria-label="Close modal"
               >
                 <IoCloseOutline className="w-6 h-6" />
               </button>
-              
+
               <h2 className="mb-4 text-xl font-bold text-center text-primary">Booking Information</h2>
-              
+
               <div className="px-3 py-4 space-y-3 border rounded-md border-primary">
                 {/* User Information Section */}
                 <div>
@@ -108,7 +108,7 @@ const TodayEntryTableBody = ({ item }) => {
                     <p className="text-sm"><span className="font-medium">Phone Number:</span> {item.phoneNumber}</p>
                   </div>
                 </div>
-                
+
                 {/* Booking Details Section */}
                 <div>
                   <h3 className="mb-2 text-base font-semibold text-primary">Booking Details</h3>
@@ -123,7 +123,7 @@ const TodayEntryTableBody = ({ item }) => {
                     <p className="text-sm"><span className="font-medium">Parking Slot:</span> {item.parkingSlot}</p>
                   </div>
                 </div>
-                
+
                 {/* Payment Information Section */}
                 <div>
                   <h3 className="mb-2 text-base font-semibold text-primary">Payment Information</h3>
@@ -132,7 +132,7 @@ const TodayEntryTableBody = ({ item }) => {
                     <p className="text-sm"><span className="font-medium">Payment By:</span> {item.paymentMethod}</p>
                     <p className="text-sm"><span className="font-medium">Transaction ID:</span> {item.transactionId}</p>
                     <p className="text-sm">
-                      <span className="font-medium">Status:</span> 
+                      <span className="font-medium">Status:</span>
                       <span className={`ml-2 px-2 py-1 rounded ${item.paid ? 'bg-green-500' : 'bg-yellow-500'} text-white`}>
                         {item.paid ? "Paid" : "Pending"}
                       </span>

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Contact, DashboardIcon, EmployeeManagement, HolidayManagement, InstituteManagement,Privacy, ShiftManagement, Terms , LocationMangement } from "../components/Icons/Icons";
+import { Contact, DashboardIcon, EmployeeManagement, HolidayManagement, InstituteManagement,Privacy, ShiftManagement, Terms , LocationMangement, Subscription, ProfileSection, LoginCanditad } from "../components/Icons/Icons";
 import { logout } from "../features/auth/authSlice";
 
 
@@ -47,6 +47,21 @@ const Sidebar = () => {
       path: "/location-management",
       name: "Location Management",
       icon: <LocationMangement />,
+    },
+     {
+      path: "/subscription",
+      name: "Subscription",
+      icon: <Subscription />,
+    },
+    {
+      path: "/login-credentials",
+      name: "Login Credentials",
+      icon: <LoginCanditad />,
+    },
+      {
+      path: "/profile",
+      name: "Profile",
+      icon: <ProfileSection />,
     },
 
     // {
@@ -153,7 +168,7 @@ const Sidebar = () => {
           ))}
         </ul>
         <button
-          className="flex items-center gap-2 p-3 pl-5 mt-10 font-semibold"
+          className="flex items-center gap-2 p-3 pl-5 mb-10 font-semibold"
           onClick={showLogoutModal}
         >
           <span>
