@@ -58,7 +58,7 @@ const ShiftModal = ({
 
   return (
     <Modal
-      title={<span style={{ fontWeight: "bold", color: "#336C79", fontSize: '20px' }}>{modalTitle}</span>}
+      title={<span style={{ fontWeight: "bold", color: "#336C79", }}>{modalTitle}</span>}
       open={visible}
       onCancel={handleCancel}
       footer={modalFooter}
@@ -76,14 +76,14 @@ const ShiftModal = ({
       >
         <Form.Item 
           name="name" 
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Name</span>}
+          label={<span style={{ fontWeight: "bold",  }}>Name</span>}
           rules={[{ required: true, message: 'Please input shift name!' }]}
         >
           <Input placeholder="Write Shift Name" size="large" />
         </Form.Item>
         
         <Form.Item 
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Time</span>}
+          label={<span style={{ fontWeight: "bold", }}>Time</span>}
         >
           <Form.Item 
             name="startTime" 

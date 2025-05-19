@@ -85,7 +85,7 @@ const DepertmentTableBody = ({ item, list }) => {
         centered
       >
         <div className="text-center py-4">
-          <p className="text-base font-medium text-red-500 mb-6">Are you sure Remove this Institution Account</p>
+          <p className="text-base font-medium text-black mb-6">Are you sure Remove this Department</p>
           <div className="flex justify-center gap-4">
             <Button
               onClick={() => setRemoveModalVisible(false)}
@@ -114,7 +114,7 @@ const DepertmentTableBody = ({ item, list }) => {
         centered
       >
         <div className="text-center py-4">
-          <p className="text-lg font-medium mb-6">Are you sure Turn off this Institution Account?</p>
+          <p className="text-lg font-medium mb-6">Are you sure Turn off this Department</p>
           <div className="flex justify-center gap-4">
             <Button
               onClick={() => setSwitchModalVisible(false)}

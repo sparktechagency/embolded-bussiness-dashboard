@@ -27,6 +27,7 @@ import Notification from "./pages/Notification";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import UserProfile from "./pages/UserProfile";
+import DepartmentManagement from "./components/DepartmentManagement/DepartmentManagement";
 
 const router = createBrowserRouter([
   {
@@ -48,7 +49,15 @@ const router = createBrowserRouter([
         path: "institution_management",
         element: <InstitutionManagement />
       },
+       {
+        path: "institution_management",
+        element: <InstitutionManagement />
+      },
       {
+        path: "department-management",
+        element: <DepartmentManagement />
+      },
+       {
         path: "holiday-management",
         element: <HolidayManagement />
       },
@@ -123,16 +132,16 @@ const router = createBrowserRouter([
       },
 
 
-      {
-        path: "/settings",
-        element: <Profile />
-      },
+      // {
+      //   path: "/settings",
+      //   element: <Profile />
+      // },
       {
         path: "help",
         element: <Help />
       },
       {
-        path: "profile",
+        path: "settings",
         element: <UserProfile />
       },
       {

@@ -3,9 +3,8 @@ import { useState } from "react";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Contact, DashboardIcon, EmployeeManagement, HolidayManagement, InstituteManagement,Privacy, ShiftManagement, Terms , LocationMangement, Subscription, ProfileSection, LoginCanditad } from "../components/Icons/Icons";
+import { Contact, DashboardIcon, EmployeeManagement, HolidayManagement, InstituteManagement, Privacy, ShiftManagement, Terms, LocationMangement, Subscription, ProfileSection, LoginCanditad, DepartmentManagement } from "../components/Icons/Icons";
 import { logout } from "../features/auth/authSlice";
-
 
 const Sidebar = () => {
   const location = useLocation();
@@ -13,79 +12,100 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
-  // Menu items based on your router configuration
-  const menuItems = [
+  const role = localStorage.getItem("role");
+  console.log(role)
+
+  // All possible menu items
+  const allMenuItems = [
     {
       path: "/",
-      name: "Dashboard",
+      name: "Dashboard Overview",
       icon: <DashboardIcon />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "Training Supervisor", "Department Heads", "HR/Employee Manager"]
     },
     {
       path: "/institution_management",
       name: "Institution Management",
       icon: <InstituteManagement />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer"]
+    },
+    {
+      path: "/department-management",
+      name: "Department Management",
+      icon: <DepartmentManagement />,
+      roles: ["HR/Employee Manager"]
     },
     {
       path: "/employee-management",
       name: "Employee Management",
       icon: <EmployeeManagement />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "HR/Employee Manager", "Training Supervisor", "Department Heads"]
     },
-
-
     {
       path: "/holiday-management",
       name: "Holiday Management",
       icon: <HolidayManagement />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "HR/Employee Manager"]
     },
-
     {
       path: "/shift-management",
       name: "Shift Management",
       icon: <ShiftManagement />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "HR/Employee Manager", "Training Supervisor", "Department Heads"]
+    },
+      {
+      path: "/login-credentials",
+      name: "Login Credentials",
+      icon: <LoginCanditad />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer","HR/Employee Manager"]
     },
     {
       path: "/location-management",
       name: "Location Management",
       icon: <LocationMangement />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "HR/Employee Manager"]
     },
-     {
+  
+    {
       path: "/subscription",
       name: "Subscription",
       icon: <Subscription />,
-    },
-    {
-      path: "/login-credentials",
-      name: "Login Credentials",
-      icon: <LoginCanditad />,
-    },
-      {
-      path: "/profile",
-      name: "Profile",
-      icon: <ProfileSection />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer"]
     },
 
-    // {
-    //   path: "/notification",
-    //   name: "Notification",
-    //   icon: "🔔",
-    // },
+     {
+      path: "/help",
+      name: "Contact Us",
+      icon: <Contact />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer"]
+    },
+    
+    {
+      path: "/settings",
+      name: "Settings",
+      icon: <ProfileSection />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer","HR/Employee Manager", "Training Supervisor", "Department Heads"]
+    },
     {
       path: "/terms-conditions",
       name: "Terms & Conditions",
       icon: <Terms />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", ]
     },
     {
       path: "/privacy-policy",
       name: "Privacy Policy",
       icon: <Privacy />,
+      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer"]
     },
-    {
-      path: "/help",
-      name: "Contact Us",
-      icon: <Contact />,
-    },
-
+   
   ];
+
+  // Filter menu items based on role
+  const menuItems = allMenuItems.filter(item => {
+    if (!role) return false;
+    return item.roles.includes(role);
+  });
 
   const showLogoutModal = () => {
     setIsLogoutModalVisible(true);
@@ -103,6 +123,7 @@ const Sidebar = () => {
   const handleLogout = () => {
     dispatch(logout());
     router("/auth/login");
+    localStorage.clear();
   };
 
   return (
@@ -112,7 +133,6 @@ const Sidebar = () => {
           <img
             src={"/icons/dashboard_logo.png"}
             title="company logo"
-
             className=" cursor-pointer w-20 h-20"
           />
         </div>
@@ -183,7 +203,7 @@ const Sidebar = () => {
         open={isLogoutModalVisible}
         onOk={handleLogoutOk}
         centered
-        closable={false} // This removes the cross (close) button
+        closable={false}
         onCancel={handleLogoutCancel}
         width={400}
         footer={[
@@ -221,7 +241,7 @@ const Sidebar = () => {
           </div>
         ]}
       >
-        <div style={{ textAlign: "center"  }}>
+        <div style={{ textAlign: "center" }}>
           <p className="pt-5 pb-3 text-xl font-bold">Do you want to Logout?</p>
         </div>
       </Modal>

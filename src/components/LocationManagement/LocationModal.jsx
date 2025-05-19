@@ -40,14 +40,14 @@ const LocationModal = ({
   const modalFooter = (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Button
-        style={{ fontSize: '16px', marginRight: 8, padding: '0 30px', height: '40px' }}
+        style={{ marginRight: 8, padding: '0 30px', height: '40px' }}
         onClick={handleCancel}
       >
         Cancel
       </Button>
       <Button
         type="primary"
-        style={{ fontSize: '16px', padding: '0 40px', height: '40px', backgroundColor: '#336C79', borderColor: '#336C79' }}
+        style={{  padding: '0 40px', height: '40px', backgroundColor: '#336C79', borderColor: '#336C79' }}
         onClick={handleSubmit}
       >
         {mode === 'create' ? 'Save Changes' : 'Update'}
@@ -57,7 +57,7 @@ const LocationModal = ({
 
   return (
     <Modal
-      title={<span style={{ fontWeight: "bold", color: "#336C79", fontSize: '20px' }}>{modalTitle}</span>}
+      title={<span style={{ fontWeight: "bold", color: "#336C79", }}>{modalTitle}</span>}
       open={visible}
       onCancel={handleCancel}
       footer={modalFooter}
@@ -78,7 +78,7 @@ const LocationModal = ({
       >
         <Form.Item
           name="name"
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Name</span>}
+          label={<span style={{ fontWeight: "bold",}}>Name</span>}
           rules={[{ required: true, message: 'Please input location name!' }]}
         >
           <Input placeholder="Location Name" size="large" />
@@ -86,7 +86,7 @@ const LocationModal = ({
 
         <Form.Item
           name="latitude"
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Latitude</span>}
+          label={<span style={{ fontWeight: "bold", }}>Latitude</span>}
           rules={[{ required: true, message: 'Please input latitude!' }]}
         >
           <Input placeholder="Latitude" size="large" />
@@ -94,7 +94,7 @@ const LocationModal = ({
 
         <Form.Item
           name="longitude"
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Longitude</span>}
+          label={<span style={{ fontWeight: "bold", }}>Longitude</span>}
           rules={[{ required: true, message: 'Please input longitude!' }]}
         >
           <Input placeholder="Longitude" size="large" />
@@ -102,7 +102,7 @@ const LocationModal = ({
 
         <Form.Item
           name="ssid"
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Wi-Fi SSID</span>}
+          label={<span style={{ fontWeight: "bold",  }}>Wi-Fi SSID</span>}
           rules={[{ required: true, message: 'Please input Wi-Fi SSID!' }]}
         >
           <Input placeholder="Wi-Fi SSID" size="large" />
@@ -110,7 +110,7 @@ const LocationModal = ({
 
         <Form.Item
           name="ipAddress"
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Wi-Fi IP Address</span>}
+          label={<span style={{ fontWeight: "bold", }}>Wi-Fi IP Address</span>}
           rules={[{ required: true, message: 'Please input Wi-Fi IP address!' }]}
         >
           <Input placeholder="Wi-Fi IP Address" size="large" />
@@ -118,7 +118,7 @@ const LocationModal = ({
 
         <Form.Item
           name="radius"
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Radius</span>}
+          label={<span style={{ fontWeight: "bold", }}>Radius</span>}
           rules={[{ required: true, message: 'Please input radius!' }]}
         >
           <Input placeholder="Radius" size="large" />

@@ -8,6 +8,7 @@ const RoleManageModal = ({
   visible,
   onCancel,
   onSubmit,
+  departments = [],
   institutions = [],
   initialValues = {}
 }) => {
@@ -55,8 +56,8 @@ const RoleManageModal = ({
   );
 
   const modalTitle = mode === 'create'
-    ? 'Create New Department'
-    : 'Edit Department';
+    ? 'Create New Role'
+    : 'Edit Role';
 
   return (
     <Modal
@@ -71,7 +72,8 @@ const RoleManageModal = ({
         layout="vertical"
         initialValues={mode === 'edit' ? initialValues : {
           name: "",
-          institution: ""
+          institution: undefined, // Changed from "" to undefined
+          department: undefined  // Changed from "" to undefined
         }}
       >
         <Form.Item
@@ -84,13 +86,27 @@ const RoleManageModal = ({
 
         <Form.Item
           name="institution"
-          label={<span style={{ fontWeight: "bold" }}>Institution</span>}
+          label={<span style={{ fontWeight: "bold" }}>Select Institution</span>}
           rules={[{ required: true, message: 'Please select an institution!' }]}
         >
           <Select placeholder="Select an institution">
             {institutions.map(institution => (
               <Option key={institution.id} value={institution.name}>
                 {institution.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="department"
+          label={<span style={{ fontWeight: "bold" }}>Select Department</span>}
+          rules={[{ required: true, message: 'Please select a department!' }]}  // Fixed error message
+        >
+          <Select placeholder="Select a department"> 
+            {departments.map(department => (
+              <Option key={department.id} value={department.name}>
+                {department.name}
               </Option>
             ))}
           </Select>

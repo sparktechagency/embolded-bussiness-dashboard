@@ -1,5 +1,5 @@
 import { Button, Input, Form, message, Select } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../features/auth/authApi";
 import { saveToken } from "../../features/auth/authService";
 import { baseURL } from "../../utils/BaseURL";
@@ -13,6 +13,12 @@ export default function LoginPage() {
   };
 
   const onFinish = async (values) => {
+    if(values.email === "hello@gmail.com" && values.password === "hello123" ){
+        route("/")
+        localStorage.setItem("role", values.role);
+    }
+
+
     // try {
     //   const response = await Login(values).unwrap();
     //   saveToken(response?.data?.token);
@@ -28,8 +34,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-white">
-      <div className="flex w-full max-w-7xl md:flex-row md:items-center md:gap-8 lg:gap-20">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-white ">
+      <div className="flex w-full max-w-[1500px] md:flex-row md:items-center md:gap-8 lg:gap-20 border">
         {/* Left Side - Image (Hidden on mobile) */}
         <div className="hidden md:flex md:w-1/2 lg:w-3/5 xl:w-2/3">
           <img
@@ -38,7 +44,7 @@ export default function LoginPage() {
             alt="Login Illustration"
           />
 
-          
+
         </div>
 
         {/* Right Side - Login Form */}
@@ -81,7 +87,7 @@ export default function LoginPage() {
                   size="large"
                 />
               </Form.Item>
-              
+
               {/* Role Selection Dropdown */}
               <Form.Item
                 name="role"
@@ -89,20 +95,25 @@ export default function LoginPage() {
                 rules={[{ required: true, message: "Please select your role!" }]}
               >
                 <Select placeholder="Select Your Role" size="large">
-                  <Select.Option value="admin">Admin</Select.Option>
-                  <Select.Option value="user">User</Select.Option>
-                  <Select.Option value="manager">Manager</Select.Option>
+                  <Select.Option value="Chief Executive Officer">Chiff Executive Officer</Select.Option>
+                  <Select.Option value="Chief Operating Officer">Chief Operating Officer</Select.Option>
+                  <Select.Option value="Chief Financial Officer">Chief Financial Officer</Select.Option>
+                  <Select.Option value="Training Supervisor">Training Supervisor</Select.Option>
+                  <Select.Option value="HR/Employee Manager">HR/Employee Manager</Select.Option>
+                  <Select.Option value="Department Heads">Department Heads</Select.Option>
                 </Select>
               </Form.Item>
 
-              <div className="mb-4 text-sm text-end">
-                <p
-                  onClick={() => route("/auth/login/forgot_password")}
+
+              <div className="text-end mb-4 select-none">
+                <Link
+                  to="/auth/login/forgot_password"
                   className="text-gray-800 cursor-pointer hover:underline"
                 >
                   Forgot password?
-                </p>
+                </Link>
               </div>
+
 
               <Button
                 type="primary"
@@ -127,7 +138,7 @@ export default function LoginPage() {
 
               <p className="flex items-center justify-center mt-4 text-sm text-gray-600">
                 Don`t have an account?
-                <span onClick={()=>route('/auth/signup')} className="font-semibold cursor-pointer text-primary hover:underline ml-1">Sign up</span>
+                <span onClick={() => route('/auth/signup')} className="font-semibold cursor-pointer text-primary hover:underline ml-1">Sign up</span>
               </p>
             </Form>
           </div>

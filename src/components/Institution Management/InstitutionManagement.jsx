@@ -94,7 +94,7 @@ function App() {
     "SL",
     "Institution",
     "Email",
-    "Phone",
+    "Phone Number",
     "Established Year",
     "Location Name",
     "Total Department",

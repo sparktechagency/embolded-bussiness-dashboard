@@ -60,7 +60,7 @@ const HolidayModal = ({
 
   return (
     <Modal
-      title={<span style={{ fontWeight: "bold", color: "#336C79", fontSize: '20px' }}>{modalTitle}</span>}
+      title={<span style={{ fontWeight: "bold", color: "#336C79",  }}>{modalTitle}</span>}
       open={visible}
       onCancel={handleCancel}
       footer={modalFooter}
@@ -79,7 +79,7 @@ const HolidayModal = ({
       >
         <Form.Item
           name="type"
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Holiday Type</span>}
+          label={<span style={{ fontWeight: "bold", }}>Holiday Type</span>}
           rules={[{ required: true, message: 'Please select holiday type!' }]}
         >
           <Select placeholder="Select holiday type">
@@ -92,14 +92,14 @@ const HolidayModal = ({
 
         <Form.Item
           name="name"
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Holiday Name</span>}
+          label={<span style={{ fontWeight: "bold", }}>Holiday Name</span>}
           rules={[{ required: true, message: 'Please input holiday name!' }]}
         >
           <Input placeholder="Write Holiday Name" size="large" />
         </Form.Item>
 
         <Form.Item
-          label={<span style={{ fontWeight: "bold", fontSize: '18px' }}>Select Date</span>}
+          label={<span style={{ fontWeight: "bold", }}>Select Date</span>}
         >
           <Form.Item
             name="startDate"

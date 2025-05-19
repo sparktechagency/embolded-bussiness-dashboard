@@ -54,11 +54,10 @@ function ShiftManagement() {
 
   const holidayColumns = [
     "SL",
-    "Holiday Type",
-    "Name",
-    "Start Date",
-    "End Date",
-    "Total Day",
+    "Shift Name",
+    "Shift Start Time",
+    "Shift End Time",
+    "Total User",
     "Status",
     "Action"
   ];
@@ -66,20 +65,18 @@ function ShiftManagement() {
   const HolidayData = [
     {
       id: 1,
-      HolidayType: "Government Holiday",
-      Name: "New Year's Day",
-      StartDate: "Jan 01, 2025",
-      EndDate: "Jan 01, 2025",
-      TotalDay: "1",
+      shiftName: "Government Holiday",
+      shiftStartTime: "09:00 AM",
+      shiftEndTime: "05:00 AM",
+      totalUser: 20,
       status: "Active"
     },
-    {
+      {
       id: 2,
-      HolidayType: "Government Holiday",
-      Name: "New Year's Day",
-      StartDate: "Jan 01, 2025",
-      EndDate: "Jan 01, 2025",
-      TotalDay: "1",
+      shiftName: "Government Holiday",
+      shiftStartTime: "09:00 AM",
+      shiftEndTime: "05:00 AM",
+      totalUser: 20,
       status: "Active"
     },
   ];

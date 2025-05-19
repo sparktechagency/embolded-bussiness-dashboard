@@ -114,68 +114,76 @@ function EmployeeManagement() {
     message.success('Department created successfully');
   };
 
-  const institutionColumns = [
-    "SL",
+  const employeeColumns = [
+    "ID",
+    "Employee Name",
     "Institution",
+    "Department",
+    "Role",
     "Email",
     "Phone",
-    "Established Year",
-    "Location Name",
-    "Total Department",
-    "Total Employee",
+    "Weekend",
+    "Shift Schedule",
     "Status",
-    "Action"
+    "Action",
   ];
 
   const departmentColumns = [
     "SL",
+    "Role Name",
     "Institution",
-    "Department Name",
-    "Total Employee",
+    "Department",
+    "Created",
     "Status",
     "Action"
   ];
 
-  const institutionData = [
+  const employeeData = [
     {
       id: 1,
+      employeName: "Dr. John Doe",
       institution: "Brookwood Baptist Health",
-      email: "C7oZ6@example.com",
+      department: "Clinical",
+      role: "Doctor",
+      email: "john.doe@example.com",
       phone: "+123 456 7890",
-      establishedYear: "1996",
-      location: "Brookwood Baptist Health",
-      totalDepartment: 5,
-      totalEmployee: 300,
-      status: "Active"
+      weekend: "Wednesday",
+      shiftSchedule: "9:00 AM - 5:00 PM",
+      status: "Active",
     },
-    {
-      id: 2,
+
+     {
+      id: 1,
+      employeName: "Dr. John Doe",
       institution: "Brookwood Baptist Health",
-      email: "C7oZ6@example.com",
+      department: "Clinical",
+      role: "Doctor",
+      email: "john.doe@example.com",
       phone: "+123 456 7890",
-      establishedYear: "1996",
-      location: "Brookwood Baptist Health",
-      totalDepartment: 5,
-      totalEmployee: 300,
-      status: "Active"
+      weekend: "Wednesday",
+      shiftSchedule: "9:00 AM - 5:00 PM",
+      status: "Active",
     },
+    
   ];
 
   const departmentData = [
     {
       id: 1,
+      roleName: "Doctor",
       institution: "Brookwood Baptist Health",
-      name: "Spark tech",
-      totalEmployee: 300,
+      department: "Clinical",
+      created: "Jan 01, 2025",
       status: "Active"
     },
     {
       id: 2,
+      roleName: "Doctor",
       institution: "Brookwood Baptist Health",
-      name: "Spark tech",
-      totalEmployee: 300,
+      department: "Clinical",
+      created: "Jan 01, 2025",
       status: "Active"
-    }
+    },
   ];
 
 
@@ -235,7 +243,7 @@ function EmployeeManagement() {
             </div>
           )}
           {activeTab === 'role' && (
-            <div className='flex items-center gap-3'>
+            <div className='flex items-center justify-end gap-3'>
               <Button
                 type="primary"
                 className="bg-[#336C79]"
@@ -250,7 +258,7 @@ function EmployeeManagement() {
 
       <div className="bg-white rounded-md shadow">
         {activeTab === 'employee' ? (
-          <EmployeTableHead activeTab={activeTab} data={institutionData} columns={institutionColumns} />
+          <EmployeTableHead activeTab={activeTab} data={employeeData} columns={employeeColumns} />
         ) : (
           <RoleTableHead activeTab={activeTab} data={departmentData} columns={departmentColumns} />
         )}

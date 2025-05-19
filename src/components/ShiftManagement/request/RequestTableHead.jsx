@@ -27,6 +27,10 @@ const RequestTableHead = ({ columns, data }) => {
             <h3 className="py-10 text-center">No Data Available</h3>
           )}
         </div>
+        <div className="flex justify-end gap-3">
+          <button className="bg-red-500 px-3 py-2 rounded text-xs  text-white ">Reject All</button>
+          <button className="bg-primary px-3 py-2 rounded text-xs text-white ">Approve All</button>
+        </div>
       </div>
     </div>
   );

@@ -72,7 +72,7 @@ const DepartmentFormModal = ({
         layout="vertical"
         initialValues={mode === 'edit' ? initialValues : {
           name: "",
-          institution: ""
+          institution: undefined // Changed from empty string to undefined
         }}
       >
         <Form.Item 
@@ -85,7 +85,7 @@ const DepartmentFormModal = ({
 
         <Form.Item 
           name="institution" 
-          label={<span style={{ fontWeight: "bold" }}>Institution</span>}
+          label={<span style={{ fontWeight: "bold" }}>Choose Institution</span>}
           rules={[{ required: true, message: 'Please select an institution!' }]}
         >
           <Select placeholder="Select an institution">

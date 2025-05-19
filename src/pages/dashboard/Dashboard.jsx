@@ -1,17 +1,27 @@
 import { Typography } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import AttendanceBarChart from '../../components/Admin/AttendanceBarChart';
 import AttendanceChart from '../../components/Admin/AttendanceChart';
 import AbsentTableHead from '../../components/Admin/AbsentTableHead';
 import LateTableHead from '../../components/Admin/LateTableHead';
 import AdminStatistics from '../../components/Statistics/AdminStatistics';
+import DepartmentStatistics from '../../components/Statistics/DepartmentStatistics';
 
 
 const { Title } = Typography;
 
 const ParkingDashboard = () => {
+  const role = localStorage.getItem("role");
+  
 
+  useEffect(() => {
+     const role = localStorage.getItem("role");
+     if(!role){
+       window.location.href = "/auth/login";
+     }
+  }, [role])
+  
 
 
 
@@ -64,7 +74,8 @@ const ParkingDashboard = () => {
         <AttendanceChart />
         <AttendanceBarChart />
         {/* Statistics Card */}
-        <AdminStatistics />
+        
+        {role === "Chief Executive Officer" || role === "Chief Operating Officer" || role === "Chief Financial Officer" ? <AdminStatistics /> : <DepartmentStatistics />}
 
         {/* Today's Entry */}
         <div className="md:col-span-3">

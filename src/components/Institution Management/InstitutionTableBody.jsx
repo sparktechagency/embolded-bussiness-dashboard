@@ -89,7 +89,7 @@ const InstitutionTableBody = ({ item, list }) => {
         centered
       >
         <div className="text-center py-4">
-          <p className="text-base font-medium text-red-500 mb-6">Are you sure Remove this Institution Account</p>
+          <p className="text-base font-medium text-black mb-6">Are you sure Remove this Institution Account</p>
           <div className="flex justify-center gap-4">
             <Button
               onClick={() => setRemoveModalVisible(false)}

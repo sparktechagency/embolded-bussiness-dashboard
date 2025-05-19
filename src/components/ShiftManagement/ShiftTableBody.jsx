@@ -46,13 +46,12 @@ const ShiftTableBody = ({ item, list }) => {
   return (
     <>
       {/* Table Row */}
-      <div className={`grid grid-cols-8 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
+      <div className={`grid grid-cols-7 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.HolidayType}</div>
-        <div className="flex items-center justify-center py-3 ml-4">{item.Name}</div>
-        <div className="flex items-center justify-center py-3">{item.StartDate}</div>
-        <div className="flex items-center justify-center py-3">{item.EndDate}</div>
-        <div className="flex items-center justify-center py-3">{item.TotalDay}</div>
+        <div className="flex items-center justify-center py-3 mr-3">{item.shiftName}</div>
+        <div className="flex items-center justify-center py-3 ml-4">{item.shiftStartTime}</div>
+        <div className="flex items-center justify-center py-3">{item.shiftEndTime}</div>
+        <div className="flex items-center justify-center py-3">{item.totalUser}</div>
         <div className="flex items-center justify-center py-3">{item.status}</div>
         <div className="flex items-center justify-center gap-5 border rounded border-primary py-1 px-2">
           <Button

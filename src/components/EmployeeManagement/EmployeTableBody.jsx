@@ -24,7 +24,7 @@ const EmployeTableBody = ({ item, list }) => {
   };
 
   const handleViewDetails = () => {
-        router("/employee-management/details")
+    router("/employee-management/details")
   };
 
   const handleSwitchChange = (checked) => {
@@ -45,15 +45,16 @@ const EmployeTableBody = ({ item, list }) => {
   return (
     <>
       {/* Table Row */}
-      <div className={`grid grid-cols-10 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
+      <div className={`grid grid-cols-11 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.institution}</div>
-        <div className="flex items-center justify-center py-3 ml-4">{item.email}</div>
+        <div className="flex items-center justify-center py-3 mr-3">{item.employeName}</div>
+        <div className="flex items-center justify-center py-3 ml-4">{item.institution}</div>
+        <div className="flex items-center justify-center py-3">{item.department}</div>
+        <div className="flex items-center justify-center py-3">{item.role}</div>
+        <div className="flex items-center justify-center py-3">{item.email}</div>
         <div className="flex items-center justify-center py-3">{item.phone}</div>
-        <div className="flex items-center justify-center py-3">{item.establishedYear}</div>
-        <div className="flex items-center justify-center py-3">{item.location}</div>
-        <div className="flex items-center justify-center py-3">{item.totalDepartment}</div>
-        <div className="flex items-center justify-center py-3">{item.totalEmployee}</div>
+        <div className="flex items-center justify-center py-3">{item.weekend}</div>
+        <div className="flex items-center justify-center py-3">{item.shiftSchedule}</div>
         <div className="flex items-center justify-center py-3">{item.status}</div>
         <div className="flex items-center justify-center border rounded border-primary py-1 px-2">
           <Button
@@ -66,7 +67,7 @@ const EmployeTableBody = ({ item, list }) => {
             type="text"
             icon={<EditOutlined />}
             className="text-orange-500 hover:text-orange-600"
-            onClick={()=>router(`/employee-management/add-new-Employee/${item.id}`)}
+            onClick={() => router(`/employee-management/add-new-Employee/${item.id}`)}
           />
           <Button
             type="text"
@@ -93,7 +94,7 @@ const EmployeTableBody = ({ item, list }) => {
         centered
       >
         <div className="text-center py-4">
-          <p className="text-base font-medium text-red-500 mb-6">Are you sure Remove this Institution Account</p>
+          <p className="text-base font-medium text-black mb-6">Are you sure Remove this Employee</p>
           <div className="flex justify-center gap-4">
             <Button
               onClick={() => setRemoveModalVisible(false)}
@@ -122,7 +123,7 @@ const EmployeTableBody = ({ item, list }) => {
         centered
       >
         <div className="text-center py-4">
-          <p className="text-lg font-medium mb-6">Are you sure Turn off this Institution Account?</p>
+          <p className="text-lg font-medium mb-6">Are you sure Turn off this Employee</p>
           <div className="flex justify-center gap-4">
             <Button
               onClick={() => setSwitchModalVisible(false)}
