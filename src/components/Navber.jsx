@@ -206,14 +206,14 @@ const NotificationPopup = () => {
 
   return (
     <div className="flex items-center justify-between">
-      {path.pathname === "/reservation" ? (
+      {path.pathname === "/employee-management" || path.pathname === "/all-user" ? (
         <div className="flex items-center justify-between w-7/12">
           <Input
             size="large"
             onChange={handleSearch}
             placeholder="Please Input your Order Number"
             style={{
-              borderColor: "#E8505B",
+              borderColor: "#336C79",
               color: "#333",
             }}
             suffix={

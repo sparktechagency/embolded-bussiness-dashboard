@@ -92,12 +92,6 @@ function LocationManagement() {
     { value: 'Inactive', label: 'Inactive' },
   ];
 
-  const institutions = [
-    { value: 'All', label: 'All' },
-    { value: 'Brookwood Baptist Health', label: 'Brookwood Baptist Health' },
-    { value: ' USA Health', label: ' USA Health' },
-    { value: 'University of Alabama Hospital', label: ' University of Alabama Hospital' },
-  ];
 
 
 
@@ -108,7 +102,7 @@ function LocationManagement() {
           <CustomFilterDropdown options={statusOptions} />
         </div>
         <div className='w-2/12'>
-          <CustomFilterDropdown options={institutions}/>
+          <CustomFilterDropdown />
         </div>
         <Button
           type="primary"

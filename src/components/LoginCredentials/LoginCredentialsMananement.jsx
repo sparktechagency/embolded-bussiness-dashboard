@@ -50,20 +50,13 @@ function LoginCredentialsMananement() {
 
 
 
-  const institutions = [
-    { value: 'All', label: 'All' },
-    { value: 'Brookwood Baptist Health', label: 'Brookwood Baptist Health' },
-    { value: ' USA Health', label: ' USA Health' },
-    { value: 'University of Alabama Hospital', label: ' University of Alabama Hospital' },
-  ];
-
 
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6 flex justify-end gap-3">
         <div className='w-2/12'>
-          <CustomFilterDropdown options={institutions} />
+          <CustomFilterDropdown />
         </div>
         <Button
         onClick={()=> router("/login-credentials/new-role")}

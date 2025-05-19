@@ -194,12 +194,7 @@ function EmployeeManagement() {
     { value: 'Softvance', label: 'Softvance' },
   ];
 
-   const institutionOptions = [
-    { value: 'All', label: 'All' },
-    { value: 'BrookwoodBaptistHealth', label: 'Brookwood Baptist Health' },
-    { value: ' USA Health ', label: 'USA Health ' },
-    { value: ' University of Alabama Hospital ', label: ' University of Alabama Hospital ' },
-  ];
+ 
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen ">
@@ -229,7 +224,7 @@ function EmployeeManagement() {
                 <CustomFilterDropdown options={departmentOptions} />
               </div>
               <div className='w-4/12'>
-                <CustomFilterDropdown options={institutionOptions} />
+                <CustomFilterDropdown />
               </div>
 
               <Button

@@ -16,6 +16,8 @@ export default function LoginPage() {
     if(values.email === "hello@gmail.com" && values.password === "hello123" ){
         route("/")
         localStorage.setItem("role", values.role);
+    } else{
+      message.error("Wrong email or password");
     }
 
 

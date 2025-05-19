@@ -28,6 +28,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import UserProfile from "./pages/UserProfile";
 import DepartmentManagement from "./components/DepartmentManagement/DepartmentManagement";
+import AllUserTable from "./components/ShiftManagement/ShiftManagementAllUser/AllUserTable";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,12 @@ const router = createBrowserRouter([
         path: "holiday-management",
         element: <HolidayManagement />
       },
+
+      {
+        path: "all-user",
+        element: <AllUserTable />
+      },
+
       {
         path: "shift-management",
         children: [
