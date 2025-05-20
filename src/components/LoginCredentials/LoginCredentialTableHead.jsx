@@ -7,7 +7,7 @@ const LoginCredentialTableHead = ({ columns, data }) => {
     <div className="overflow-x-auto">
       <div className="min-w-[1200px] w-full bg-transparent rounded-lg shadow-md space-y-3">
         {/* Header */}
-        <div className={`grid grid-cols-9 text-center border-2 border-opacity-50 rounded-lg bg-surfacePrimary px-2 border-primary`}>
+        <div className={`grid grid-cols-8 text-center border-2 border-opacity-50 rounded-lg bg-surfacePrimary px-2 border-primary`}>
           {columns.map((column, index) => (
             <div key={index} className="py-3 font-semibold text-center">
               {column}

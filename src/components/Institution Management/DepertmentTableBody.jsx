@@ -134,14 +134,13 @@ const DepertmentTableBody = ({ item, list }) => {
       </Modal>
 
 
-      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle="Hospital Details"
-        imageAlt="Hospital building"
+      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle="Department Information"
+        imageAlt="Hospital building" sectionTitle="Department Information"
         details={[
-          { label: "Name", value: "City General Hospital" },
-          { label: "Phone Number", value: "+1234567890" },
-          { label: "Email", value: "contact@cityhospital.com" },
-          { label: "Address", value: "123 Medical Drive, Health City" },
-          { label: "Status", value: "Active" }
+          { label: "Institution Name", value: "Brookwood Baptist Health " },
+          { label: "Department Name", value: "Spark tech" },
+          { label: "Total Employee", value: "200" },
+          { label: "Status", value: "active" },
         ]} />
 
 

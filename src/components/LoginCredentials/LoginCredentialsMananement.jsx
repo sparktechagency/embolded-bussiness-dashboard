@@ -1,7 +1,7 @@
-import { Button, message, Select } from 'antd';
+import { Button, Select } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import CustomFilterDropdown from '../CustomFilterDropdown';
 import LoginCredentialTableHead from './LoginCredentialTableHead';
-import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -11,40 +11,38 @@ function LoginCredentialsMananement() {
 
   // State for modals
 
-  const LocationColumns = [
+  const loginColumns = [
     "SL",
-    "Location Name",
-    "Latitude",
-    "Longitude",
-    "Wi-Fi SSID",
-    "Wi-Fi IP-Address",
-    "Radius",
+    "User Name",
+    "Email",
+    "Password",
+    "Role",
+    "Created at",
     "Status",
     "Action"
   ];
 
-  const HolidayData = [
+  const loginData = [
     {
       id: 1,
-      locationName: "Brookwood Baptist Health",
-      latitude: "40.7128",
-      longitude: "74.0060",
-      wifiSSID: "Institution-WiFi",
-      wifiIPAddress: "10.0.60.85",
-      redius: "600 meters",
+      userName: "Brookwood Baptist Health",
+      email: "rpsabbir.ahmed@gmail.com",
+      password: "123456789",
+      role: "Brookwood Baptist Health",
+      createdAt: "April 25, 2025",
+      status: "Active"
+    },
+    {
+      id: 2,
+      userName: "Brookwood Baptist Health",
+      email: "rpsabbir.ahmed@gmail.com",
+      password: "123456789",
+      role: "Brookwood Baptist Health",
+      assignRole: "HR/Employee Management",
+      createdAt: "April 25, 2025",
       status: "Active"
     },
 
-    {
-      id: 1,
-      locationName: "Brookwood Baptist Health",
-      latitude: "40.7128",
-      longitude: "74.0060",
-      wifiSSID: "Institution-WiFi",
-      wifiIPAddress: "10.0.60.85",
-      redius: "600 meters",
-      status: "Active"
-    },
   ];
 
 
@@ -59,7 +57,7 @@ function LoginCredentialsMananement() {
           <CustomFilterDropdown />
         </div>
         <Button
-        onClick={()=> router("/login-credentials/new-role")}
+          onClick={() => router("/login-credentials/new-role")}
           type="primary"
           className="bg-[#336C79]"
         >
@@ -67,7 +65,7 @@ function LoginCredentialsMananement() {
         </Button>
       </div>
 
-      <LoginCredentialTableHead data={HolidayData} columns={LocationColumns} />
+      <LoginCredentialTableHead data={loginData} columns={loginColumns} />
     </div>
   );
 }

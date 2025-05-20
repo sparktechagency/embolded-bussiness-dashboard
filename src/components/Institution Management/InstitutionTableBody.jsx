@@ -138,8 +138,8 @@ const InstitutionTableBody = ({ item, list }) => {
       </Modal>
 
 
-      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle="Hospital Details"
-        imageAlt="Hospital building"
+      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle="Institution Information"
+        imageAlt="Institution Information"
         details={[
           { label: "Name", value: "City General Hospital" },
           { label: "Phone Number", value: "+1234567890" },

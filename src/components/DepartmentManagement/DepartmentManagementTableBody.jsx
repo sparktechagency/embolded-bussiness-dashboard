@@ -2,7 +2,6 @@ import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { Button, Modal, Switch } from "antd";
 import { useState } from "react";
 import ViewDetailsModal from "../Institution Management/ViewDetailsModal";
-import DepartmentFormModal from "../Institution Management/DepartmentFormModal";
 import DepartmentManagementFormModal from "./DepartmentManagementFormModal";
 
 const DepartmentManagementTableBody = ({ item, list }) => {
@@ -134,7 +133,7 @@ const DepartmentManagementTableBody = ({ item, list }) => {
       </Modal>
 
 
-      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle="Hospital Details"
+      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle=""
         imageAlt="Hospital building"
         details={[
           { label: "Name", value: "City General Hospital" },

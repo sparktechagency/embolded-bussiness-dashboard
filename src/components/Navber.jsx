@@ -211,7 +211,7 @@ const NotificationPopup = () => {
           <Input
             size="large"
             onChange={handleSearch}
-            placeholder="Please Input your Order Number"
+            placeholder="Search Here..."
             style={{
               borderColor: "#336C79",
               color: "#333",

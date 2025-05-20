@@ -97,12 +97,12 @@ export default function LoginPage() {
                 rules={[{ required: true, message: "Please select your role!" }]}
               >
                 <Select placeholder="Select Your Role" size="large">
-                  <Select.Option value="Chief Executive Officer">Chiff Executive Officer</Select.Option>
-                  <Select.Option value="Chief Operating Officer">Chief Operating Officer</Select.Option>
-                  <Select.Option value="Chief Financial Officer">Chief Financial Officer</Select.Option>
-                  <Select.Option value="Training Supervisor">Training Supervisor</Select.Option>
+                  <Select.Option value="Chief Executive Officer">Chiff Executive Officer (CEO)</Select.Option>
+                  <Select.Option value="Chief Financial Officer">Chief Financial Officer (CFO)</Select.Option>
+                  <Select.Option value="Chief Operating Officer">Chief Operating Officer (COO)</Select.Option>
                   <Select.Option value="HR/Employee Manager">HR/Employee Manager</Select.Option>
                   <Select.Option value="Department Heads">Department Heads</Select.Option>
+                  <Select.Option value="Training Supervisor">Training Supervisor</Select.Option>
                 </Select>
               </Form.Item>
 

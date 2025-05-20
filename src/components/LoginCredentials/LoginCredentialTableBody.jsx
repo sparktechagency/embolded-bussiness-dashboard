@@ -16,6 +16,10 @@ const LoginCredentialTableBody = ({ item, list }) => {
     setRemoveModalVisible(true);
   };
 
+   const handleEdit = (id) => {
+      router(`/login-credentials/new-role/${id}`);
+  };
+
 
   const handleSwitchChange = (checked) => {
     setSwitchModalVisible(true);
@@ -35,21 +39,20 @@ const LoginCredentialTableBody = ({ item, list }) => {
   return (
     <>
       {/* Table Row */}
-      <div className={`grid grid-cols-9 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
+      <div className={`grid grid-cols-8 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.locationName}</div>
-        <div className="flex items-center justify-center py-3 ml-4">{item.latitude}</div>
-        <div className="flex items-center justify-center py-3">{item.longitude}</div>
-        <div className="flex items-center justify-center py-3">{item.wifiSSID}</div>
-        <div className="flex items-center justify-center py-3">{item.wifiIPAddress}</div>
-        <div className="flex items-center justify-center py-3">{item.redius}</div>
+        <div className="flex items-center justify-center py-3 mr-3">{item.userName}</div>
+        <div className="flex items-center justify-center py-3 ml-4">{item.email}</div>
+        <div className="flex items-center justify-center py-3">{item.password}</div>
+        <div className="flex items-center justify-center py-3">{item.role}</div>
+        <div className="flex items-center justify-center py-3">{item.createdAt}</div>
         <div className="flex items-center justify-center py-3">{item.status}</div>
         <div className="flex items-center justify-center gap-2 border rounded border-primary py-1 px-2">
           <Button
             type="text"
             icon={<EditOutlined />}
             className="text-orange-500 hover:text-orange-600"
-          // onClick={handleEdit}
+          onClick={()=>handleEdit(item.id)}
           />
           <Button
             type="text"

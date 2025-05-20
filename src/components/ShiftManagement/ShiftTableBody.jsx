@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
+import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { Button, Modal, Switch } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +25,7 @@ const ShiftTableBody = ({ item, list }) => {
   };
 
   const handleViewDetails = () => {
-        router("/employee-management/details")
+    router("/shift-management/all-user")
   };
 
   const handleSwitchChange = (checked) => {
@@ -62,9 +62,9 @@ const ShiftTableBody = ({ item, list }) => {
           />
           <Button
             type="text"
-            icon={<DeleteOutlined />}
-            className="text-red-500 hover:text-red-600"
-            onClick={handleDelete}
+            icon={<EyeOutlined />}
+            className="text-amber-500 hover:text-amber-600"
+            onClick={handleViewDetails}
           />
           <Switch
             checked={switchStatus}
@@ -134,7 +134,7 @@ const ShiftTableBody = ({ item, list }) => {
       </Modal>
 
       <NewShiftModal mode="edit" visible={editModalVisible} onCancel={() => setEditModalVisible(false)} />
-      
+
     </>
   );
 };

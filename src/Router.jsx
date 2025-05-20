@@ -83,10 +83,14 @@ const router = createBrowserRouter([
             path: "add-new-Employee/:id",
             element: <NewEmploye />
           },
+          // {
+          //   path: "details",
+          //   element: <EmployeeInformation />
+          // },
           {
-            path: "details",
-            element: <EmployeeInformation />
-          },
+        path: "all-user",
+        element: <AllUserTable />
+      },
         ]
       },
 
@@ -133,6 +137,10 @@ const router = createBrowserRouter([
           },
           {
             path: "new-role",
+            element: <NewRole />
+          },
+           {
+            path: "new-role/:id",
             element: <NewRole />
           }
         ]
