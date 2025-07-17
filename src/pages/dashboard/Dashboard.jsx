@@ -15,12 +15,12 @@ const ParkingDashboard = () => {
   const role = localStorage.getItem("role");
   
 
-  useEffect(() => {
-     const role = localStorage.getItem("role");
-     if(!role){
-       window.location.href = "/auth/login";
-     }
-  }, [role])
+  // useEffect(() => {
+  //    const role = localStorage.getItem("role");
+  //    if(!role){
+  //      window.location.href = "/auth/login";
+  //    }
+  // }, [role])
   
 
 

@@ -1,6 +1,6 @@
 import { Button, Form, Input, notification } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { useSignupMutation } from "../../features/auth/authApi";
+import { useSignupMutation } from '../../features/auth/authApi';
 import { baseURL } from "../../utils/BaseURL";
 
 export default function SignupPage() {
@@ -20,8 +20,10 @@ export default function SignupPage() {
 
     try {
       const response = await signup(data).unwrap();
-      localStorage.setItem("businessLoginId", response?.data?._id);
-      route(`/auth/signup/verify?email=${values?.email}`);
+      if (response.success) {
+        localStorage.setItem("BUSINESS_OWNER_ID", response?.data?._id);
+        route(`/auth/signup/verify?email=${values?.email}`);
+      }
     } catch (error) {
       let errorMessage = "Signup failed. Please try again.";
       if (error.status === 400) {

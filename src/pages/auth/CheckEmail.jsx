@@ -1,10 +1,13 @@
 import { Button } from "antd";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function CheckEmail() {
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email");
+  console.log(email);
   const route = useNavigate();
-  
+
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-white">
       <div className="flex flex-col items-center w-full max-w-6xl md:flex-row">
@@ -38,15 +41,15 @@ export default function CheckEmail() {
             {/* Button */}
             <div className="mt-6 ">
               <Button
-                onClick={() => window.location.href = "https://mail.google.com/mail/"}
+                onClick={() => route('/auth/login/set_password')}
                 type="primary"
                 className="w-full"
                 size="large"
               >
-                Open email app
+                Open email app And Reset
               </Button>
             </div>
-              <p className="mt-6 text-sm font-normal text-center text-black ">Didn’t receive the email? <span className="text-sm font-normal text-stokePrimary cursor-pointer">Click to resend</span></p>
+            <p className="mt-6 text-sm font-normal text-center text-black ">Didn’t receive the email? <span className="text-sm font-normal text-stokePrimary cursor-pointer">Click to resend</span></p>
             {/* Back to Login */}
             <button
               onClick={() => route('/auth/login')}

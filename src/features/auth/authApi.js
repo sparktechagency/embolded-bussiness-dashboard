@@ -4,10 +4,10 @@ export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Signup
     signup: builder.mutation({
-      query: (newUser) => ({
-        url: "/user/create-businessman",
+      query: (data) => ({
+        url: "/users/",
         method: "POST",
-        body: newUser,
+        body: data,
       }),
     }),
 
@@ -32,23 +32,38 @@ export const authApi = baseApi.injectEndpoints({
     // Forgot Password
     forgotPassword: builder.mutation({
       query: (data) => ({
-        url: "/auth/dashboard/forget-password",
+        url: "/auth/forget-password",
         method: "POST",
         body: data,
       }),
     }),
 
-    // Reset Password
-    resetPassword: builder.mutation({
+
+    forgotPasswordVerifyOtp: builder.mutation({
       query: (data) => ({
-        url: "/auth/dashboard/reset-password",
+        url: "/auth/verify-email",
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
         body: data,
       }),
     }),
+
+    resetPassword: builder.mutation({ 
+      query: ({ data, token }) => {
+        console.log('API Query - Data:', data);
+        console.log('API Query - Token:', token)
+        return {
+          url: "/auth/reset-password", 
+          method: "POST", 
+          body: data,
+          headers: {
+            resetToken: token,
+            'Content-Type': 'application/json',
+          },
+        };
+      }, 
+    }),
+
+
 
     // Resend OTP
     resendOtp: builder.mutation({
@@ -60,6 +75,7 @@ export const authApi = baseApi.injectEndpoints({
     }),
   }),
 });
+
 
 // Export hooks
 export const {

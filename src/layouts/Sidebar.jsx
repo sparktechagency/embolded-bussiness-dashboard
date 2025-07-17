@@ -3,7 +3,7 @@ import { useState } from "react";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Contact, DashboardIcon, EmployeeManagement, HolidayManagement, InstituteManagement, Privacy, ShiftManagement, Terms, LocationMangement, Subscription, ProfileSection, LoginCanditad, DepartmentManagement } from "../components/Icons/Icons";
+import { Contact, DashboardIcon, DepartmentManagement, EmployeeManagement, HolidayManagement, InstituteManagement, LocationMangement, LoginCanditad, Privacy, ProfileSection, ShiftManagement, Subscription, Terms } from "../components/Icons/Icons";
 import { logout } from "../features/auth/authSlice";
 
 const Sidebar = () => {
@@ -21,84 +21,84 @@ const Sidebar = () => {
       path: "/",
       name: "Dashboard Overview",
       icon: <DashboardIcon />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "Training Supervisor", "Department Heads", "HR/Employee Manager"]
+      roles: ["BUSINESS_OWNER", "SUPER_ADMIN", "DEPARTMENT_MANAGER", "HR"]
     },
     {
       path: "/institution_management",
       name: "Institution Management",
       icon: <InstituteManagement />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer"]
+      roles: ["BUSINESS_OWNER"]
     },
     {
       path: "/department-management",
       name: "Department Management",
       icon: <DepartmentManagement />,
-      roles: ["HR/Employee Manager"]
+      roles: ["HR"]
     },
     {
       path: "/employee-management",
       name: "Employee Management",
       icon: <EmployeeManagement />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "HR/Employee Manager", "Training Supervisor", "Department Heads"]
+      roles: ["BUSINESS_OWNER", "SUPER_ADMIN", "DEPARTMENT_MANAGER", "HR"]
     },
     {
       path: "/holiday-management",
       name: "Holiday Management",
       icon: <HolidayManagement />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "HR/Employee Manager"]
+      roles: ["BUSINESS_OWNER", "HR"]
     },
     {
       path: "/shift-management",
       name: "Shift Management",
       icon: <ShiftManagement />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "HR/Employee Manager", "Training Supervisor", "Department Heads"]
+      roles: ["BUSINESS_OWNER", "SUPER_ADMIN", "DEPARTMENT_MANAGER", "HR"]
     },
-      {
+    {
       path: "/login-credentials",
       name: "Login Credentials",
       icon: <LoginCanditad />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer","HR/Employee Manager"]
+      roles: ["BUSINESS_OWNER", "HR"]
     },
     {
       path: "/location-management",
       name: "Location Management",
       icon: <LocationMangement />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", "HR/Employee Manager"]
+      roles: ["BUSINESS_OWNER", "HR"]
     },
-  
+
     {
       path: "/subscription",
       name: "Subscription",
       icon: <Subscription />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer"]
+      roles: ["BUSINESS_OWNER"]
     },
 
-     {
+    {
       path: "/help",
       name: "Contact Us",
       icon: <Contact />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer"]
+      roles: ["BUSINESS_OWNER"]
     },
-    
+
     {
       path: "/settings",
       name: "Settings",
       icon: <ProfileSection />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer","HR/Employee Manager", "Training Supervisor", "Department Heads"]
+      roles: ["BUSINESS_OWNER", "SUPER_ADMIN", "DEPARTMENT_MANAGER", "HR"]
     },
     {
       path: "/terms-conditions",
       name: "Terms & Conditions",
       icon: <Terms />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer", ]
+      roles: ["BUSINESS_OWNER"]
     },
     {
       path: "/privacy-policy",
       name: "Privacy Policy",
       icon: <Privacy />,
-      roles: ["Chief Executive Officer", "Chief Operating Officer", "Chief Financial Officer"]
+      roles: ["BUSINESS_OWNER"]
     },
-   
+
   ];
 
   // Filter menu items based on role

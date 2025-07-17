@@ -1,21 +1,20 @@
 import { Button, Card, Divider, Input, Space, Typography, message } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useResendOtpMutation, useVerifyEmailMutation } from "../../features/auth/authApi";
 import { saveToken } from "../../features/auth/authService";
-import SuccessSign from "../auth/SuccessSign";
 
 const { Title, Text } = Typography;
 
-const Verification = () => {
+const ForgotOtp = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
   const [code, setCode] = useState(["", "", "", ""]);
-  const [success, setSuccess] = useState(false);
   const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
   const [resendOtp, { isLoading: resendLoading }] = useResendOtpMutation();
   const [timer, setTimer] = useState(60);
   const inputsRef = useRef([]);
+  const route = useNavigate();
 
   useEffect(() => {
     inputsRef.current[0]?.focus();
@@ -70,9 +69,10 @@ const Verification = () => {
 
     try {
       const response = await verifyEmail({ email, oneTimeCode: parseFloat(enteredCode) }).unwrap();
+      console.log(response)
       if (response.success) {
-        saveToken(response?.data?.accessToken);
-        setSuccess(true);
+        saveToken(response?.data);
+        route(`/auth/login/set_password?token=${response?.data}`)
       }
     } catch (error) {
       console.error("OTP verification failed:", error);
@@ -95,10 +95,6 @@ const Verification = () => {
     }
   };
 
-  if (success) {
-    return <SuccessSign />;
-  }
-
   return (
     <div className="flex items-center justify-center min-h-screen">
       <Card className="">
@@ -120,7 +116,7 @@ const Verification = () => {
                 Verify Your Email
               </Title>
               <Text type="secondary" className="block text-center">
-                We`ve sent a 6-digit verification code to {email}
+                We`ve sent a 4-digit verification code to {email}
               </Text>
 
               <Divider />
@@ -177,4 +173,4 @@ const Verification = () => {
   );
 };
 
-export default Verification;
+export default ForgotOtp;

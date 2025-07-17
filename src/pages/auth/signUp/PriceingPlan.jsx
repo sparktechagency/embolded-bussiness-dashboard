@@ -1,22 +1,21 @@
+import { Button, Card, Typography } from 'antd';
 import React from 'react';
-import { Button, Card, Typography, Space } from 'antd';
-import { PlusOutlined, TeamOutlined, RocketOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
 // Custom check icon component
 const CheckIcon = () => (
-  <svg 
-    className="w-5 h-5 text-green-500" 
-    fill="none" 
-    stroke="currentColor" 
-    viewBox="0 0 24 24" 
+  <svg
+    className="w-5 h-5 text-green-500"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <path 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      strokeWidth="2" 
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
       d="M5 13l4 4L19 7"
     />
   </svg>
@@ -44,17 +43,17 @@ const PlanCard = ({ icon, title, price, features }) => (
       </div>
       <Text className="text-gray-500 mb-4">Billed annually.</Text>
     </div>
-    
+
     <div className="flex-grow">
       {features.map((feature, index) => (
         <FeatureItem key={index}>{feature}</FeatureItem>
       ))}
     </div>
-    
-    <Button 
-      type="primary" 
-      size="large" 
-      block 
+
+    <Button
+      type="primary"
+      size="large"
+      block
       className="mt-4 "
     >
       Get started
@@ -103,12 +102,12 @@ const PricingPlans = () => {
   ];
 
   return (
-    
-        <div className="min-h-screen flex flex-col justify-center py-12">
+
+    <div className="min-h-screen flex flex-col justify-center py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Skip button at the top right */}
-        <h3 className='text-base cursor-pointer font-medium mb-4 text-end text-primary'>Skip</h3>
-        
+        {/* <h3 className='text-base cursor-pointer font-medium mb-4 text-end text-primary'>Skip</h3> */}
+
         {/* Main content */}
         <div className="">
           {/* Header section */}

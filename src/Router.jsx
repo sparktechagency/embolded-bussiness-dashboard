@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import DepartmentManagement from "./components/DepartmentManagement/DepartmentManagement";
 import EmployeeInformation from "./components/EmployeeManagement/EmployeeInformation";
 import EmployeeManagement from "./components/EmployeeManagement/EmployeeManagement";
 import NewEmploye from "./components/EmployeeManagement/NewEmploye";
@@ -7,12 +8,13 @@ import InstitutionManagement from "./components/Institution Management/Instituti
 import LocationManagement from "./components/LocationManagement/LocationManagement";
 import LoginCredentialsMananement from "./components/LoginCredentials/LoginCredentialsMananement";
 import NewRole from "./components/LoginCredentials/NewRole";
-import Profile from "./components/Settings/Profile";
 import RequestManagement from "./components/ShiftManagement/request/RequestManagement";
 import ShiftManagement from "./components/ShiftManagement/ShiftManagement";
+import AllUserTable from "./components/ShiftManagement/ShiftManagementAllUser/AllUserTable";
 import SubscriptionManagement from "./components/SubscriptionManagement/SubscriptionManagement";
 import Layout from "./layouts/Layout";
 import CheckEmail from "./pages/auth/CheckEmail";
+import ForgotOtp from './pages/auth/ForgotOtp';
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import SetPassword from "./pages/auth/SetPassword";
 import Login from "./pages/auth/SignIn";
@@ -27,8 +29,6 @@ import Notification from "./pages/Notification";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import UserProfile from "./pages/UserProfile";
-import DepartmentManagement from "./components/DepartmentManagement/DepartmentManagement";
-import AllUserTable from "./components/ShiftManagement/ShiftManagementAllUser/AllUserTable";
 
 const router = createBrowserRouter([
   {
@@ -50,7 +50,7 @@ const router = createBrowserRouter([
         path: "institution_management",
         element: <InstitutionManagement />
       },
-       {
+      {
         path: "institution_management",
         element: <InstitutionManagement />
       },
@@ -58,7 +58,7 @@ const router = createBrowserRouter([
         path: "department-management",
         element: <DepartmentManagement />
       },
-       {
+      {
         path: "holiday-management",
         element: <HolidayManagement />
       },
@@ -88,9 +88,9 @@ const router = createBrowserRouter([
           //   element: <EmployeeInformation />
           // },
           {
-        path: "all-user",
-        element: <AllUserTable />
-      },
+            path: "all-user",
+            element: <AllUserTable />
+          },
         ]
       },
 
@@ -139,7 +139,7 @@ const router = createBrowserRouter([
             path: "new-role",
             element: <NewRole />
           },
-           {
+          {
             path: "new-role/:id",
             element: <NewRole />
           }
@@ -202,6 +202,10 @@ const router = createBrowserRouter([
   {
     path: "/auth/login/check_email",
     element: <CheckEmail />
+  },
+  {
+    path: "/auth/forgotOTP",
+    element: <ForgotOtp />
   },
   {
     path: "/auth/login/set_password",

@@ -1,8 +1,11 @@
-import { Button, Input, Form, message, Select } from "antd";
+import { Button, Form, Input, message, Select } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../features/auth/authApi";
-import { saveToken } from "../../features/auth/authService";
 import { baseURL } from "../../utils/BaseURL";
+import { Role } from '../../utils/RoleManage';
+import { saveToken } from '../../utils/storage';
+
+
 
 export default function LoginPage() {
   const route = useNavigate();
@@ -13,26 +16,17 @@ export default function LoginPage() {
   };
 
   const onFinish = async (values) => {
-    if(values.email === "hello@gmail.com" && values.password === "hello123" ){
-        route("/")
-        localStorage.setItem("role", values.role);
-    } else{
-      message.error("Wrong email or password");
+    try {
+      const response = await Login(values).unwrap();
+      if (response.success) {
+        localStorage.setItem("role", response?.data?.user?.role)
+        saveToken(response?.data?.token);
+        localStorage.setItem("adminLoginId", response?.data?.user?._id);
+        route("/");
+      }
+    } catch (error) {
+      message.error(error?.data?.message)
     }
-
-
-    // try {
-    //   const response = await Login(values).unwrap();
-    //   saveToken(response?.data?.token);
-    //   localStorage.setItem("adminLoginId", response?.data?.user?._id);
-    //   route("/");
-    // } catch (error) {
-    //   if(error?.data){
-    //     message.error(error?.data?.message);
-    //   }else{
-    //     message.error("Server error Please try Another time")
-    //   }
-    // }
   };
 
   return (
@@ -97,16 +91,9 @@ export default function LoginPage() {
                 rules={[{ required: true, message: "Please select your role!" }]}
               >
                 <Select placeholder="Select Your Role" size="large">
-                  <Select.Option value="Chief Executive Officer">Chiff Executive Officer (CEO)</Select.Option>
-                  <Select.Option value="Chief Financial Officer">Chief Financial Officer (CFO)</Select.Option>
-                  <Select.Option value="Chief Operating Officer">Chief Operating Officer (COO)</Select.Option>
-                  <Select.Option value="HR/Employee Manager">HR/Employee Manager</Select.Option>
-                  <Select.Option value="Department Heads">Department Heads</Select.Option>
-                  <Select.Option value="Training Supervisor">Training Supervisor</Select.Option>
+                  {Role.map((item, index) => <Select.Option key={index} value={item}>{item}</Select.Option>)}
                 </Select>
               </Form.Item>
-
-
               <div className="text-end mb-4 select-none">
                 <Link
                   to="/auth/login/forgot_password"
