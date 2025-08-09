@@ -1,5 +1,8 @@
+import { Spin } from 'antd';
+import { useStatisticsForHrAndDepQuery } from '../../features/dashboardOverView/dashboardApi';
 
 const DepartmentStatistics = () => {
+  const { data, isLoading } = useStatisticsForHrAndDepQuery();
   return (
     <div className="border border-primary rounded-lg p-3">
       <div className="w-full rounded-xl flex flex-col gap-3">
@@ -11,23 +14,23 @@ const DepartmentStatistics = () => {
           <div className="flex items-center gap-3">
             <div className="border border-primary w-full rounded-xl p-4 ">
               <div className=" font-medium text-2xl mb-2">Total Employee</div>
-              <div className="text-xl font-bold text-gray-800">50</div>
+              <div className="text-xl font-bold text-gray-800">{isLoading ? <Spin size='small' /> : data?.totalEmployees}</div>
             </div>
 
             <div className="border border-primary w-full rounded-xl p-4 ">
               <div className=" font-medium text-2xl mb-2">Total Check IN</div>
-              <div className="text-xl font-bold text-gray-800">40</div>
+              <div className="text-xl font-bold text-gray-800">{isLoading ? <Spin size='small' /> : data?.todayCheckIn}</div>
             </div>
           </div>
 
           <div className="border border-primary rounded-xl p-4 ">
             <div className=" font-medium text-2xl mb-2">Total Check out</div>
-            <div className="text-xl font-bold text-gray-800">8</div>
+            <div className="text-xl font-bold text-gray-800">{isLoading ? <Spin size='small' /> : data?.todayCheckOut}</div>
           </div>
 
           <div className="border border-primary rounded-xl p-4 ">
             <div className=" font-medium text-2xl mb-2">Total Absent</div>
-            <div className="text-xl font-bold text-gray-800">2</div>
+            <div className="text-xl font-bold text-gray-800">{isLoading ? <Spin size='small' /> : data?.todayAbsent}</div>
           </div>
         </div>
       </div>

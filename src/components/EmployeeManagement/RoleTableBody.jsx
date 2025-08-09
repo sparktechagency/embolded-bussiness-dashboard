@@ -1,6 +1,7 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Modal, Switch } from "antd";
+import { Button, message, Modal, Switch } from "antd";
 import { useState } from "react";
+import { useDeleteDesignationMutation } from '../../features/Designation/designationApi';
 import ViewDetailsModal from "../Institution Management/ViewDetailsModal";
 import RoleManageModal from "./RoleManageModal";
 
@@ -12,6 +13,7 @@ const RoleTableBody = ({ item, list }) => {
   const [viewdetailsModalVisible, setViewdetailsModalVisible] = useState(false);
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
   const [switchStatus, setSwitchStatus] = useState(item.status === "Active");
+  const [deleteDesignation, { isLoading: isDeleting }] = useDeleteDesignationMutation();
 
   const handleDelete = () => {
     setRemoveModalVisible(true);
@@ -29,9 +31,20 @@ const RoleTableBody = ({ item, list }) => {
     setSwitchModalVisible(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async (id) => {
     // Implement delete logic here
-    setRemoveModalVisible(false);
+    try {
+      const result = await deleteDesignation(id);
+      if (result.success) {
+        message.success(result.message || "Designation deleted successfully");
+        setRemoveModalVisible(false);
+      }
+      console.log("Designation deleted successfully:", result);
+    } catch (error) {
+      console.log("Error deleting designation:", error);
+    }
+
+    // setRemoveModalVisible(false);
   };
 
   const handleConfirmSwitch = () => {
@@ -45,7 +58,7 @@ const RoleTableBody = ({ item, list }) => {
       {/* Table Row */}
       <div className={`grid items-center grid-cols-7 gap-2 px-2 my-3 text-sm bg-gray-100 space-x-5 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3">{item.roleName}</div>
+        <div className="flex items-center justify-center py-3">{item?.designationName}</div>
         <div className="flex items-center justify-center py-3">{item.institution}</div>
         <div className="flex items-center justify-center py-3">{item.department}</div>
         <div className="flex items-center justify-center py-3">{item.created}</div>
@@ -90,8 +103,9 @@ const RoleTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={isDeleting}
               type="primary"
-              onClick={handleConfirmDelete}
+              onClick={() => handleConfirmDelete(item._id)}
               className="px-8 bg-primary"
             >
               Yes

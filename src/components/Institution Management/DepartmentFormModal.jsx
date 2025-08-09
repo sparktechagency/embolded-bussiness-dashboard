@@ -1,22 +1,28 @@
-import { Button, Form, Input, Modal, Select } from 'antd';
+import { Button, Form, Input, Modal, Select, Spin } from 'antd';
 import { useEffect } from 'react';
+import { useGetAllInstitutionsQuery } from '../../features/instituteManagement/instituteManagementApi';
 
 const { Option } = Select;
 
-const DepartmentFormModal = ({ 
+const DepartmentFormModal = ({
   mode = 'create', // 'create' or 'edit'
-  visible, 
-  onCancel, 
+  visible,
+  onCancel,
   onSubmit,
-  institutions = [],
-  initialValues = {}
+  initialValues = {},
+  dataLoading,
+  updateLoading
 }) => {
   const [form] = Form.useForm();
+  const { data: instituteData, isLoading } = useGetAllInstitutionsQuery();
 
   // Set form values when mode changes or initialValues update
   useEffect(() => {
     if (mode === 'edit' && visible) {
-      form.setFieldsValue(initialValues);
+      form.setFieldsValue({
+        departmentName: initialValues.departmentName,
+        institution: initialValues.institutionID?._id
+      });
     } else if (mode === 'create' && visible) {
       form.resetFields();
     }
@@ -38,16 +44,17 @@ const DepartmentFormModal = ({
 
   const modalFooter = (
     <div>
-      <Button 
-        style={{paddingLeft: "30px", paddingRight: "30px", fontSize: "16px", marginRight: 8}} 
+      <Button
+        style={{ paddingLeft: "30px", paddingRight: "30px", fontSize: "16px", marginRight: 8 }}
         onClick={handleCancel}
       >
         Cancel
       </Button>
-      <Button 
-        type="primary" 
-        style={{paddingLeft: "40px", paddingRight: "40px", fontSize: "16px"}} 
-        onClick={handleSubmit} 
+      <Button
+        type="primary"
+        loading={updateLoading}
+        style={{ paddingLeft: "40px", paddingRight: "40px", fontSize: "16px" }}
+        onClick={handleSubmit}
         className="bg-[#336C79]"
       >
         {mode === 'create' ? 'Create' : 'Update'}
@@ -55,48 +62,50 @@ const DepartmentFormModal = ({
     </div>
   );
 
-  const modalTitle = mode === 'create' 
-    ? 'Create New Department' 
+  const modalTitle = mode === 'create'
+    ? 'Create New Department'
     : 'Edit Department';
 
   return (
     <Modal
-      title={<span style={{ fontWeight: "bold", color:"#336C79", paddingTop:"20px", paddbottom:"20px" }}>{modalTitle}</span>}
+      title={<span style={{ fontWeight: "bold", color: "#336C79", paddingTop: "20px", paddbottom: "20px" }}>{modalTitle}</span>}
       open={visible}
       onCancel={handleCancel}
       footer={modalFooter}
       closable={false}
     >
-      <Form 
-        form={form} 
-        layout="vertical"
-        initialValues={mode === 'edit' ? initialValues : {
-          name: "",
-          institution: undefined // Changed from empty string to undefined
-        }}
-      >
-        <Form.Item 
-          name="name" 
-          label={<span style={{ fontWeight: "bold" }}>Department Name</span>}
-          rules={[{ required: true, message: 'Please input department name!' }]}
-        >
-          <Input placeholder="Enter department name" />
-        </Form.Item>
+      {
+        dataLoading ? <div className='flex items-center justify-center h-[100px]'><Spin size='small' /></div> : (
+          <Form
+            form={form}
+            layout="vertical"
+          >
+            <Form.Item
+              name="departmentName"
+              label={<span style={{ fontWeight: "bold" }}>Department Name</span>}
+              rules={[{ required: true, message: 'Please input department name!' }]}
+            >
+              <Input placeholder="Enter department name" />
+            </Form.Item>
 
-        <Form.Item 
-          name="institution" 
-          label={<span style={{ fontWeight: "bold" }}>Choose Institution</span>}
-          rules={[{ required: true, message: 'Please select an institution!' }]}
-        >
-          <Select placeholder="Select an institution">
-            {institutions.map(institution => (
-              <Option key={institution.id} value={institution.name}>
-                {institution.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-      </Form>
+            <Form.Item
+              name="institution"
+              label={<span style={{ fontWeight: "bold" }}>Institution</span>}
+            >
+              <Select
+                placeholder="Select an institution"
+                disabled={mode === 'edit'}
+              >
+                {instituteData?.data?.data.map(institution => (
+                  <Option key={institution._id} value={institution._id}>
+                    {institution.institutionName}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Form>
+        )
+      }
     </Modal>
   );
 };

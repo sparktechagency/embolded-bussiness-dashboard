@@ -1,5 +1,5 @@
 import { Modal } from 'antd';
-import React from 'react';
+import { baseURL } from '../../utils/BaseURL';
 
 const ViewDetailsModal = ({
   isOpen,
@@ -9,7 +9,8 @@ const ViewDetailsModal = ({
   imageAlt = "Institution image",
   sectionTitle = "Institution Information",
   details = [],
-  width = 550
+  width = 550,
+  data
 }) => {
   return (
     <Modal
@@ -22,12 +23,12 @@ const ViewDetailsModal = ({
       <h1 className="text-2xl text-center font-bold text-gray-800 mb-6">
         {modalTitle}
       </h1>
-      
+
       {imageSrc && (
         <div className="mb-4">
-          <img 
-            src={imageSrc} 
-            alt={imageAlt} 
+          <img
+            src={data?.data?.logo ? `${baseURL + data?.data?.logo}` : imageSrc}
+            alt={imageAlt}
             className="w-full rounded-lg"
           />
         </div>
@@ -38,12 +39,13 @@ const ViewDetailsModal = ({
           {sectionTitle}
         </h2>
 
-        <div className="space-y-4">
-          {details.map((item, index) => (
-            <div key={index}>
-              <span className="font-bold">{item.label}:</span> {item.value}
-            </div>
-          ))}
+        <div className='flex flex-col space-y-4'>
+          <div className="space-y-4"><span className="font-medium">institutionName : </span>{data?.data?.institutionName || "N/A"}</div>
+          <div className="space-y-4"><span className="font-medium">Email : </span>{data?.data?.email || "N/A"}</div>
+          <div className="space-y-4"><span className="font-medium">address : </span>{data?.data?.address || "N/A"}</div>
+          <div className="space-y-4"><span className="font-medium">institution Website Link : </span>{data?.data?.institutionWebsiteLink || "N/A"}</div>
+          <div className="space-y-4"><span className="font-medium">Phone Number : </span>{data?.data?.phoneNumber || "N/A"}</div>
+          <div className="space-y-4"><span className="font-medium">Established Year : </span>{data?.data?.establishedYear || "N/A"}</div>
         </div>
       </div>
     </Modal>

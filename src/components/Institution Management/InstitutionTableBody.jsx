@@ -1,8 +1,9 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { Button, Modal, Switch } from "antd";
-import { useState } from "react";
-import ViewDetailsModal from "./ViewDetailsModal";
+import { Button, message, Modal, Switch } from "antd";
+import { useEffect, useState } from "react";
+import { useDeleteInstitueMutation, useGetInstitutionsByIdQuery, useUpdateInstitueMutation, useUpdateInstitueStatusMutation } from '../../features/instituteManagement/instituteManagementApi';
 import InstitutionFormModal from "./InstitutionFormModal";
+import ViewDetailsModal from "./ViewDetailsModal";
 
 const InstitutionTableBody = ({ item, list }) => {
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
@@ -10,16 +11,23 @@ const InstitutionTableBody = ({ item, list }) => {
   const [viewdetailsModalVisible, setViewdetailsModalVisible] = useState(false);
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
   const [switchStatus, setSwitchStatus] = useState(item.status === "Active");
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState(null);
+  const [deleteInstitution, { isLoading: deleteLoading }] = useDeleteInstitueMutation();
+  const [updateStatus, { isLoading: updateStatusLoading }] = useUpdateInstitueStatusMutation();
+  const { data, isLoading } = useGetInstitutionsByIdQuery(selectedInstitutionId, { skip: !selectedInstitutionId });
+  const [updateInstitution, { isLoading: updateInstitutionLoading }] = useUpdateInstitueMutation();
 
   const handleDelete = () => {
     setRemoveModalVisible(true);
   };
 
-  const handleEdit = (value) => {
+  const handleEdit = (id) => {
+    setSelectedInstitutionId(id);
     setEditModalVisible(true);
   };
 
-  const handleViewDetails = () => {
+  const handleViewDetails = (id) => {
+    setSelectedInstitutionId(id);
     setViewdetailsModalVisible(true);
   };
 
@@ -27,15 +35,63 @@ const InstitutionTableBody = ({ item, list }) => {
     setSwitchModalVisible(true);
   };
 
-  const handleConfirmDelete = () => {
-    // Implement delete logic here
-    setRemoveModalVisible(false);
+  useEffect(() => {
+    setSwitchStatus(item.status === "ACTIVE");
+  }, [item.status]);
+
+  const handleConfirmDelete = async (id) => {
+    console.log("Deleting institution with ID:", id);
+    try {
+      const response = await deleteInstitution(id);
+      console.log("Institution deleted successfully:", response);
+      message.success(response?.data.message);
+      setRemoveModalVisible(false);
+    } catch (error) {
+      console.error("Failed to delete institution:", error);
+      message.error("Failed to delete institution");
+    }
   };
 
-  const handleConfirmSwitch = () => {
-    // Implement switch logic here
-    setSwitchStatus(!switchStatus);
-    setSwitchModalVisible(false);
+  const handleConfirmSwitch = async (id) => {
+    const data = { status: switchStatus ? "INACTIVE" : "ACTIVE" };
+    try {
+      const response = await updateStatus({ data, id });
+      message.success(response?.data.message);
+      setSwitchStatus(!switchStatus); // This will now properly toggle the state
+      setSwitchModalVisible(false);
+    } catch (error) {
+      message.error("Failed to update institution status");
+    }
+  };
+
+  const handleUpdateInstitution = async (values) => {
+    try {
+      const formData = new FormData();
+
+      // Append all fields to formData
+      formData.append('institutionName', values.name);
+      formData.append('address', values.address);
+      formData.append('email', values.email);
+      formData.append('phoneNumber', values.phone);
+      formData.append('institutionWebsiteLink', values.website);
+      formData.append('establishedYear', values.establishedYear);
+
+      // Append logo file if it exists and is new
+      if (values.logo && values.logo[0]?.originFileObj) {
+        formData.append('logo', values.logo[0].originFileObj);
+      }
+
+      const response = await updateInstitution({
+        id: selectedInstitutionId,
+        data: formData
+      });
+
+      message.success(response?.data?.message);
+      setEditModalVisible(false);
+    } catch (error) {
+      console.error("Update error:", error);
+      message.error("Failed to update institution");
+    }
   };
 
   return (
@@ -43,11 +99,11 @@ const InstitutionTableBody = ({ item, list }) => {
       {/* Table Row */}
       <div className={`grid grid-cols-10 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.institution}</div>
+        <div className="flex items-center justify-center py-3 mr-3">{item.institutionName}</div>
         <div className="flex items-center justify-center py-3 ml-4">{item.email}</div>
-        <div className="flex items-center justify-center py-3">{item.phone}</div>
+        <div className="flex items-center justify-center py-3">{item.phoneNumber}</div>
         <div className="flex items-center justify-center py-3">{item.establishedYear}</div>
-        <div className="flex items-center justify-center py-3">{item.location}</div>
+        <div className="flex items-center justify-center py-3">{item.address}</div>
         <div className="flex items-center justify-center py-3">{item.totalDepartment}</div>
         <div className="flex items-center justify-center py-3">{item.totalEmployee}</div>
         <div className="flex items-center justify-center py-3">{item.status}</div>
@@ -56,13 +112,13 @@ const InstitutionTableBody = ({ item, list }) => {
             type="text"
             icon={<EyeOutlined />}
             className="text-amber-500 hover:text-amber-600"
-            onClick={handleViewDetails}
+            onClick={() => handleViewDetails(item._id)}
           />
           <Button
             type="text"
             icon={<EditOutlined />}
             className="text-orange-500 hover:text-orange-600"
-            onClick={handleEdit}
+            onClick={() => handleEdit(item._id)}
           />
           <Button
             type="text"
@@ -98,8 +154,9 @@ const InstitutionTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={deleteLoading}
               type="primary"
-              onClick={handleConfirmDelete}
+              onClick={() => handleConfirmDelete(item._id)}
               className="px-8 bg-primary"
             >
               Yes
@@ -127,8 +184,9 @@ const InstitutionTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={updateStatusLoading}
               type="primary"
-              onClick={handleConfirmSwitch}
+              onClick={() => handleConfirmSwitch(item._id)}
               className="px-8 bg-primary"
             >
               Yes
@@ -137,22 +195,21 @@ const InstitutionTableBody = ({ item, list }) => {
         </div>
       </Modal>
 
+      <ViewDetailsModal
+        isOpen={viewdetailsModalVisible}
+        onClose={() => setViewdetailsModalVisible(false)}
+        modalTitle="Institution Information"
+        data={data}
+      />
 
-      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle="Institution Information"
-        imageAlt="Institution Information"
-        details={[
-          { label: "Name", value: "City General Hospital" },
-          { label: "Phone Number", value: "+1234567890" },
-          { label: "Email", value: "contact@cityhospital.com" },
-          { label: "Address", value: "123 Medical Drive, Health City" },
-          { label: "Status", value: "Active" }
-        ]} />
-
-
-      <InstitutionFormModal mode="edit" visible={editModalVisible} onCancel={() => setEditModalVisible(false)}    /> {/* initialValues={institution} */}
-
-
-
+      <InstitutionFormModal
+        mode="edit"
+        visible={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        initialValues={data?.data}
+        onSubmit={handleUpdateInstitution}
+        loading={updateInstitutionLoading}
+      />
     </>
   );
 };

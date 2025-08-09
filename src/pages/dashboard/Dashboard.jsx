@@ -1,19 +1,14 @@
-import { Typography } from 'antd';
-import React, { useEffect } from 'react';
-import { FaSearch } from 'react-icons/fa';
+import AbsentTableHead from '../../components/Admin/AbsentTableHead';
 import AttendanceBarChart from '../../components/Admin/AttendanceBarChart';
 import AttendanceChart from '../../components/Admin/AttendanceChart';
-import AbsentTableHead from '../../components/Admin/AbsentTableHead';
 import LateTableHead from '../../components/Admin/LateTableHead';
 import AdminStatistics from '../../components/Statistics/AdminStatistics';
 import DepartmentStatistics from '../../components/Statistics/DepartmentStatistics';
 
 
-const { Title } = Typography;
-
 const ParkingDashboard = () => {
   const role = localStorage.getItem("role");
-  
+
 
   // useEffect(() => {
   //    const role = localStorage.getItem("role");
@@ -21,29 +16,7 @@ const ParkingDashboard = () => {
   //      window.location.href = "/auth/login";
   //    }
   // }, [role])
-  
 
-
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div style={{
-          backgroundColor: '#fff',
-          padding: '10px',
-          border: '1px solid #ddd',
-          borderRadius: '4px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          {/* <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>{label}</p> */}
-          <p style={{ color: '#FF6384' }}>
-            <strong>${payload[0].value.toLocaleString()}</strong>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
 
   const AbSentTableHead = [
@@ -53,7 +26,6 @@ const ParkingDashboard = () => {
     "Institution",
     "Department",
     "Shift Schedule",
-    "Day",
     "Account Status",
   ]
 
@@ -74,8 +46,8 @@ const ParkingDashboard = () => {
         <AttendanceChart />
         <AttendanceBarChart />
         {/* Statistics Card */}
-        
-        {role === "Chief Executive Officer" || role === "Chief Operating Officer" || role === "Chief Financial Officer" ? <AdminStatistics /> : <DepartmentStatistics />}
+
+        {role === "BUSINESS_OWNER" ? <AdminStatistics /> : <DepartmentStatistics />}
 
         {/* Today's Entry */}
         <div className="md:col-span-3">
@@ -98,7 +70,7 @@ const ParkingDashboard = () => {
             </div>
             <div className='p-2'>
               <LateTableHead columns={LateTableHeadCollumn} />
-              
+
             </div>
           </div>
         </div>

@@ -1,42 +1,70 @@
-import { Button, Col, Form, Input, Modal, Row, Select, Upload } from 'antd';
+import { Button, Col, Form, Input, Modal, Row, Upload } from 'antd';
 import { Upload as UploadIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
-const { Option } = Select;
+import { baseURL } from '../../utils/BaseURL';
 
 const InstitutionFormModal = ({
-  mode = 'create', // 'create' or 'edit'
+  mode = 'create',
   visible,
   onCancel,
   onSubmit,
-  initialValues = {}
+  initialValues = {},
+  loading
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
 
-  // Set form values when mode changes or initialValues update
+  // Separate effect for handling modal opening
   useEffect(() => {
-    if (mode === 'edit' && visible) {
-      form.setFieldsValue({
-        ...initialValues,
-        // Ensure geofencingLocation is undefined if empty
-        geofencingLocation: initialValues.geofencingLocation || undefined
-      });
-    } else if (mode === 'create' && visible) {
-      form.setFieldsValue({
-        name: "",
-        address: "",
-        email: "",
-        phone: "",
-        website: "",
-        establishedYear: "",
-        geofencingLocation: undefined // This ensures placeholder shows
-      });
+    if (visible && mode === 'create') {
+      // For create mode, ensure clean form when opening
+      form.resetFields();
       setFileList([]);
     }
-  }, [mode, visible, initialValues, form]);
+  }, [visible, mode]);
 
-  // Handle file upload
+  // Separate effect for handling edit mode data
+  useEffect(() => {
+    if (visible && mode === 'edit' && initialValues && Object.keys(initialValues).length > 0) {
+      const timer = setTimeout(() => {
+        const values = {
+          name: initialValues.institutionName,
+          address: initialValues.address,
+          email: initialValues.email,
+          phone: initialValues.phoneNumber,
+          website: initialValues.institutionWebsiteLink,
+          establishedYear: initialValues.establishedYear,
+        };
+
+        form.setFieldsValue(values);
+
+        if (initialValues.logo) {
+          const logoUrl = initialValues.logo.startsWith('http')
+            ? initialValues.logo
+            : `${baseURL}${initialValues.logo}`;
+
+          const existingFile = {
+            uid: '-1',
+            name: 'existing-logo.jpg',
+            status: 'done',
+            url: logoUrl,
+            thumbUrl: logoUrl
+          };
+
+          setFileList([existingFile]);
+          form.setFieldsValue({
+            ...values,
+            logo: [existingFile]
+          });
+        } else {
+          setFileList([]);
+        }
+      }, 150); // Slightly longer delay
+
+      return () => clearTimeout(timer);
+    }
+  }, [visible, mode, initialValues]);
+
   const normFile = (e) => {
     if (Array.isArray(e)) {
       return e;
@@ -44,37 +72,53 @@ const InstitutionFormModal = ({
     return e?.fileList;
   };
 
-  const uploadProps = {
-    onRemove: (file) => {
-      const index = fileList.indexOf(file);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-      setFileList(newFileList);
-    },
-    beforeUpload: (file) => {
-      setFileList([...fileList, file]);
-      return false;
-    },
-    fileList,
-  };
-
   const handleSubmit = () => {
     form.validateFields().then(values => {
       onSubmit(values);
-      if (mode === 'create') {
-        form.resetFields();
-        setFileList([]);
-      }
     });
   };
 
   const handleCancel = () => {
+    // Always reset when canceling
     form.resetFields();
     setFileList([]);
     onCancel();
   };
 
-  // Custom footer with centered buttons
+  const uploadProps = {
+    onRemove: (file) => {
+      setFileList([]);
+      // Clear the form field when removing
+      form.setFieldsValue({ logo: [] });
+    },
+    beforeUpload: (file) => {
+      const newFileList = [{
+        uid: file.uid,
+        name: file.name,
+        status: 'uploading',
+        originFileObj: file
+      }];
+      setFileList(newFileList);
+      return false; // Prevent automatic upload
+    },
+    fileList,
+    listType: "picture-card",
+    onPreview: async (file) => {
+      let src = file.url || file.thumbUrl;
+      if (!src && file.originFileObj) {
+        src = await new Promise(resolve => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file.originFileObj);
+          reader.onload = () => resolve(reader.result);
+        });
+      }
+      const image = new Image();
+      image.src = src;
+      const imgWindow = window.open(src);
+      imgWindow?.document.write(image.outerHTML);
+    }
+  };
+
   const modalFooter = (
     <div>
       <Button
@@ -85,6 +129,7 @@ const InstitutionFormModal = ({
       </Button>
       <Button
         type="primary"
+        loading={loading}
         style={{ paddingLeft: "40px", paddingRight: "40px", fontSize: "16px" }}
         onClick={handleSubmit}
         className="bg-[#336C79]"
@@ -100,17 +145,14 @@ const InstitutionFormModal = ({
 
   return (
     <Modal
-      title={<span style={{ fontWeight: "bold", color: "#336C79", paddingTop: "20px", paddbottom: "20px", fontSize: "20px" }}>{modalTitle}</span>}
+      title={<span style={{ fontWeight: "bold", color: "#336C79", paddingTop: "20px", fontSize: "20px" }}>{modalTitle}</span>}
       open={visible}
       onCancel={handleCancel}
       footer={modalFooter}
       closable={false}
       width={1000}
     >
-      <Form
-        form={form}
-        layout="vertical"
-      >
+      <Form form={form} layout="vertical">
         <Row gutter={24}>
           <Col span={8}>
             <Form.Item
@@ -175,20 +217,6 @@ const InstitutionFormModal = ({
         </Row>
 
         <Row gutter={24}>
-          <Col span={8}>
-            <Form.Item
-              name="geofencingLocation"
-              label="Choose Geofencing Location"
-              rules={[{ required: true, message: 'Please select location!' }]}
-            >
-              <Select placeholder="Select a location">
-                <Option value="Brookwood Baptist Health">Brookwood Baptist Health</Option>
-                <Option value="St. Vincent's Hospital">St. Vincent`s Hospital</Option>
-                <Option value="UAB Hospital">UAB Hospital</Option>
-                <Option value="Princeton Baptist Medical Center">Princeton Baptist Medical Center</Option>
-              </Select>
-            </Form.Item>
-          </Col>
           <Col span={24}>
             <Form.Item
               name="logo"
@@ -199,13 +227,15 @@ const InstitutionFormModal = ({
               <Upload
                 {...uploadProps}
                 listType="picture-card"
-                maxCount={5}
+                maxCount={1}
                 className="institution-logo-uploader"
               >
-                <div>
-                  <UploadIcon size={24} className="text-gray-400 ml-2" />
-                  <div className="mt-2">Upload</div>
-                </div>
+                {fileList.length >= 1 ? null : (
+                  <div>
+                    <UploadIcon size={24} className="text-gray-400 ml-2" />
+                    <div className="mt-2">Upload</div>
+                  </div>
+                )}
               </Upload>
             </Form.Item>
           </Col>

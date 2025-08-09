@@ -1,7 +1,8 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { Button, Modal, Switch } from "antd";
-import { useState } from "react";
+import { Button, message, Modal, Select, Switch } from "antd";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDeleteEmployeeMutation, useUpdateEmplyeeStatusMutation } from '../../features/EmployeeManagement/employeeManagementApi';
 // import ViewDetailsModal from "./ViewDetailsModal";
 // import InstitutionFormModal from "./InstitutionFormModal";
 
@@ -11,6 +12,8 @@ const EmployeTableBody = ({ item, list }) => {
   const [viewdetailsModalVisible, setViewdetailsModalVisible] = useState(false);
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
   const [switchStatus, setSwitchStatus] = useState(item.status === "Active");
+  const [deleteEmployee, { isLoading: deleteLoading }] = useDeleteEmployeeMutation();
+  const [updateStatus, { isLoading: updateStatusLoading }] = useUpdateEmplyeeStatusMutation();
 
 
   const router = useNavigate();
@@ -31,30 +34,77 @@ const EmployeTableBody = ({ item, list }) => {
     setSwitchModalVisible(true);
   };
 
-  const handleConfirmDelete = () => {
+  useEffect(() => {
+    setSwitchStatus(item.status === "ACTIVE");
+  }, [item.status]);
+
+  const handleConfirmDelete = async (id) => {
     // Implement delete logic here
+    try {
+      const response = await deleteEmployee(id);
+      if (response.success) {
+        message.success(response.message || "Employee deleted successfully");
+      }
+    } catch (error) {
+      message.error(error?.data?.message || "Failed to delete employee");
+      console.log("Delete error:", error);
+
+    }
     setRemoveModalVisible(false);
   };
 
-  const handleConfirmSwitch = () => {
+
+
+  const handleConfirmSwitch = async (id) => {
+    const newStatus = switchStatus ? "INACTIVE" : "ACTIVE";
+    try {
+      const response = await updateStatus({ data: { status: newStatus }, id: id })
+      console.log("Switch response:", response);
+    } catch (error) {
+      console.log("Switch error:", error);
+      message.error(error?.data?.message || "Failed to update employee status");
+    }
+
     // Implement switch logic here
     setSwitchStatus(!switchStatus);
     setSwitchModalVisible(false);
   };
+
+  function convertTime(dateOrTime) {
+    const date = new Date(dateOrTime);
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
 
   return (
     <>
       {/* Table Row */}
       <div className={`grid grid-cols-11 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.employeName}</div>
-        <div className="flex items-center justify-center py-3 ml-4">{item.institution}</div>
-        <div className="flex items-center justify-center py-3">{item.department}</div>
-        <div className="flex items-center justify-center py-3">{item.role}</div>
-        <div className="flex items-center justify-center py-3">{item.email}</div>
-        <div className="flex items-center justify-center py-3">{item.phone}</div>
-        <div className="flex items-center justify-center py-3">{item.weekend}</div>
-        <div className="flex items-center justify-center py-3">{item.shiftSchedule}</div>
+        <div className="flex items-center justify-center py-3">{item.name}</div>
+        <div className="flex items-center justify-center py-3">{item?.institutionID?.institutionName}</div>
+        <div className="flex items-center justify-center py-3">{item?.departmentID?.departmentName}</div>
+        <div className="flex items-center justify-center py-3">{item?.role}</div>
+        <div className="flex items-center justify-center py-3">{item?.email}</div>
+        <div className="flex items-center justify-center py-3">{item?.phone}</div>
+
+        <div className="flex items-center justify-center py-3">
+          <Select
+            className="w-full"
+            defaultValue={item?.weekend?.[0]}
+          >
+            {item?.weekend?.map((day, index) => (
+              <Select.Option
+                key={index}
+                value={day}
+              >
+                {day}
+              </Select.Option>
+            ))}
+          </Select>
+        </div>
+        <div className="flex items-center justify-center py-3">{convertTime(item?.shiftSchedule?.shiftStartTime)} - {convertTime(item?.shiftSchedule?.shiftEndTime)}</div>
+
+
         <div className="flex items-center justify-center py-3">{item.status}</div>
         <div className="flex items-center justify-center border rounded border-primary py-1 px-2">
           <Button
@@ -67,7 +117,7 @@ const EmployeTableBody = ({ item, list }) => {
             type="text"
             icon={<EditOutlined />}
             className="text-orange-500 hover:text-orange-600"
-            onClick={() => router(`/employee-management/add-new-Employee/${item.id}`)}
+            onClick={() => router(`/employee-management/add-new-Employee/${item._id}`)}
           />
           <Button
             type="text"
@@ -103,8 +153,9 @@ const EmployeTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={deleteLoading}
               type="primary"
-              onClick={handleConfirmDelete}
+              onClick={() => handleConfirmDelete(item._id)}
               className="px-8 bg-primary"
             >
               Yes
@@ -132,8 +183,9 @@ const EmployeTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={updateStatusLoading}
               type="primary"
-              onClick={handleConfirmSwitch}
+              onClick={() => handleConfirmSwitch(item._id)}
               className="px-8 bg-primary"
             >
               Yes

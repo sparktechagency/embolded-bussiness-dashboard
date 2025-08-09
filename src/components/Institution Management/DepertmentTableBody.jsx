@@ -1,9 +1,9 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { Button, Modal, Switch } from "antd";
-import { useState } from "react";
-import ViewDetailsModal from "./ViewDetailsModal";
-import InstitutionFormModal from "./InstitutionFormModal";
+import { Button, message, Modal, Switch } from "antd";
+import { useEffect, useState } from "react";
+import { useDeleteDepartmentMutation, useGetDepartmentByIdQuery, useUpdateDepartmentMutation, useUpdateDepartmentStatusMutation } from '../../features/instituteManagement/DepartmentManagementApi';
 import DepartmentFormModal from "./DepartmentFormModal";
+import DepartmentViewDetailsModal from './DepartmentViewDetailsModal';
 
 const DepertmentTableBody = ({ item, list }) => {
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
@@ -11,16 +11,23 @@ const DepertmentTableBody = ({ item, list }) => {
   const [viewdetailsModalVisible, setViewdetailsModalVisible] = useState(false);
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
   const [switchStatus, setSwitchStatus] = useState(item.status === "Active");
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState(null);
+  const [deleteDepartment, { isLoading: deleteLoading }] = useDeleteDepartmentMutation();
+  const [updateStatus, { isLoading: updateStatusLoading }] = useUpdateDepartmentStatusMutation();
+  const { data, isLoading } = useGetDepartmentByIdQuery(selectedInstitutionId, { skip: !selectedInstitutionId });
+  const [updateDepartment, { isLoading: updateDepartmentLoading }] = useUpdateDepartmentMutation();
 
   const handleDelete = () => {
     setRemoveModalVisible(true);
   };
 
-  const handleEdit = (value) => {
+  const handleEdit = (id) => {
+    setSelectedInstitutionId(id);
     setEditModalVisible(true);
   };
 
-  const handleViewDetails = () => {
+  const handleViewDetails = (id) => {
+    setSelectedInstitutionId(id);
     setViewdetailsModalVisible(true);
   };
 
@@ -28,15 +35,47 @@ const DepertmentTableBody = ({ item, list }) => {
     setSwitchModalVisible(true);
   };
 
-  const handleConfirmDelete = () => {
-    // Implement delete logic here
-    setRemoveModalVisible(false);
+  useEffect(() => {
+    setSwitchStatus(item.status === "ACTIVE");
+  }, [item.status]);
+
+  const handleConfirmDelete = async (id) => {
+    console.log("Deleting institution with ID:", id);
+    try {
+      const response = await deleteDepartment(id);
+      console.log("department deleted successfully:", response);
+      message.success(response?.data.message);
+      setRemoveModalVisible(false);
+    } catch (error) {
+      console.error("Failed to delete institution:", error);
+      message.error("Failed to delete institution");
+    }
   };
 
-  const handleConfirmSwitch = () => {
-    // Implement switch logic here
-    setSwitchStatus(!switchStatus);
-    setSwitchModalVisible(false);
+  const handleConfirmSwitch = async (id) => {
+    const data = { status: switchStatus ? "INACTIVE" : "ACTIVE" };
+    try {
+      const response = await updateStatus({ data, id });
+      message.success(response?.data.message);
+      setSwitchStatus(!switchStatus);
+      setSwitchModalVisible(false);
+    } catch (error) {
+      message.error("Failed to update institution status");
+    }
+  };
+
+  const handleUpdateDepartment = async (values) => {
+    try {
+      const response = await updateDepartment({
+        id: selectedInstitutionId,
+        data: { departmentName: values.departmentName }
+      });
+      message.success(response?.data?.message);
+      setEditModalVisible(false);
+    } catch (error) {
+      console.error("Update error:", error);
+      message.error("Failed to update department");
+    }
   };
 
   return (
@@ -44,22 +83,22 @@ const DepertmentTableBody = ({ item, list }) => {
       {/* Table Row */}
       <div className={`grid items-center grid-cols-6 gap-2 px-2 my-3 text-sm bg-gray-100 space-x-5 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3">{item.institution}</div>
-        <div className="flex items-center justify-center py-3">{item.name}</div>
-        <div className="flex items-center justify-center py-3">{item.totalEmployee}</div>
-        <div className="flex items-center justify-center py-3">{item.status}</div>
+        <div className="flex items-center justify-center py-3">{item?.institutionID?.institutionName}</div>
+        <div className="flex items-center justify-center py-3">{item?.departmentName}</div>
+        <div className="flex items-center justify-center py-3">{item?.totalEmployee}</div>
+        <div className="flex items-center justify-center py-3">{item?.status}</div>
         <div className="flex items-center  border justify-center px-3 rounded border-primary">
           <Button
             type="text"
             icon={<EyeOutlined />}
             className="text-amber-500 hover:text-amber-600"
-            onClick={handleViewDetails}
+            onClick={() => handleViewDetails(item._id)}
           />
           <Button
             type="text"
             icon={<EditOutlined />}
             className="text-orange-500 hover:text-orange-600"
-            onClick={handleEdit}
+            onClick={() => handleEdit(item._id)}
           />
           <Button
             type="text"
@@ -94,8 +133,9 @@ const DepertmentTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={deleteLoading}
               type="primary"
-              onClick={handleConfirmDelete}
+              onClick={() => handleConfirmDelete(item._id)}
               className="px-8 bg-primary"
             >
               Yes
@@ -123,8 +163,9 @@ const DepertmentTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={updateStatusLoading}
               type="primary"
-              onClick={handleConfirmSwitch}
+              onClick={() => handleConfirmSwitch(item._id)}
               className="px-8 bg-primary"
             >
               Yes
@@ -133,21 +174,23 @@ const DepertmentTableBody = ({ item, list }) => {
         </div>
       </Modal>
 
+      <DepartmentViewDetailsModal
+        isOpen={viewdetailsModalVisible}
+        onClose={() => setViewdetailsModalVisible(false)}
+        modalTitle="Department Information"
+        data={data}
+        isLoading={isLoading}
+      />
 
-      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle="Department Information"
-        imageAlt="Hospital building" sectionTitle="Department Information"
-        details={[
-          { label: "Institution Name", value: "Brookwood Baptist Health " },
-          { label: "Department Name", value: "Spark tech" },
-          { label: "Total Employee", value: "200" },
-          { label: "Status", value: "active" },
-        ]} />
-
-
-      <DepartmentFormModal mode="edit" visible={editModalVisible} onCancel={() => setEditModalVisible(false)} /> {/* initialValues={institution} */}
-
-
-
+      <DepartmentFormModal
+        mode="edit"
+        visible={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        initialValues={data?.data}
+        onSubmit={handleUpdateDepartment}
+        updateLoading={updateDepartmentLoading}
+        dataLoading={isLoading}
+      />
     </>
   );
 };

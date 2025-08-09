@@ -13,7 +13,6 @@ const Sidebar = () => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
   const role = localStorage.getItem("role");
-  console.log(role)
 
   // All possible menu items
   const allMenuItems = [
