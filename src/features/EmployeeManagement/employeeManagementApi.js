@@ -13,11 +13,14 @@ export const employeeApi = baseApi.injectEndpoints({
     }),
 
     getAllEmployee: builder.query({
-      query: (page) => ({
-        url: `/employees?page=${page || 1}`,
-        method: "GET",
-      }),
-      providesTags: ["empolyeeManagement"]
+      query: (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return {
+          url: `/employees?${queryString}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["employeeManagement"], // fixed typo
     }),
 
     getEmployeeById: builder.query({

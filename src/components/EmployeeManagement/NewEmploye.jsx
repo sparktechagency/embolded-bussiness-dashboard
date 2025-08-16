@@ -7,6 +7,7 @@ import { useCreateEmployeeMutation, useGetEmployeeByIdQuery, useUpdateEmployeeMu
 import { useGetAllDepartmentQuery } from '../../features/instituteManagement/DepartmentManagementApi';
 import { useGetAllInstitutionsQuery } from '../../features/instituteManagement/instituteManagementApi';
 import { useGetAllShiftQuery } from '../../features/shiftManagement/shiftApi';
+import { baseURL } from '../../utils/BaseURL';
 
 export default function NewEmploye() {
   const { id } = useParams();
@@ -89,13 +90,14 @@ export default function NewEmploye() {
         setSelectedDays(mappedDays.length > 0 ? mappedDays : ['Sun']);
       }
 
+      console.log(employeeData.profileImage)
       // Set profile image if exists
       if (employeeData.profileImage) {
         setFileList([{
           uid: '-1',
           name: 'profile-image',
           status: 'done',
-          url: employeeData.profileImage,
+          url: baseURL+employeeData.profileImage,
         }]);
       }
     }
@@ -237,14 +239,10 @@ export default function NewEmploye() {
         // console.log('Employee updated successfully:', result);
       } else {
         // Create new employee
-        result = await createEmployee(apiFormData).unwrap();
-        console.log('Employee created successfully:', result);
+        const result = await createEmployee(apiFormData).unwrap();
       }
-
-      if (result.success) {
-        message.success(result.message || `Employee ${id ? 'updated' : 'created'} successfully!`);
-        router('/employee-management');
-      }
+      message.success(result?.message || `Employee ${id ? 'updated' : 'created'} successfully!`);
+      router('/employee-management');
 
     } catch (error) {
       console.error('Error creating/updating employee:', error);
@@ -253,8 +251,12 @@ export default function NewEmploye() {
   };
 
   const uploadProps = {
+    listType: "picture-card",
     onRemove: (file) => {
-      setFileList([]);
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
     },
     beforeUpload: (file) => {
       const isImage = file.type.startsWith('image/');
@@ -262,17 +264,27 @@ export default function NewEmploye() {
         message.error('You can only upload image files!');
         return false;
       }
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        message.error('Image must be smaller than 2MB!');
+        return false;
+      }
       setFileList([{
-        ...file,
         uid: file.uid,
         name: file.name,
         status: 'done',
+        originFileObj: file,
       }]);
       return false; // Prevent automatic upload
     },
     fileList,
     accept: 'image/*',
-    maxCount: 1
+    maxCount: 1,
+    showUploadList: {
+      showPreviewIcon: true,
+      showRemoveIcon: true,
+      showDownloadIcon: false,
+    }
   };
 
   function convertTime(dateOrTime) {
@@ -444,12 +456,12 @@ export default function NewEmploye() {
           <div className="col-span-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Upload Picture</label>
             <Upload {...uploadProps}>
-              <div className="border border-dashed border-gray-300 rounded-md p-6 flex justify-center items-center cursor-pointer">
-                <div className="text-center">
-                  <UploadOutlined className="text-2xl text-gray-400" />
-                  <p className="m-0 text-gray-500">Click or drag file to upload</p>
+              {fileList.length >= 1 ? null : (
+                <div className="flex flex-col items-center">
+                  <UploadOutlined className="text-2xl" />
+                  <div className="mt-2">Upload</div>
                 </div>
-              </div>
+              )}
             </Upload>
           </div>
 

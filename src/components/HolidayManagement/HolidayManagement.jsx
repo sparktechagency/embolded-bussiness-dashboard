@@ -1,14 +1,28 @@
-import { Button, message, Select } from 'antd';
+import { Button, Select } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import HolidayTableHead from './HolidayTableHead';
-import HolidayModal from './HolidayModal';
+import { useCreateHolidayMutation } from '../../features/holiday/holidayApi';
 import CustomFilterDropdown from '../CustomFilterDropdown';
+import HolidayModal from './HolidayModal';
+import HolidayTableHead from './HolidayTableHead';
 
 const { Option } = Select;
 
 function HolidayManagement() {
   const router = useNavigate();
+  const [createHoliday, { isLoading: isCreatingHoliday }] = useCreateHolidayMutation();
+  const holidayTypes = [
+    { label: "GOVERNMENT", value: "GOVERNMENT" },
+    { label: "OFFICE", value: "OFFICE" }
+  ];
+
+  const [selectedHolidayType, setSelectedHolidayType] = useState(null);
+
+  // Handle selection change
+  const handleHolidayTypeChange = (selectedOption) => {
+    setSelectedHolidayType(selectedOption);
+    // You can perform any additional actions here with the selected value
+  };
 
   const [holidays, setHolidays] = useState([
     {
@@ -33,20 +47,22 @@ function HolidayManagement() {
   // State for modals
   const [isNewHolidayModalVisible, setIsNewHolidayModalVisible] = useState(false);
 
-  // Handle department creation
-  const handleCreateHoliday = (values) => {
-    const newDepartment = {
-      key: (holidays.length + 1).toString(),
-      id: holidays.length + 1,
-      institution: values.institution,
-      name: values.name,
-      totalEmployee: values.totalEmployee,
-      status: 'Active'
-    };
-
-    setHolidays([...holidays, newDepartment]);
-    setIsNewHolidayModalVisible(false);
-    message.success('Department created successfully');
+  // Handle holiday creation
+  const handleCreateHoliday = async (values) => {
+    try {
+      const holidayData = {
+        name: values.name,
+        startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
+        endDate: values.endDate ? values.endDate.format('YYYY-MM-DD') : null,
+        holidayType: values.type,
+        institutionID: values.instituteName
+      };
+      const response = await createHoliday(holidayData).unwrap();
+      console.log(response)
+    } catch (error) {
+      console.error('Error creating holiday:', error);
+      message.error(error?.data?.message || 'Failed to create holiday');
+    }
   };
 
   const holidayColumns = [
@@ -79,17 +95,31 @@ function HolidayManagement() {
       TotalDay: "1",
       status: "Active"
     },
-
   ];
 
 
 
+
+
+
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50">
       <div className="mb-6 flex justify-end gap-3">
-       <div className='w-2/12'>
-       <CustomFilterDropdown />
-       </div>
+        <div className='w-2/12'>
+          <CustomFilterDropdown
+            options={holidayTypes}
+            placeholder="Select holiday type"
+            showAllOption={true}
+            allOptionLabel="All Types"
+            allOptionValue="all"
+            onChange={handleHolidayTypeChange}
+            labelKey="label"
+            valueKey="value"
+            width="100%"
+            value={selectedHolidayType}
+          />
+        </div>
         <Button
           type="primary"
           className="bg-[#336C79]"
@@ -99,14 +129,14 @@ function HolidayManagement() {
         </Button>
       </div>
 
-      <HolidayTableHead data={HolidayData} columns={holidayColumns} />
+      <HolidayTableHead filterValue = {selectedHolidayType} data={HolidayData} columns={holidayColumns} />
 
       <HolidayModal
         mode="create"
         visible={isNewHolidayModalVisible}
         onCancel={() => setIsNewHolidayModalVisible(false)}
-        onCreate={handleCreateHoliday}
-      // institutions={institutions}
+        onSubmit={handleCreateHoliday}
+        loading={isCreatingHoliday}
       />
     </div>
   );

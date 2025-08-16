@@ -1,31 +1,42 @@
-import { Button, Form, Input, Modal, TimePicker } from 'antd';
-import { useEffect } from 'react';
 import { ClockCircleOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Modal, TimePicker } from 'antd';
+import moment from 'moment';
+import { useEffect } from 'react';
 
-const ShiftModal = ({ 
+const NewShiftModal = ({
   mode = 'create', // 'create' or 'edit'
-  visible, 
-  onCancel, 
+  visible,
+  onCancel,
   onSubmit,
-  initialValues = {}
+  initialValues = {},
+  loading
 }) => {
   const [form] = Form.useForm();
-  
+
   // Set form values when mode changes or initialValues update
   useEffect(() => {
-    if (mode === 'edit' && visible) {
-      form.setFieldsValue(initialValues);
-    } else if (mode === 'create' && visible) {
-      form.resetFields();
+    if (visible) {
+      if (mode === 'edit') {
+        form.setFieldsValue({
+          name: initialValues.name,
+          startTime: initialValues.startTime ? moment(initialValues.startTime) : null,
+          endTime: initialValues.endTime ? moment(initialValues.endTime) : null
+        });
+      } else {
+        form.resetFields();
+      }
     }
   }, [mode, visible, initialValues, form]);
 
   const handleSubmit = () => {
     form.validateFields().then(values => {
-      onSubmit(values);
-      if (mode === 'create') {
-        form.resetFields();
-      }
+      // Convert moment objects to ISO strings
+      const formattedValues = {
+        ...values,
+        startTime: values.startTime ? values.startTime.toISOString() : null,
+        endTime: values.endTime ? values.endTime.toISOString() : null
+      };
+      onSubmit(formattedValues);
     });
   };
 
@@ -34,21 +45,22 @@ const ShiftModal = ({
     onCancel();
   };
 
-  const modalTitle = mode === 'create' 
-    ? 'Create New Shift' 
+  const modalTitle = mode === 'create'
+    ? 'Create New Shift'
     : 'Edit Shift';
 
   const modalFooter = (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-      <Button 
-        style={{ fontSize: '16px', marginRight: 8, padding: '0 30px', height: '40px' }} 
+      <Button
+        style={{ fontSize: '16px', marginRight: 8, padding: '0 30px', height: '40px' }}
         onClick={handleCancel}
       >
         Cancel
       </Button>
-      <Button 
-        type="primary" 
-        style={{ fontSize: '16px', padding: '0 40px', height: '40px', backgroundColor: '#336C79', borderColor: '#336C79' }} 
+      <Button
+        loading={loading}
+        type="primary"
+        style={{ fontSize: '16px', padding: '0 40px', height: '40px', backgroundColor: '#336C79', borderColor: '#336C79' }}
         onClick={handleSubmit}
       >
         {mode === 'create' ? 'Create' : 'Update'}
@@ -65,46 +77,41 @@ const ShiftModal = ({
       closable={true}
       width={500}
     >
-      <Form 
-        form={form} 
+      <Form
+        form={form}
         layout="vertical"
-        initialValues={mode === 'edit' ? initialValues : {
-          name: "",
-          startTime: null,
-          endTime: null
-        }}
       >
-        <Form.Item 
-          name="name" 
-          label={<span style={{ fontWeight: "bold",  }}>Name</span>}
+        <Form.Item
+          name="name"
+          label={<span style={{ fontWeight: "bold", }}>Name</span>}
           rules={[{ required: true, message: 'Please input shift name!' }]}
         >
           <Input placeholder="Write Shift Name" size="large" />
         </Form.Item>
-        
-        <Form.Item 
+
+        <Form.Item
           label={<span style={{ fontWeight: "bold", }}>Time</span>}
         >
-          <Form.Item 
-            name="startTime" 
+          <Form.Item
+            name="startTime"
             style={{ marginBottom: 16 }}
             rules={[{ required: true, message: 'Please select start time!' }]}
           >
-            <TimePicker 
-              placeholder="Start Time" 
+            <TimePicker
+              placeholder="Start Time"
               style={{ width: '100%' }}
               size="large"
               format="HH:mm"
               suffixIcon={<ClockCircleOutlined />}
             />
           </Form.Item>
-          
-          <Form.Item 
+
+          <Form.Item
             name="endTime"
             rules={[{ required: true, message: 'Please select end time!' }]}
           >
-            <TimePicker 
-              placeholder="End Time" 
+            <TimePicker
+              placeholder="End Time"
               style={{ width: '100%' }}
               size="large"
               format="HH:mm"
@@ -117,4 +124,4 @@ const ShiftModal = ({
   );
 };
 
-export default ShiftModal;
+export default NewShiftModal;

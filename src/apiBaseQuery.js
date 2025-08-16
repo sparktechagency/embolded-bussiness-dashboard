@@ -3,7 +3,7 @@ import { baseURL } from "./utils/BaseURL";
 import { getToken } from "./utils/storage";
 
 export const baseApi = createApi({
-  tagTypes: ["overview", "institueManagement", "empolyeeManagement", "shiftManagement", "designation", "holidayManagement", "siftManagement", "LoginManagement", "subscription", "contact", "settings", "rules"],
+  tagTypes: ["overview", "institueManagement", "empolyeeManagement", "location", "shiftManagement", "designation", "holidayManagement", "siftManagement", "LoginManagement", "subscription", "contact", "settings", "rules", "shiftAndLeave"],
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${baseURL}/api/v1`,

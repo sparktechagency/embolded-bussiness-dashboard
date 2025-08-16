@@ -1,44 +1,86 @@
-import { Button, Form, Input, Modal, Select } from 'antd';
-import { useEffect } from 'react';
 import { DownOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Modal, Select } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { useGetAllDepartmentQuery } from '../../features/instituteManagement/DepartmentManagementApi';
+import { useGetAllInstitutionsQuery } from '../../features/instituteManagement/instituteManagementApi';
+import { useGetAllShiftQuery } from '../../features/shiftManagement/shiftApi';
 
-const AssignShiftModal = ({ 
-  visible, 
-  onCancel, 
+const AssignShiftModal = ({
+  visible,
+  onCancel,
   onSubmit,
-  institutions = [],
-  departments = [],
-  shifts = [],
   initialValues = {}
 }) => {
   const [form] = Form.useForm();
-  
+  const [selectedInstitution, setSelectedInstitution] = useState(null);
+  const [filteredDepartments, setFilteredDepartments] = useState([]);
+
+  // Only fetch data when modal is visible
+  const { data: allInstitute } = useGetAllInstitutionsQuery(undefined, { skip: !visible });
+  const { data: allDepartment } = useGetAllDepartmentQuery(undefined, { skip: !visible });
+  const { data: allShift } = useGetAllShiftQuery(undefined, { skip: !visible });
+
+  // Memoize the data to prevent unnecessary re-renders
+  const institutes = useMemo(() => allInstitute?.data?.data || [], [allInstitute]);
+  const departments = useMemo(() => allDepartment?.data?.data || [], [allDepartment]);
+  const shifts = useMemo(() => allShift?.data?.data || [], [allShift]);
+
   useEffect(() => {
     if (visible) {
       form.setFieldsValue(initialValues);
+      if (initialValues.institution) {
+        setSelectedInstitution(initialValues.institution);
+      }
     } else {
       form.resetFields();
+      setSelectedInstitution(null);
+      setFilteredDepartments([]);
     }
-  }, [visible, initialValues, form]);
+  }, []);
+
+  useEffect(() => {
+    if (selectedInstitution && departments.length > 0) {
+      const filtered = departments.filter(
+        dept => dept.institutionID?._id === selectedInstitution
+      );
+      setFilteredDepartments(filtered);
+    } else {
+      setFilteredDepartments([]);
+    }
+  }, [selectedInstitution, departments]);
 
   const handleSubmit = () => {
     form.validateFields().then(values => {
-      onSubmit(values);
+
+      const output = {
+        institutionID: values.institution,
+        departmentID: values.department,
+        employeeID: values.employeeId,
+        shiftID: values.shift
+      };
+      onSubmit(output);
     });
   };
 
   const handleCancel = () => {
     form.resetFields();
+    setSelectedInstitution(null);
+    setFilteredDepartments([]);
     onCancel();
+  };
+
+  const handleInstitutionChange = (value) => {
+    setSelectedInstitution(value);
+    form.setFieldsValue({ department: undefined });
   };
 
   const suffixIcon = <DownOutlined style={{ fontSize: '14px' }} />;
 
   return (
     <Modal
-      title={<div style={{ 
-        fontWeight: 600, 
-        color: "#336C79", 
+      title={<div style={{
+        fontWeight: 600,
+        color: "#336C79",
         fontSize: '22px',
         paddingBottom: '20px',
         borderBottom: '1px solid #f0f0f0'
@@ -51,13 +93,13 @@ const AssignShiftModal = ({
       closeIcon={<span style={{ fontSize: '22px' }}>×</span>}
     >
       <div style={{ padding: '24px 0' }}>
-        <Form 
-          form={form} 
+        <Form
+          form={form}
           layout="vertical"
           initialValues={initialValues}
         >
-          <Form.Item 
-            name="institution" 
+          <Form.Item
+            name="institution"
             label={<span style={{ fontWeight: 600, fontSize: '16px' }}>Institution</span>}
             rules={[{ required: true, message: 'Please select an institution!' }]}
           >
@@ -65,55 +107,47 @@ const AssignShiftModal = ({
               placeholder="Select Institution"
               size="middle"
               suffixIcon={suffixIcon}
-              options={institutions.map(institution => ({
-                value: institution.id,
-                label: institution.name
+              onChange={handleInstitutionChange}
+              loading={!allInstitute}
+              options={institutes.map(institute => ({
+                value: institute._id,
+                label: institute.institutionName
               }))}
               style={{ display: 'flex', alignItems: 'center' }}
             />
           </Form.Item>
-          
-          <Form.Item 
-            name="department" 
+
+          <Form.Item
+            name="department"
             label={<span style={{ fontWeight: 600, fontSize: '16px' }}>Department</span>}
             rules={[{ required: true, message: 'Please select a department!' }]}
           >
             <Select
-              placeholder="Select Department"
+              placeholder={selectedInstitution ? "Select Department" : "First select an institution"}
               size="middle"
               suffixIcon={suffixIcon}
-              options={departments.map(department => ({
-                value: department.id,
-                label: department.name
+              disabled={!selectedInstitution}
+              loading={!allDepartment}
+              options={filteredDepartments.map(department => ({
+                value: department._id,
+                label: department.departmentName
               }))}
-              
             />
           </Form.Item>
-          
-          <Form.Item 
-            name="employeeId" 
+
+          <Form.Item
+            name="employeeId"
             label={<span style={{ fontWeight: 600, fontSize: '16px' }}>Employee ID</span>}
             rules={[{ required: true, message: 'Please enter employee ID!' }]}
           >
-            <Input 
-              placeholder="Enter Your Employee ID" 
-              size="large" 
+            <Input
+              placeholder="Enter Your Employee ID"
+              size="large"
             />
           </Form.Item>
-          
-          <Form.Item 
-            name="employeeName" 
-            label={<span style={{ fontWeight: 600, fontSize: '16px' }}>Employee Name</span>}
-          >
-            <Input 
-              placeholder="Employee Name" 
-              size="large" 
-              defaultValue="Sabbir Ahmed"
-            />
-          </Form.Item>
-          
-          <Form.Item 
-            name="shift" 
+
+          <Form.Item
+            name="shift"
             label={<span style={{ fontWeight: 600, fontSize: '16px' }}>Shift</span>}
             rules={[{ required: true, message: 'Please select a shift!' }]}
           >
@@ -121,32 +155,29 @@ const AssignShiftModal = ({
               placeholder="Select Your Shift"
               size="large"
               suffixIcon={suffixIcon}
+              loading={!allShift}
               options={shifts.map(shift => ({
-                value: shift.id,
-                label: shift.name
+                value: shift._id,
+                label: shift.shiftName
               }))}
               style={{ display: 'flex', alignItems: 'center' }}
             />
           </Form.Item>
         </Form>
       </div>
-      
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'flex-end', 
+
+      <div style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
         borderTop: '1px solid #f0f0f0',
-        gap:"10px",
+        gap: "10px",
         paddingTop: '15px'
       }}>
-        <Button 
-
-          onClick={handleCancel}
-        >
+        <Button onClick={handleCancel}>
           Cancel
         </Button>
-        <Button 
-          type="primary" 
-         
+        <Button
+          type="primary"
           onClick={handleSubmit}
         >
           Assign Employee

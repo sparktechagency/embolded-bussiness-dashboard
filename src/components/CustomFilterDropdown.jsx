@@ -66,7 +66,7 @@ export default function CustomFilterDropdown({
     setSelectedOption(option);
     setDropdownVisible(false);
     if (onChange) {
-      onChange(option.value, option.originalData || option);
+      onChange(option, option.originalData || option);
     }
   };
 

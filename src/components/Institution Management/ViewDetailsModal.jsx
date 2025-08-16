@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { Modal, Spin } from 'antd';
 import { baseURL } from '../../utils/BaseURL';
 
 const ViewDetailsModal = ({
@@ -10,12 +10,14 @@ const ViewDetailsModal = ({
   sectionTitle = "Institution Information",
   details = [],
   width = 550,
-  data
+  data,
+  loading
 }) => {
   return (
     <Modal
       open={isOpen}
       onCancel={onClose}
+      loading={loading}
       footer={null}
       width={width}
       centered
@@ -23,16 +25,15 @@ const ViewDetailsModal = ({
       <h1 className="text-2xl text-center font-bold text-gray-800 mb-6">
         {modalTitle}
       </h1>
-
-      {imageSrc && (
-        <div className="mb-4">
-          <img
+      <div className="mb-4">
+        {
+          loading ? <Spin size='small' /> : <img
             src={data?.data?.logo ? `${baseURL + data?.data?.logo}` : imageSrc}
             alt={imageAlt}
             className="w-full rounded-lg"
           />
-        </div>
-      )}
+        }
+      </div>
 
       <div className="border border-primary rounded-lg p-6">
         <h2 className="text-xl font-bold text-teal-700 mb-6">

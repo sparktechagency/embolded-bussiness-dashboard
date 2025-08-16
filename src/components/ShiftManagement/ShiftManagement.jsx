@@ -1,6 +1,8 @@
 import { Button, message, Select } from 'antd';
+import moment from 'moment'; // Import moment.js
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useGetAllShiftAndLeaveQuery } from '../../features/shiftAndLeave/ShiftAndLeave';
+import { useAssignEmployeeShiftMutation, useCreateShiftMutation } from '../../features/shiftManagement/shiftApi';
 import AssignShiftModal from './AssignEmployeeModal';
 import NewShiftModal from './NewShiftModal';
 import ShiftRequestModal from './ShiftRequestModal';
@@ -9,47 +11,50 @@ import ShiftTableHead from './ShiftTableHead';
 const { Option } = Select;
 
 function ShiftManagement() {
-  const router = useNavigate();
+  const [createNewShift, { isLoading: createShiftLoading }] = useCreateShiftMutation();
+  const [updateAssign, { isLoading: AssignEmployeeShiftLoading }] = useAssignEmployeeShiftMutation();
+  const { data, isLoading } = useGetAllShiftAndLeaveQuery();
 
-  const [Shifts, setShifts] = useState([
-    {
-      key: '1',
-      id: 1,
-      institution: 'Brookwood Baptist Health',
-      name: 'Spark tech',
-      totalEmployee: 200,
-      status: 'Active'
-    },
-    // Duplicate entries for demo purposes
-    ...Array.from({ length: 8 }, (_, i) => ({
-      key: (i + 2).toString(),
-      id: i + 2,
-      institution: 'Brookwood Baptist Health',
-      name: 'Spark tech',
-      totalEmployee: 200,
-      status: 'Active'
-    }))
-  ]);
+  const findLenght = () => {
+    return data?.data?.data?.filter(item => item.status === 'PENDING')
+  }
 
   // State for modals
   const [isNewShiftModalVisible, setIsNewShiftModalVisible] = useState(false);
   const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
   const [isAssignShiftModalVisible, setIsAssignShiftModalVisible] = useState(false);
 
-  // Handle department creation
-  const handleCreateHoliday = (values) => {
-    const newDepartment = {
-      key: (Shifts.length + 1).toString(),
-      id: Shifts.length + 1,
-      institution: values.institution,
-      name: values.name,
-      totalEmployee: values.totalEmployee,
-      status: 'Active'
-    };
+  // Handle shift creation with proper moment.js validation
+  const handleCreateHoliday = async (values) => {
+    try {
+      // Ensure startTime and endTime are moment objects
+      const startTime = moment.isMoment(values?.startTime) ? values.startTime : moment(values?.startTime);
+      const endTime = moment.isMoment(values?.endTime) ? values.endTime : moment(values?.endTime);
 
-    setShifts([...Shifts, newDepartment]);
-    setIsNewShiftModalVisible(false);
-    message.success('Department created successfully');
+      // Validate that the times are valid
+      if (!startTime.isValid() || !endTime.isValid()) {
+        message.error("Please provide valid start and end times");
+        return;
+      }
+
+      const shiftData = {
+        shiftName: values?.name,
+        shiftStartTime: startTime.format("HH:mm"),
+        shiftEndTime: endTime.format("HH:mm")
+      };
+
+      const result = await createNewShift(shiftData);
+
+      if (result.error) {
+        message.error(result?.error?.data?.message || "Failed to create shift");
+      } else {
+        setIsNewShiftModalVisible(false);
+        message.success(result?.data?.message || "Shift created successfully");
+      }
+    } catch (error) {
+      console.error("Error creating shift:", error);
+      message.error(error?.message || "Something went wrong while creating shift");
+    }
   };
 
   const holidayColumns = [
@@ -62,34 +67,31 @@ function ShiftManagement() {
     "Action"
   ];
 
-  const HolidayData = [
-    {
-      id: 1,
-      shiftName: "Government Holiday",
-      shiftStartTime: "09:00 AM",
-      shiftEndTime: "05:00 AM",
-      totalUser: 20,
-      status: "Active"
-    },
-      {
-      id: 2,
-      shiftName: "Government Holiday",
-      shiftStartTime: "09:00 AM",
-      shiftEndTime: "05:00 AM",
-      totalUser: 20,
-      status: "Active"
-    },
-  ];
+  const handleAssignShift = async (values) => {
+    console.log(values);
+    try {
+      const response = await updateAssign(values);
+      if (response.error) {
+        message.error(response?.error?.data?.message || "Failed to assign shift");
+      } else {
+        message.success(response?.data?.message || "Shift assigned successfully");
+        setIsAssignShiftModalVisible(false);
+      }
+    } catch (err) {
+      console.error("Error assigning shift:", err);
+      message.error(err?.message || "Something went wrong while assigning shift");
+    }
+  }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50">
       <div className="mb-6 flex justify-end gap-3">
         <Button
           type="primary"
           className="bg-[#336C79]"
           onClick={() => setIsRequestModalVisible(true)}
         >
-          Request (02)
+          Request ({findLenght()?.length || 0})
         </Button>
         <Button
           type="primary"
@@ -107,13 +109,14 @@ function ShiftManagement() {
         </Button>
       </div>
 
-      <ShiftTableHead data={HolidayData} columns={holidayColumns} />
+      <ShiftTableHead columns={holidayColumns} />
 
       <NewShiftModal
         mode="create"
         visible={isNewShiftModalVisible}
         onCancel={() => setIsNewShiftModalVisible(false)}
-        onCreate={handleCreateHoliday}
+        onSubmit={handleCreateHoliday}
+        loading={createShiftLoading}
       />
 
       <ShiftRequestModal
@@ -123,9 +126,10 @@ function ShiftManagement() {
 
       <AssignShiftModal
         visible={isAssignShiftModalVisible}
+        onSubmit={handleAssignShift}
         onCancel={() => setIsAssignShiftModalVisible(false)}
+        loading={AssignEmployeeShiftLoading}
       />
-
     </div>
   );
 }

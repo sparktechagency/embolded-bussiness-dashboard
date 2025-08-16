@@ -1,4 +1,5 @@
 import { Button, Form, Input, message, Select } from "antd";
+import { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../features/auth/authApi";
 import { baseURL } from "../../utils/BaseURL";
@@ -10,19 +11,24 @@ import { saveToken } from '../../utils/storage';
 export default function LoginPage() {
   const route = useNavigate();
   const [Login, { isLoading }] = useLoginMutation();
+  const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = () => {
     window.location.href = `${baseURL}/api/v1/auth/google`;
   };
 
   const onFinish = async (values) => {
+    setLoading(true)
     try {
       const response = await Login(values).unwrap();
       if (response.success) {
         localStorage.setItem("role", response?.data?.user?.role)
         saveToken(response?.data?.token);
         localStorage.setItem("adminLoginId", response?.data?.user?._id);
-        route("/");
+        setTimeout(() => {
+          route("/");
+          setLoading(false)
+        }, 1500);
       }
     } catch (error) {
       message.error(error?.data?.message)
@@ -109,7 +115,7 @@ export default function LoginPage() {
                 htmlType="submit"
                 className="w-full"
                 size="large"
-                loading={isLoading}
+                loading={loading}
               >
                 Sign in
               </Button>

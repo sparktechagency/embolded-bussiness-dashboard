@@ -1,13 +1,16 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Modal, Switch } from "antd";
-import { useState } from "react";
+import { Button, message, Modal, Switch } from "antd";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDeleteCredentialsMutation, useUpdateCredentialStatusMutation } from '../../features/LoginCredentials/LoginCredentialsApi';
 
 
 const LoginCredentialTableBody = ({ item, list }) => {
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
   const [switchStatus, setSwitchStatus] = useState(item.status === "Active");
+  const [updateStatus, { isLoading: updateStatusLoading }] = useUpdateCredentialStatusMutation();
+  const [deleteCredential, { isLoading: deleteCredentialLoading }] = useDeleteCredentialsMutation();
 
 
   const router = useNavigate();
@@ -16,43 +19,76 @@ const LoginCredentialTableBody = ({ item, list }) => {
     setRemoveModalVisible(true);
   };
 
-   const handleEdit = (id) => {
-      router(`/login-credentials/new-role/${id}`);
+  const handleEdit = (id) => {
+    router(`/login-credentials/new-role/${id}`);
   };
+
+  useEffect(() => {
+    setSwitchStatus(item.status === "ACTIVE");
+  }, [item.status]);
+
 
 
   const handleSwitchChange = (checked) => {
     setSwitchModalVisible(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async (id) => {
+    try {
+      const response = await deleteCredential(id);
+      console.log(response)
+      message.success(response.data.message);
+    } catch (error) {
+      console.log(error);
+      message.error(error.data.message);
+    }
     // Implement delete logic here
     setRemoveModalVisible(false);
   };
 
-  const handleConfirmSwitch = () => {
+  const handleConfirmSwitch = async (id) => {
+
+    const data = { status: switchStatus ? "INACTIVE" : "ACTIVE" };
+    try {
+      const response = await updateStatus({ data, id });
+      message.success(response?.data.message);
+      setSwitchStatus(!switchStatus);
+      setSwitchModalVisible(false);
+    } catch (error) {
+      message.error("Failed to update institution status");
+    }
+
+
     // Implement switch logic here
-    setSwitchStatus(!switchStatus);
-    setSwitchModalVisible(false);
+
   };
+
+
+  function convertDateTime(dateOrTime) {
+    const date = new Date(dateOrTime);
+    return date.toLocaleDateString([], {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
 
   return (
     <>
       {/* Table Row */}
-      <div className={`grid grid-cols-8 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
+      <div className={`grid grid-cols-7 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.userName}</div>
+        <div className="flex items-center justify-center py-3 mr-3">{item.name}</div>
         <div className="flex items-center justify-center py-3 ml-4">{item.email}</div>
-        <div className="flex items-center justify-center py-3">{item.password}</div>
         <div className="flex items-center justify-center py-3">{item.role}</div>
-        <div className="flex items-center justify-center py-3">{item.createdAt}</div>
+        <div className="flex items-center justify-center py-3">{convertDateTime(item.createdAt)}</div>
         <div className="flex items-center justify-center py-3">{item.status}</div>
         <div className="flex items-center justify-center gap-2 border rounded border-primary py-1 px-2">
           <Button
             type="text"
             icon={<EditOutlined />}
             className="text-orange-500 hover:text-orange-600"
-          onClick={()=>handleEdit(item.id)}
+            onClick={() => handleEdit(item._id)}
           />
           <Button
             type="text"
@@ -88,8 +124,9 @@ const LoginCredentialTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={deleteCredentialLoading}
               type="primary"
-              onClick={handleConfirmDelete}
+              onClick={() => handleConfirmDelete(item._id)}
               className="px-8 bg-primary"
             >
               Yes
@@ -117,8 +154,9 @@ const LoginCredentialTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={updateStatusLoading}
               type="primary"
-              onClick={handleConfirmSwitch}
+              onClick={() => handleConfirmSwitch(item._id)}
               className="px-8 bg-primary"
             >
               Yes

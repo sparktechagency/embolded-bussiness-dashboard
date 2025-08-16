@@ -1,52 +1,69 @@
-import { Button, message, Select } from 'antd';
+import { Button, message } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGetAllInstitutionsQuery } from '../../features/instituteManagement/instituteManagementApi';
+import { useCreateLocationMutation } from '../../features/location/locationApi';
 import CustomFilterDropdown from '../CustomFilterDropdown';
 import LocationManagementHead from './LocationManagementHead';
 import LocationModal from './LocationModal';
 
-const { Option } = Select;
-
 function LocationManagement() {
   const router = useNavigate();
 
-  const [holidays, setHolidays] = useState([
-    {
-      key: '1',
-      id: 1,
-      institution: 'Brookwood Baptist Health',
-      name: 'Spark tech',
-      totalEmployee: 200,
-      status: 'Active'
-    },
-    // Duplicate entries for demo purposes
-    ...Array.from({ length: 8 }, (_, i) => ({
-      key: (i + 2).toString(),
-      id: i + 2,
-      institution: 'Brookwood Baptist Health',
-      name: 'Spark tech',
-      totalEmployee: 200,
-      status: 'Active'
-    }))
-  ]);
+  const [selectedInstitution, setSelectedInstitution] = useState(null);
+  const [status, setStatus] = useState(null);
+  console.log(selectedInstitution)
+  const [createLocation, { isLoading: creatingLoading }] = useCreateLocationMutation();
+  const { data: institutionData, isLoading: instituteLoading } = useGetAllInstitutionsQuery();
 
   // State for modals
   const [isNewHolidayModalVisible, setIsNewHolidayModalVisible] = useState(false);
 
-  // Handle department creation
-  const handleCreateHoliday = (values) => {
-    const newDepartment = {
-      key: (holidays.length + 1).toString(),
-      id: holidays.length + 1,
-      institution: values.institution,
-      name: values.name,
-      totalEmployee: values.totalEmployee,
-      status: 'Active'
-    };
+  const handleInstitutionChange = (value) => {
+    setSelectedInstitution(value === 'all' ? null : value);
+    setStatus(null);
+  };
 
-    setHolidays([...holidays, newDepartment]);
-    setIsNewHolidayModalVisible(false);
-    message.success('Department created successfully');
+
+  const handleStatusChage = (value) => {
+    setStatus(value === 'all' ? null : value)
+    setSelectedInstitution(null)
+  }
+
+  // Handle location creation with API
+  const handleCreateLocation = async (values) => {
+
+    try {
+      // Map form values to API payload format
+      const locationPayload = {
+        locationName: values.name,
+        institutionID: values.institutionId,
+        latitude: String(values.latitude),
+        longitude: String(values.longitude),
+        wifiSSID: values.ssid,
+        wifiIPAddress: values.ipAddress,
+        radius: parseInt(values.radius)
+      };
+      const response = await createLocation(locationPayload).unwrap();
+      // Handle successful creation
+      if (response.success) {
+        message.success(response.message || 'Location created successfully');
+        setIsNewHolidayModalVisible(false);
+      } else {
+        message.error('Failed to create location');
+      }
+    } catch (error) {
+      console.error('Error creating location:', error);
+
+      // Handle different types of errors
+      if (error.data && error.data.message) {
+        message.error(error.data.message);
+      } else if (error.message) {
+        message.error(error.message);
+      } else {
+        message.error('An error occurred while creating the location');
+      }
+    }
   };
 
   const LocationColumns = [
@@ -69,58 +86,75 @@ function LocationManagement() {
       longitude: "74.0060",
       wifiSSID: "Institution-WiFi",
       wifiIPAddress: "10.0.60.85",
-      redius: "600 meters",
+      radius: "600 meters",
       status: "Active"
     },
-
-     {
-      id: 1,
+    {
+      id: 2,
       locationName: "Brookwood Baptist Health",
       latitude: "40.7128",
       longitude: "74.0060",
       wifiSSID: "Institution-WiFi",
       wifiIPAddress: "10.0.60.85",
-      redius: "600 meters",
+      radius: "600 meters",
       status: "Active"
     },
   ];
 
-
   const statusOptions = [
-    { value: 'All', label: 'All' },
-    { value: 'Active', label: 'Active' },
-    { value: 'Inactive', label: 'Inactive' },
+    { value: 'ACTIVE', label: 'Active' },
+    { value: 'INACTIVE', label: 'Inactive' },
   ];
 
-
-
-
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50">
       <div className="mb-6 flex justify-end gap-3">
         <div className='w-2/12'>
-          <CustomFilterDropdown options={statusOptions} />
+          <CustomFilterDropdown
+            options={institutionData?.data.data}
+            placeholder="Choose an institution"
+            showAllOption={true}
+            allOptionLabel="All Institutions"
+            allOptionValue="all"
+            onChange={handleInstitutionChange}
+            labelKey="institutionName"
+            valueKey="_id"
+            width="100%"
+            value={selectedInstitution}
+          />
         </div>
         <div className='w-2/12'>
-          <CustomFilterDropdown />
+          <CustomFilterDropdown
+            options={statusOptions}
+            placeholder="Choose an institution"
+            showAllOption={true}
+            allOptionLabel="Select Status"
+            allOptionValue="All"
+            onChange={handleStatusChage}
+            labelKey="institutionName"
+            valueKey="_id"
+            width="100%"
+            value={selectedInstitution}
+          />
         </div>
         <Button
           type="primary"
           className="bg-[#336C79]"
           onClick={() => setIsNewHolidayModalVisible(true)}
+          loading={creatingLoading}
         >
           Create New Location
         </Button>
       </div>
 
-      <LocationManagementHead data={HolidayData} columns={LocationColumns} />
+      <LocationManagementHead status={status} selectedInstitution={selectedInstitution} institutionFilter={selectedInstitution} data={HolidayData} columns={LocationColumns} />
 
       <LocationModal
         mode="create"
         visible={isNewHolidayModalVisible}
         onCancel={() => setIsNewHolidayModalVisible(false)}
-        onCreate={handleCreateHoliday}
-      // institutions={institutions}
+        onSubmit={handleCreateLocation}
+        loading={creatingLoading}
       />
     </div>
   );

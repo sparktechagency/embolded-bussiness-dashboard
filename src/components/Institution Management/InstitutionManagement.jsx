@@ -50,17 +50,16 @@ function App() {
   // Handle department creation
   const handleCreateDepartment = async (values) => {
     const data = {
-      departmentName: values.name,
+      departmentName: values.departmentName,
       institutionID: values?.institution
     }
     try {
       const response = await createDepartment(data);
-      console.log('Department created:', response);
-      message.success('Department created successfully');
+      message.success(response.message || 'Department created successfully');
       setIsNewDepartmentModalVisible(false);
     } catch (error) {
       console.error('Error creating department:', error);
-      message.error('Failed to create department');
+      message.error(error?.message);
     }
   };
 
@@ -104,7 +103,7 @@ function App() {
     }
   ];
 
-  
+
 
   return (
     <div className="p-6 bg-gray-50">

@@ -3,13 +3,10 @@ import { useState } from 'react';
 import { useGetAllDesignationQuery } from '../../features/Designation/designationApi';
 import RoleTableBody from './RoleTableBody';
 
-
-const RoleTableHead = ({ columns }) => {
-  // Complete demo data with all required fields
+const RoleTableHead = ({ columns, institutions, departments }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const { data: designation, isLoading } = useGetAllDesignationQuery();
 
-  // Extract data and meta from response
   const data = designation?.data?.data || [];
   const meta = designation?.data?.meta || {
     total: 0,
@@ -18,11 +15,9 @@ const RoleTableHead = ({ columns }) => {
     totalPage: 1
   };
 
-  // Handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-
 
   return (
     <div className="">
@@ -34,14 +29,19 @@ const RoleTableHead = ({ columns }) => {
               {column}
             </div>
           ))}
-          {/* <h3 className="py-3 font-semibold text-center col-span-2">Action</h3> */}
         </div>
 
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
-          {data?.length > 0 ? (
+          {isLoading ? "Loading..." : data?.length > 0 ? (
             data?.map((item, index) => (
-              <RoleTableBody item={item} key={item.id} list={index + 1} />
+              <RoleTableBody
+                item={item}
+                key={item._id}
+                list={index + 1}
+                institutions={institutions}
+                departments={departments}
+              />
             ))
           ) : (
             <h3 className="py-10 text-center">No Data Available</h3>

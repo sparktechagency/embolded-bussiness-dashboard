@@ -1,61 +1,74 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, message, Modal, Switch } from "antd";
-import { useState } from "react";
-import { useDeleteDesignationMutation } from '../../features/Designation/designationApi';
-import ViewDetailsModal from "../Institution Management/ViewDetailsModal";
+import { useEffect, useState } from "react";
+import {
+  useDeleteDesignationMutation,
+  useUpdateDesignationMutation,
+  useUpdateDesignationStatusMutation
+} from '../../features/Designation/designationApi';
 import RoleManageModal from "./RoleManageModal";
 
-
-
-const RoleTableBody = ({ item, list }) => {
+const RoleTableBody = ({ item, list, institutions, departments }) => {
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [viewdetailsModalVisible, setViewdetailsModalVisible] = useState(false);
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
-  const [switchStatus, setSwitchStatus] = useState(item.status === "Active");
+  const [switchStatus, setSwitchStatus] = useState(item.status === "ACTIVE");
+
   const [deleteDesignation, { isLoading: isDeleting }] = useDeleteDesignationMutation();
+  const [updateStatus, { isLoading: updateStatusLoading }] = useUpdateDesignationStatusMutation();
+  const [updateDesignation, { isLoading: updating }] = useUpdateDesignationMutation();
 
-  const handleDelete = () => {
-    setRemoveModalVisible(true);
-  };
+  const handleEdit = () => setEditModalVisible(true);
 
-  const handleEdit = (value) => {
-    setEditModalVisible(true);
-  };
+  const handleDelete = () => setRemoveModalVisible(true);
 
-  const handleViewDetails = () => {
-    setViewdetailsModalVisible(true);
-  };
-
-  const handleSwitchChange = (checked) => {
-    setSwitchModalVisible(true);
-  };
+  const handleSwitchChange = (checked) => setSwitchModalVisible(true);
 
   const handleConfirmDelete = async (id) => {
-    // Implement delete logic here
     try {
       const result = await deleteDesignation(id);
-      if (result.success) {
-        message.success(result.message || "Designation deleted successfully");
-        setRemoveModalVisible(false);
-      }
-      console.log("Designation deleted successfully:", result);
+      message.success(result.data.message || "Designation deleted successfully");
+      setRemoveModalVisible(false);
     } catch (error) {
-      console.log("Error deleting designation:", error);
+      message.error("Failed to delete designation");
     }
-
-    // setRemoveModalVisible(false);
   };
 
-  const handleConfirmSwitch = () => {
-    // Implement switch logic here
-    setSwitchStatus(!switchStatus);
-    setSwitchModalVisible(false);
+  const handleConfirmSwitch = async (id) => {
+    const data = { status: switchStatus ? "INACTIVE" : "ACTIVE" };
+    try {
+      const response = await updateStatus({ data, id });
+      message.success(response?.data?.message);
+      setSwitchStatus(!switchStatus);
+      setSwitchModalVisible(false);
+    } catch (error) {
+      message.error("Failed to update status");
+    }
   };
+
+  const handleUpdateDesignation = async (values) => {
+    try {
+      const data = {
+        designationName: values.departmentName,
+        institutionID: values.institutionId,
+        departmentID: values.departmentId
+      };
+      const response = await updateDesignation({ id: item._id, data });
+      if (response.data?.success) {
+        message.success(response.data.message);
+        setEditModalVisible(false);
+      }
+    } catch (error) {
+      message.error("Failed to update designation");
+    }
+  };
+
+  useEffect(() => {
+    setSwitchStatus(item.status === "ACTIVE");
+  }, [item.status]);
 
   return (
     <>
-      {/* Table Row */}
       <div className={`grid items-center grid-cols-7 gap-2 px-2 my-3 text-sm bg-gray-100 space-x-5 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
         <div className="flex items-center justify-center py-3">{item?.designationName}</div>
@@ -63,7 +76,7 @@ const RoleTableBody = ({ item, list }) => {
         <div className="flex items-center justify-center py-3">{item.department}</div>
         <div className="flex items-center justify-center py-3">{item.created}</div>
         <div className="flex items-center justify-center py-3">{item.status}</div>
-        <div className="flex items-center  border justify-between px-3 rounded border-primary">
+        <div className="flex items-center border justify-between px-3 rounded border-primary">
           <Button
             type="text"
             icon={<EditOutlined />}
@@ -84,6 +97,7 @@ const RoleTableBody = ({ item, list }) => {
           />
         </div>
       </div>
+
       {/* Delete Confirmation Modal */}
       <Modal
         open={removeModalVisible}
@@ -133,8 +147,9 @@ const RoleTableBody = ({ item, list }) => {
               No
             </Button>
             <Button
+              loading={updateStatusLoading}
               type="primary"
-              onClick={handleConfirmSwitch}
+              onClick={() => handleConfirmSwitch(item._id)}
               className="px-8 bg-primary"
             >
               Yes
@@ -143,22 +158,23 @@ const RoleTableBody = ({ item, list }) => {
         </div>
       </Modal>
 
-
-      <ViewDetailsModal isOpen={viewdetailsModalVisible} onClose={() => setViewdetailsModalVisible(false)} modalTitle="Hospital Details"
-        imageAlt="Hospital building"
-        details={[
-          { label: "Name", value: "City General Hospital" },
-          { label: "Phone Number", value: "+1234567890" },
-          { label: "Email", value: "contact@cityhospital.com" },
-          { label: "Address", value: "123 Medical Drive, Health City" },
-          { label: "Status", value: "Active" }
-        ]} />
-
-
-      <RoleManageModal mode="edit" visible={editModalVisible} onCancel={() => setEditModalVisible(false)} /> {/* initialValues={institution} */}
-
-
-
+      {/* Edit Modal */}
+      <RoleManageModal
+        mode="edit"
+        visible={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        onSubmit={handleUpdateDesignation}
+        initialValues={{
+          institution: item.institutionID?._id,
+          department: item.departmentID?._id,
+          departmentName: item.designationName,
+          institutionId: item.institutionID?._id,
+          departmentId: item.departmentID?._id
+        }}
+        institutions={institutions}
+        departments={departments}
+        creatingLoading={updating}
+      />
     </>
   );
 };

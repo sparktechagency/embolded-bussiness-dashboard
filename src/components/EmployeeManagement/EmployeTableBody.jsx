@@ -6,7 +6,7 @@ import { useDeleteEmployeeMutation, useUpdateEmplyeeStatusMutation } from '../..
 // import ViewDetailsModal from "./ViewDetailsModal";
 // import InstitutionFormModal from "./InstitutionFormModal";
 
-const EmployeTableBody = ({ item, list }) => {
+const EmployeTableBody = ({ item, list, refetch }) => {
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [viewdetailsModalVisible, setViewdetailsModalVisible] = useState(false);
@@ -41,10 +41,11 @@ const EmployeTableBody = ({ item, list }) => {
   const handleConfirmDelete = async (id) => {
     // Implement delete logic here
     try {
-      const response = await deleteEmployee(id);
+      const response = await deleteEmployee(id).unwrap();
       if (response.success) {
         message.success(response.message || "Employee deleted successfully");
       }
+      refetch()
     } catch (error) {
       message.error(error?.data?.message || "Failed to delete employee");
       console.log("Delete error:", error);
@@ -60,14 +61,15 @@ const EmployeTableBody = ({ item, list }) => {
     try {
       const response = await updateStatus({ data: { status: newStatus }, id: id })
       console.log("Switch response:", response);
+      setSwitchStatus(!switchStatus);
+      setSwitchModalVisible(false);
     } catch (error) {
       console.log("Switch error:", error);
       message.error(error?.data?.message || "Failed to update employee status");
     }
 
     // Implement switch logic here
-    setSwitchStatus(!switchStatus);
-    setSwitchModalVisible(false);
+
   };
 
   function convertTime(dateOrTime) {
@@ -111,7 +113,7 @@ const EmployeTableBody = ({ item, list }) => {
             type="text"
             icon={<EyeOutlined />}
             className="text-amber-500 hover:text-amber-600"
-            onClick={handleViewDetails}
+            onClick={() => router(`/employee-management/details/${item._id}`)}
           />
           <Button
             type="text"

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useProfileQuery } from "../features/profile/profileApi";
+
 
 // import Avator from "../assets/avator2.png";
 import moment from "moment";
@@ -14,6 +14,7 @@ import {
   useGetNotificationQuery,
   useReadNotificationMutation,
 } from "../features/notification/notification";
+import { useGetProfileQuery } from '../features/settings/settingApi';
 import { baseURL } from "../utils/BaseURL";
 
 const NotificationPopup = () => {
@@ -27,7 +28,9 @@ const NotificationPopup = () => {
   const notificationContainerRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const { data: profile } = useProfileQuery();
+  const { data: profile } = useGetProfileQuery();
+
+
   const {
     data: notifications,
     refetch,
@@ -129,11 +132,17 @@ const NotificationPopup = () => {
       } else if (path.pathname === "/earning") {
         navigate("/earning");
       }
+      else if (path.pathname === "/employee-management") {
+        navigate("/employee-management");
+      }
     } else {
       if (path.pathname === "/reservation") {
         navigate(`/reservation?search=${searchQuery}`);
       } else if (path.pathname === "/earning") {
         navigate(`/earning?search=${searchQuery}`);
+      }
+      else if (path.pathname === "/employee-management") {
+        navigate(`/employee-management?search=${searchQuery}`);
       }
     }
   };
@@ -235,11 +244,11 @@ const NotificationPopup = () => {
           </span>
           <Avatar
             src={
-              profile?.data?.image
-                ? `${baseURL}${profile?.data?.image}`
+              profile?.data?.profileImage
+                ? `${baseURL}${profile?.data?.profileImage}`
                 : `/avator2.png`
             }
-            size={30}
+            size={35}
           />
         </div>
 

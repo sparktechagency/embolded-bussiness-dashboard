@@ -200,6 +200,7 @@ const InstitutionTableBody = ({ item, list }) => {
         onClose={() => setViewdetailsModalVisible(false)}
         modalTitle="Institution Information"
         data={data}
+        loading={isLoading}
       />
 
       <InstitutionFormModal

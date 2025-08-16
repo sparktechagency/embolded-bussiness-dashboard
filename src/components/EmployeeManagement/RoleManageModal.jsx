@@ -1,70 +1,81 @@
-import { Button, Form, Input, Modal, Select } from 'antd';
-import { useEffect, useState } from 'react';
+import { Button, Form, Input, Modal, Select, Spin } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
 
 const { Option } = Select;
 
 const RoleManageModal = ({
-  mode = 'create', // 'create' or 'edit'
+  mode = 'create',
   visible,
   onCancel,
   onSubmit,
   departments = [],
   institutions = [],
-  initialValues = {}
+  initialValues = {},
+  creatingLoading
 }) => {
   const [form] = Form.useForm();
   const [selectedInstitution, setSelectedInstitution] = useState(null);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [filteredDepartments, setFilteredDepartments] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Initialize form when modal opens
+  // Memoize the initial values to prevent unnecessary changes
+  const memoizedInitialValues = useMemo(() => initialValues, [
+    initialValues.institution,
+    initialValues.department,
+    initialValues.departmentName,
+    initialValues.institutionId,
+    initialValues.departmentId
+  ]);
+
   useEffect(() => {
     if (visible) {
-      const timer = setTimeout(() => {
-        if (mode === 'edit' && initialValues) {
-          form.setFieldsValue(initialValues);
-          if (initialValues.institutionId) {
-            setSelectedInstitution(initialValues.institutionId);
-          }
-          if (initialValues.departmentId) {
-            setSelectedDepartment(initialValues.departmentId);
-          }
-        } else if (mode === 'create') {
-          form.resetFields();
-          setSelectedInstitution(null);
-          setSelectedDepartment(null);
-          setFilteredDepartments([]);
-        }
-      }, 150)
-      return () => clearTimeout(timer);
-    }
-  }, [mode, visible, form]); // Removed initialValues from dependencies to prevent infinite loop
+      setLoading(true);
+      if (mode === 'edit' && memoizedInitialValues) {
+        form.setFieldsValue({
+          institution: memoizedInitialValues.institution,
+          department: memoizedInitialValues.department,
+          departmentName: memoizedInitialValues.departmentName
+        });
+        setSelectedInstitution(memoizedInitialValues.institutionId);
+        setSelectedDepartment(memoizedInitialValues.departmentId);
 
-  // Filter departments based on selected institution
-  useEffect(() => {
-    if (selectedInstitution && departments.length > 0) {
+        if (memoizedInitialValues.institutionId) {
+          const filtered = departments.filter(dept =>
+            dept.institutionID && dept.institutionID._id === memoizedInitialValues.institutionId
+          );
+          setFilteredDepartments(filtered);
+        }
+      } else {
+        form.resetFields();
+        setSelectedInstitution(null);
+        setSelectedDepartment(null);
+        setFilteredDepartments([]);
+      }
+      setLoading(false);
+    }
+  }, [visible, mode, memoizedInitialValues, form, departments]);
+
+  const handleInstitutionChange = (value) => {
+    setSelectedInstitution(value);
+    setSelectedDepartment(null);
+    form.setFieldsValue({
+      department: undefined,
+      departmentName: ''
+    });
+
+    if (value && departments.length > 0) {
       const filtered = departments.filter(dept =>
-        dept.institutionID && dept.institutionID._id === selectedInstitution
+        dept.institutionID && dept.institutionID._id === value
       );
       setFilteredDepartments(filtered);
     } else {
       setFilteredDepartments([]);
     }
-  }, [selectedInstitution]);
-
-  const handleInstitutionChange = (value) => {
-    setSelectedInstitution(value);
-    setSelectedDepartment(null);
-    // Clear department field when institution changes
-    form.setFieldsValue({
-      department: undefined,
-      departmentName: ''
-    });
   };
 
   const handleDepartmentChange = (value) => {
     setSelectedDepartment(value);
-    // Find the selected department and auto-fill the department name
     const selectedDept = filteredDepartments.find(dept => dept._id === value);
     if (selectedDept) {
       form.setFieldsValue({
@@ -75,23 +86,12 @@ const RoleManageModal = ({
 
   const handleSubmit = () => {
     form.validateFields().then(values => {
-      // Add selected institution and department IDs to the values
       const submitData = {
         ...values,
         institutionId: selectedInstitution,
         departmentId: selectedDepartment
       };
       onSubmit(submitData);
-
-      // Reset form and state after successful submission
-      if (mode === 'create') {
-        form.resetFields();
-        setSelectedInstitution(null);
-        setSelectedDepartment(null);
-        setFilteredDepartments([]);
-      }
-    }).catch(error => {
-      console.error('Form validation failed:', error);
     });
   };
 
@@ -103,99 +103,80 @@ const RoleManageModal = ({
     onCancel();
   };
 
-  const modalFooter = (
-    <div>
-      <Button
-        style={{ paddingLeft: "30px", paddingRight: "30px", fontSize: "16px", marginRight: 8 }}
-        onClick={handleCancel}
-      >
-        Cancel
-      </Button>
-      <Button
-        type="primary"
-        style={{ paddingLeft: "40px", paddingRight: "40px", fontSize: "16px" }}
-        onClick={handleSubmit}
-        className="bg-[#336C79]"
-      >
-        {mode === 'create' ? 'Create' : 'Update'}
-      </Button>
-    </div>
-  );
-
-  const modalTitle = mode === 'create'
-    ? 'Create New Role'
-    : 'Edit Role';
-
   return (
     <Modal
-      title={<span style={{ fontWeight: "bold", color: "#336C79", paddingTop: "20px", paddingBottom: "20px" }}>{modalTitle}</span>}
+      title={<span style={{ fontWeight: "bold", color: "#336C79" }}>
+        {mode === 'create' ? 'Create New Designation' : 'Edit Designation'}
+      </span>}
       open={visible}
       onCancel={handleCancel}
-      footer={modalFooter}
+      footer={[
+        <Button key="cancel" onClick={handleCancel}>
+          Cancel
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          loading={creatingLoading}
+          onClick={handleSubmit}
+          className="bg-[#336C79]"
+        >
+          {mode === 'create' ? 'Create' : 'Update'}
+        </Button>
+      ]}
       closable={false}
-      destroyOnClose={true} // This ensures the modal is completely reset when closed
+      destroyOnClose
     >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          roleName: "",
-          institution: undefined,
-          department: undefined,
-          departmentName: ""
-        }}
-      >
-        <Form.Item
-          name="institution"
-          label={<span style={{ fontWeight: "bold" }}>Select Institution</span>}
-          rules={[{ required: true, message: 'Please select an institution!' }]}
-        >
-          <Select
-            placeholder="Select an institution"
-            onChange={handleInstitutionChange}
-            value={selectedInstitution}
-            allowClear
+      <Spin spinning={loading}>
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="institution"
+            label="Select Institution"
+            rules={[{ required: true, message: 'Please select an institution!' }]}
           >
-            {institutions.map(institution => (
-              <Option key={institution._id} value={institution._id}>
-                {institution.institutionName}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Select
+              placeholder="Select an institution"
+              onChange={handleInstitutionChange}
+              value={selectedInstitution}
+              allowClear
+            >
+              {institutions.map(institution => (
+                <Option key={institution._id} value={institution._id}>
+                  {institution.institutionName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-        <Form.Item
-          name="department"
-          label={<span style={{ fontWeight: "bold" }}>Select Department</span>}
-          rules={[{ required: true, message: 'Please select a department!' }]}
-        >
-          <Select
-            placeholder="Select a department"
-            onChange={handleDepartmentChange}
-            value={selectedDepartment}
-            disabled={!selectedInstitution}
-            allowClear
+          <Form.Item
+            name="department"
+            label="Select Department"
+            rules={[{ required: true, message: 'Please select a department!' }]}
           >
-            {filteredDepartments.map(department => (
-              <Option key={department._id} value={department._id}>
-                {department.departmentName}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Select
+              placeholder="Select a department"
+              onChange={handleDepartmentChange}
+              value={selectedDepartment}
+              disabled={!selectedInstitution}
+              allowClear
+            >
+              {filteredDepartments.map(department => (
+                <Option key={department._id} value={department._id}>
+                  {department.departmentName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-        <Form.Item
-          name="departmentName"
-          label={<span style={{ fontWeight: "bold" }}>Department Name</span>}
-          rules={[{ required: true, message: 'Please select a department first!' }]}
-        >
-          <Input
-            placeholder="Department name will appear here"
-            readOnly
-            style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
-          />
-        </Form.Item>
-      </Form>
+          <Form.Item
+            name="departmentName"
+            label="Designation Name"
+            rules={[{ required: true, message: 'Designation name is required!' }]}
+          >
+            <Input placeholder="Enter designation name" />
+          </Form.Item>
+        </Form>
+      </Spin>
     </Modal>
   );
 };

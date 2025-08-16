@@ -3,9 +3,20 @@ import { useState } from 'react';
 import { useGetAllEmployeeQuery } from '../../features/EmployeeManagement/employeeManagementApi';
 import EmployeTableBody from "./EmployeTableBody";
 
-const EmployeTableHead = ({ columns }) => {
+const EmployeTableHead = ({
+  columns,
+  institutionFilter,  // Now receives ID
+  departmentFilter,  // Now receives ID
+  searchTerm
+}) => {
+
   const [currentPage, setCurrentPage] = useState(1);
-  const { data: employeeData, isLoading } = useGetAllEmployeeQuery(currentPage);
+  const { data: employeeData, isLoading , refetch } = useGetAllEmployeeQuery({
+    page: currentPage,
+    searchTerm: searchTerm,
+    institutionName: institutionFilter === null || institutionFilter.label === "All Institutions" ? "" : institutionFilter?.label,  // Directly passing the ID
+    departmentName: departmentFilter === null || departmentFilter.label === "All Departments" ? "" : departmentFilter?.label   // Directly passing the ID
+  });
 
   const employees = employeeData?.data?.data || [];
   const paginationInfo = employeeData?.data?.meta || {
@@ -33,11 +44,14 @@ const EmployeTableHead = ({ columns }) => {
 
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
-          {isLoading ? "loading..." : employees.length > 0 ? (
+          {isLoading ? (
+            <div className="py-10 text-center">Loading...</div>
+          ) : employees.length > 0 ? (
             employees.map((item, index) => (
               <EmployeTableBody
                 item={item}
                 key={item._id}
+                refetch={refetch}
                 list={(currentPage - 1) * paginationInfo.limit + index + 1}
               />
             ))

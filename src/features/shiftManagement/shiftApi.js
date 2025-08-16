@@ -11,7 +11,6 @@ export const shiftApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['shiftManagement'],
     }),
-
     getAllShift: builder.query({
       query: (page) => ({
         url: `/shifts?page=${page || 1}`,
@@ -29,7 +28,7 @@ export const shiftApi = baseApi.injectEndpoints({
     }),
 
     updateShift: builder.mutation({
-      query: ({ data, id }) => ({
+      query: ({ id, data }) => ({
         url: `/shifts/${id}`,
         method: "PATCH",
         body: data,
@@ -42,6 +41,15 @@ export const shiftApi = baseApi.injectEndpoints({
         url: `/shifts/${id}/status`,
         method: "PATCH",
         body: data,  // {"status": "ACTIVE"}
+      }),
+      invalidatesTags: ["shiftManagement"]
+    }),
+
+    assignEmployeeShift: builder.mutation({
+      query: (data) => ({
+        url: `/assign-shifts`,
+        method: "PATCH",
+        body: data,
       }),
       invalidatesTags: ["shiftManagement"]
     }),
@@ -63,5 +71,6 @@ export const {
   useGetShiftByIdQuery,
   useUpdateShiftMutation,
   useUpdateShiftStatusMutation,
-  useDeleteShiftMutation
+  useDeleteShiftMutation,
+  useAssignEmployeeShiftMutation
 } = shiftApi;
