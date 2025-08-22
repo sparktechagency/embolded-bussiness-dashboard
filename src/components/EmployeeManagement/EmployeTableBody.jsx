@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Select, Switch } from "antd";
+import { Button, message, Modal, Select, Switch, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDeleteEmployeeMutation, useUpdateEmplyeeStatusMutation } from '../../features/EmployeeManagement/employeeManagementApi';
@@ -82,12 +82,31 @@ const EmployeTableBody = ({ item, list, refetch }) => {
       {/* Table Row */}
       <div className={`grid grid-cols-11 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3">{item.name}</div>
-        <div className="flex items-center justify-center py-3">{item?.institutionID?.institutionName}</div>
-        <div className="flex items-center justify-center py-3">{item?.departmentID?.departmentName}</div>
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.name.length > 10 && (<Tooltip title={item.name}><span>{item.name.slice(0, 10)}...</span></Tooltip>)}
+          {item.name.length <= 10 && item.name}
+        </div>
+
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item?.institutionID?.institutionName.length > 10 && (<Tooltip title={item?.institutionID?.institutionName}><span>{item?.institutionID?.institutionName.slice(0, 10)}...</span></Tooltip>)}
+          {item?.institutionID?.institutionName.length <= 10 && item?.institutionID?.institutionName}
+        </div>
+
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item?.departmentID?.departmentName.length > 10 && (<Tooltip title={item?.departmentID?.departmentName}><span>{item?.departmentID?.departmentName.slice(0, 10)}...</span></Tooltip>)}
+          {item?.departmentID?.departmentName.length <= 10 && item?.departmentID?.departmentName}
+        </div>
         <div className="flex items-center justify-center py-3">{item?.role}</div>
-        <div className="flex items-center justify-center py-3">{item?.email}</div>
-        <div className="flex items-center justify-center py-3">{item?.phone}</div>
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.email.length > 10 && (<Tooltip title={item.email}><span>{item.email.slice(0, 10)}...</span></Tooltip>)}
+          {item.email.length <= 10 && item.email}
+        </div>
+
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item?.phone?.length > 10 && (<Tooltip title={item.phone}><span>{item.phone.slice(0, 10)}...</span></Tooltip>)}
+          {item?.phone?.length <= 10 && item.phone}
+        </div>
+
 
         <div className="flex items-center justify-center py-3">
           <Select
@@ -107,7 +126,7 @@ const EmployeTableBody = ({ item, list, refetch }) => {
         <div className="flex items-center justify-center py-3">{convertTime(item?.shiftSchedule?.shiftStartTime)} - {convertTime(item?.shiftSchedule?.shiftEndTime)}</div>
 
 
-        <div className="flex items-center justify-center py-3">{item.status}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
         <div className="flex items-center justify-center border rounded border-primary py-1 px-2">
           <Button
             type="text"

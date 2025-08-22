@@ -1,5 +1,6 @@
+// src/components/ShiftManagement/ShiftManagement.jsx
 import { Button, message, Select } from 'antd';
-import moment from 'moment'; // Import moment.js
+import moment from 'moment';
 import { useState } from 'react';
 import { useGetAllShiftAndLeaveQuery } from '../../features/shiftAndLeave/ShiftAndLeave';
 import { useAssignEmployeeShiftMutation, useCreateShiftMutation } from '../../features/shiftManagement/shiftApi';
@@ -15,23 +16,22 @@ function ShiftManagement() {
   const [updateAssign, { isLoading: AssignEmployeeShiftLoading }] = useAssignEmployeeShiftMutation();
   const { data, isLoading } = useGetAllShiftAndLeaveQuery();
 
-  const findLenght = () => {
-    return data?.data?.data?.filter(item => item.status === 'PENDING')
-  }
+  // সঠিক স্পেলিং: findLength
+  const findLength = () => {
+    return data?.data?.data?.filter(item => item.status === 'PENDING') || [];
+  };
 
-  // State for modals
+  // Modals visibility
   const [isNewShiftModalVisible, setIsNewShiftModalVisible] = useState(false);
   const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
   const [isAssignShiftModalVisible, setIsAssignShiftModalVisible] = useState(false);
 
-  // Handle shift creation with proper moment.js validation
+  // Handle shift creation
   const handleCreateHoliday = async (values) => {
     try {
-      // Ensure startTime and endTime are moment objects
       const startTime = moment.isMoment(values?.startTime) ? values.startTime : moment(values?.startTime);
       const endTime = moment.isMoment(values?.endTime) ? values.endTime : moment(values?.endTime);
 
-      // Validate that the times are valid
       if (!startTime.isValid() || !endTime.isValid()) {
         message.error("Please provide valid start and end times");
         return;
@@ -53,7 +53,22 @@ function ShiftManagement() {
       }
     } catch (error) {
       console.error("Error creating shift:", error);
-      message.error(error?.message || "Something went wrong while creating shift");
+      message.error(error?.message || "Something went wrong");
+    }
+  };
+
+  const handleAssignShift = async (values) => {
+    try {
+      const response = await updateAssign(values);
+      if (response.error) {
+        message.error(response?.error?.data?.message || "Failed to assign shift");
+      } else {
+        message.success(response?.data?.message || "Shift assigned successfully");
+        setIsAssignShiftModalVisible(false);
+      }
+    } catch (err) {
+      console.error("Error assigning shift:", err);
+      message.error(err?.message || "Something went wrong");
     }
   };
 
@@ -67,32 +82,19 @@ function ShiftManagement() {
     "Action"
   ];
 
-  const handleAssignShift = async (values) => {
-    console.log(values);
-    try {
-      const response = await updateAssign(values);
-      if (response.error) {
-        message.error(response?.error?.data?.message || "Failed to assign shift");
-      } else {
-        message.success(response?.data?.message || "Shift assigned successfully");
-        setIsAssignShiftModalVisible(false);
-      }
-    } catch (err) {
-      console.error("Error assigning shift:", err);
-      message.error(err?.message || "Something went wrong while assigning shift");
-    }
-  }
-
   return (
     <div className="p-6 bg-gray-50">
       <div className="mb-6 flex justify-end gap-3">
+        {/* Request Modal Trigger */}
         <Button
           type="primary"
           className="bg-[#336C79]"
           onClick={() => setIsRequestModalVisible(true)}
         >
-          Request ({findLenght()?.length || 0})
+          Request ({findLength().length || 0})
         </Button>
+
+        {/* Create New Shift Modal Trigger */}
         <Button
           type="primary"
           className="bg-[#336C79]"
@@ -100,6 +102,8 @@ function ShiftManagement() {
         >
           Create New Shift
         </Button>
+
+        {/* Assign Shift Modal Trigger */}
         <Button
           type="primary"
           className="bg-[#336C79]"
@@ -111,6 +115,7 @@ function ShiftManagement() {
 
       <ShiftTableHead columns={holidayColumns} />
 
+      {/* Modals */}
       <NewShiftModal
         mode="create"
         visible={isNewShiftModalVisible}

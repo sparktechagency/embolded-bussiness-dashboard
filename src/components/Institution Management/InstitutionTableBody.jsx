@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Switch } from "antd";
+import { Button, message, Modal, Switch, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { useDeleteInstitueMutation, useGetInstitutionsByIdQuery, useUpdateInstitueMutation, useUpdateInstitueStatusMutation } from '../../features/instituteManagement/instituteManagementApi';
 import InstitutionFormModal from "./InstitutionFormModal";
@@ -94,19 +94,36 @@ const InstitutionTableBody = ({ item, list }) => {
     }
   };
 
+
+
   return (
     <>
       {/* Table Row */}
       <div className={`grid grid-cols-10 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.institutionName}</div>
-        <div className="flex items-center justify-center py-3 ml-4">{item.email}</div>
-        <div className="flex items-center justify-center py-3">{item.phoneNumber}</div>
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.institutionName.length > 10 && (<Tooltip title={item.institutionName}><span>{item.institutionName.slice(0, 10)}...</span></Tooltip>)}
+          {item.institutionName.length <= 10 && item.institutionName}
+        </div>
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.email.length > 10 && (<Tooltip title={item.email}><span>{item.email.slice(0, 10)}...</span></Tooltip>)}
+          {item.email.length <= 10 && item.email}
+        </div>
+
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.phoneNumber.length > 10 && (<Tooltip title={item.phoneNumber}><span>{item.phoneNumber.slice(0, 10)}...</span></Tooltip>)}
+          {item.phoneNumber.length <= 10 && item.phoneNumber}
+        </div>
+
         <div className="flex items-center justify-center py-3">{item.establishedYear}</div>
-        <div className="flex items-center justify-center py-3">{item.address}</div>
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.address.length > 10 && (<Tooltip title={item.address}><span>{item.address.slice(0, 10)}...</span></Tooltip>)}
+          {item.address.length <= 10 && item.address}
+        </div>
+
         <div className="flex items-center justify-center py-3">{item.totalDepartment}</div>
         <div className="flex items-center justify-center py-3">{item.totalEmployee}</div>
-        <div className="flex items-center justify-center py-3">{item.status}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
         <div className="flex items-center justify-center border rounded border-primary py-1 px-2">
           <Button
             type="text"
@@ -200,7 +217,7 @@ const InstitutionTableBody = ({ item, list }) => {
         onClose={() => setViewdetailsModalVisible(false)}
         modalTitle="Institution Information"
         data={data}
-        loading={isLoading}
+        isLoading={isLoading}
       />
 
       <InstitutionFormModal
@@ -209,7 +226,8 @@ const InstitutionTableBody = ({ item, list }) => {
         onCancel={() => setEditModalVisible(false)}
         initialValues={data?.data}
         onSubmit={handleUpdateInstitution}
-        loading={updateInstitutionLoading}
+        isLoading={updateInstitutionLoading}
+        getDataLoading={isLoading}
       />
     </>
   );

@@ -9,7 +9,8 @@ const AssignShiftModal = ({
   visible,
   onCancel,
   onSubmit,
-  initialValues = {}
+  initialValues = {},
+  loading
 }) => {
   const [form] = Form.useForm();
   const [selectedInstitution, setSelectedInstitution] = useState(null);
@@ -177,6 +178,7 @@ const AssignShiftModal = ({
           Cancel
         </Button>
         <Button
+          loading={loading}
           type="primary"
           onClick={handleSubmit}
         >

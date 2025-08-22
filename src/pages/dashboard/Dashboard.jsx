@@ -1,3 +1,5 @@
+// src/pages/ParkingDashboard.jsx
+import { useEffect } from 'react';
 import AbsentTableHead from '../../components/Admin/AbsentTableHead';
 import AttendanceBarChart from '../../components/Admin/AttendanceBarChart';
 import AttendanceChart from '../../components/Admin/AttendanceChart';
@@ -5,21 +7,16 @@ import LateTableHead from '../../components/Admin/LateTableHead';
 import AdminStatistics from '../../components/Statistics/AdminStatistics';
 import DepartmentStatistics from '../../components/Statistics/DepartmentStatistics';
 
-
 const ParkingDashboard = () => {
   const role = localStorage.getItem("role");
 
+  useEffect(() => {
+    if (!role) {
+      window.location.href = "/auth/login";
+    }
+  }, [role]);
 
-  // useEffect(() => {
-  //    const role = localStorage.getItem("role");
-  //    if(!role){
-  //      window.location.href = "/auth/login";
-  //    }
-  // }, [role])
-
-
-
-  const AbSentTableHead = [
+  const absentTableHeaders = [
     "SL",
     "Employee ID",
     "Employee Name",
@@ -27,9 +24,9 @@ const ParkingDashboard = () => {
     "Department",
     "Shift Schedule",
     "Account Status",
-  ]
+  ];
 
-  const LateTableHeadCollumn = [
+  const lateTableHeaders = [
     "SL",
     "Employee ID",
     "Employee Name",
@@ -38,39 +35,47 @@ const ParkingDashboard = () => {
     "Shift Schedule",
     "Late Min",
     "Account Status",
-  ]
+  ];
 
   return (
-    <div className="mt-7">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <AttendanceChart />
-        <AttendanceBarChart />
-        {/* Statistics Card */}
+    <div className="mt-4 sm:mt-6 px-4 sm:px-6">
+      {/* Responsive Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        {/* Attendance Chart */}
+        <div className="sm:col-span-2 lg:col-span-1">
+          <AttendanceChart />
+        </div>
 
-        {role === "BUSINESS_OWNER" ? <AdminStatistics /> : <DepartmentStatistics />}
+        {/* Bar Chart */}
+        <div className="sm:col-span-2 lg:col-span-1">
+          <AttendanceBarChart />
+        </div>
 
-        {/* Today's Entry */}
-        <div className="md:col-span-3">
-          <div className="bg-white rounded-lg overflow-hidden">
-            <div className="px-4 py-3 border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-800">Today’s Absent</h2>
+        {/* Statistics */}
+        <div className="sm:col-span-2 lg:col-span-1">
+          {role === "BUSINESS_OWNER" ? <AdminStatistics /> : <DepartmentStatistics />}
+        </div>
 
+        {/* Today's Absent */}
+        <div className="sm:col-span-2 lg:col-span-3">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-800">Today's Absent</h2>
             </div>
-            <div className='p-2'>
-              <AbsentTableHead columns={AbSentTableHead} />
+            <div className="p-2 overflow-x-auto">
+              <AbsentTableHead columns={absentTableHeaders} />
             </div>
           </div>
         </div>
 
-        {/* Today's Exit */}
-        <div className="md:col-span-3">
-          <div className="bg-white rounded-lg overflow-hidden">
-            <div className="px-4 py-3  flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-800">Today’s Late</h2>
+        {/* Today's Late */}
+        <div className="sm:col-span-2 lg:col-span-3">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-800">Today's Late</h2>
             </div>
-            <div className='p-2'>
-              <LateTableHead columns={LateTableHeadCollumn} />
-
+            <div className="p-2 overflow-x-auto">
+              <LateTableHead columns={lateTableHeaders} />
             </div>
           </div>
         </div>

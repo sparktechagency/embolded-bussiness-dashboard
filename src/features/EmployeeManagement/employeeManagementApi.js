@@ -1,6 +1,5 @@
 import { baseApi } from "../../apiBaseQuery";
 
-
 export const employeeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createEmployee: builder.mutation({
@@ -9,7 +8,7 @@ export const employeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ['empolyeeManagement'],
+      invalidatesTags: ['employeeManagement'],
     }),
 
     getAllEmployee: builder.query({
@@ -20,7 +19,7 @@ export const employeeApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["employeeManagement"], // fixed typo
+      providesTags: ["employeeManagement"],
     }),
 
     getEmployeeById: builder.query({
@@ -28,16 +27,22 @@ export const employeeApi = baseApi.injectEndpoints({
         url: `/employees/${id}`,
         method: "GET",
       }),
-      providesTags: ["empolyeeManagement"]
+      providesTags: (result, error, id) => [
+        { type: 'employeeManagement', id },
+        'employeeManagement'
+      ]
     }),
 
     updateEmployee: builder.mutation({
-      query: ({ data, id }) => ({
+      query: ({ id, formData }) => ({
         url: `/employees/${id}`,
         method: "PATCH",
-        body: data,
+        body: formData,
       }),
-      invalidatesTags: ['empolyeeManagement'],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'employeeManagement', id },
+        'employeeManagement'
+      ],
     }),
 
     updateEmplyeeStatus: builder.mutation({
@@ -46,7 +51,10 @@ export const employeeApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,  // {"status": "ACTIVE"}
       }),
-      invalidatesTags: ["empolyeeManagement"]
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'employeeManagement', id },
+        'employeeManagement'
+      ]
     }),
 
     deleteEmployee: builder.mutation({
@@ -54,11 +62,10 @@ export const employeeApi = baseApi.injectEndpoints({
         url: `/employees/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ['empolyeeManagement'],
+      invalidatesTags: ['employeeManagement'],
     }),
   }),
 });
-
 
 export const {
   useCreateEmployeeMutation,

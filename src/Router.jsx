@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import CustomersAccount from './components/CustomersAccount';
 import DepartmentManagement from "./components/DepartmentManagement/DepartmentManagement";
 import EmployeeInformation from "./components/EmployeeManagement/EmployeeInformation";
 import EmployeeManagement from "./components/EmployeeManagement/EmployeeManagement";
@@ -8,6 +9,7 @@ import InstitutionManagement from "./components/Institution Management/Instituti
 import LocationManagement from "./components/LocationManagement/LocationManagement";
 import LoginCredentialsMananement from "./components/LoginCredentials/LoginCredentialsMananement";
 import NewRole from "./components/LoginCredentials/NewRole";
+import ProtectedRoute from './components/ProtectedRoute';
 import RequestManagement from "./components/ShiftManagement/request/RequestManagement";
 import ShiftManagement from "./components/ShiftManagement/ShiftManagement";
 import AllUserTable from "./components/ShiftManagement/ShiftManagementAllUser/AllUserTable";
@@ -34,9 +36,9 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      // <ProtectedRoute>
-      <Layout />
-      // </ProtectedRoute>
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
     ),
     errorElement: <NotFound />,
     children: [
@@ -159,6 +161,7 @@ const router = createBrowserRouter([
         path: "settings",
         element: <UserProfile />
       },
+
       {
         path: "notification",
         element: <Notification />
@@ -198,6 +201,10 @@ const router = createBrowserRouter([
   {
     path: "/pricing-plans",
     element: <PricingPlans />
+  },
+  {
+    path: "customers_account",
+    element: <CustomersAccount />
   },
   {
     path: "/auth/login/check_email",

@@ -1,11 +1,15 @@
-import { Pagination } from 'antd';
+import { Pagination, Spin } from 'antd';
 import { useState } from 'react';
 import { useGetAllDesignationQuery } from '../../features/Designation/designationApi';
 import RoleTableBody from './RoleTableBody';
 
-const RoleTableHead = ({ columns, institutions, departments }) => {
+const RoleTableHead = ({ columns, institutions, departments, searchTerm }) => {
+  console.log(searchTerm);
   const [currentPage, setCurrentPage] = useState(1);
-  const { data: designation, isLoading } = useGetAllDesignationQuery();
+  const { data: designation, isLoading } = useGetAllDesignationQuery({
+    page: currentPage,
+    searchTerm: searchTerm,
+  });
 
   const data = designation?.data?.data || [];
   const meta = designation?.data?.meta || {
@@ -33,7 +37,7 @@ const RoleTableHead = ({ columns, institutions, departments }) => {
 
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
-          {isLoading ? "Loading..." : data?.length > 0 ? (
+          {isLoading ? <div className="py-10 text-center"><Spin size='small' /></div> : data?.length > 0 ? (
             data?.map((item, index) => (
               <RoleTableBody
                 item={item}

@@ -1,15 +1,15 @@
 export const saveToken = (token) => {
-  localStorage.setItem("businessToken", token);
+  localStorage.setItem("taken", token);
 };
 
 export const getToken = () => {
-  return localStorage.getItem("businessToken");
+  return localStorage.getItem("taken");
 };
 
 export const removeToken = () => {
-  localStorage.removeItem("businessToken");
+  localStorage.removeItem("taken");
 };
 
 export const isAuthenticated = () => {
-  return !getToken();
+  return getToken();
 };

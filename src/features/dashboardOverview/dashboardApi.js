@@ -1,4 +1,5 @@
-import { baseApi } from "../../apiBaseQuery";
+import { baseApi } from '../../apiBaseQuery';
+
 
 export const overviewApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -14,11 +15,15 @@ export const overviewApi = baseApi.injectEndpoints({
       providesTags: ["overview"]
     }),
 
-    getAttendance: builder.query({
-      query: () => "/analytics/present-summary/last-seven-days",
+    getCharts: builder.query({
+      query: () => {
+        return {
+          url: `/analytics/present-summary/last-seven-days`,
+          method: "GET",
+        };
+      },
       providesTags: ["overview"]
     }),
-
     statisticsForBussiness: builder.query({
       query: () => "/analytics/summary/last-seven-days",
       transformResponse: (response) => response?.data,
@@ -40,4 +45,4 @@ export const overviewApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetAbesntsQuery, useGetAttendanceQuery, useGetLatesQuery, useStatisticsForBussinessQuery, useStatisticsForHrAndDepQuery, useSummaryQuery } = overviewApi;
+export const { useGetAbesntsQuery, useGetChartsQuery, useGetLatesQuery, useStatisticsForBussinessQuery, useStatisticsForHrAndDepQuery, useSummaryQuery } = overviewApi;

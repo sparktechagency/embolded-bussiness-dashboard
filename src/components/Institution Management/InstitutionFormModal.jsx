@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Modal, Row, Upload } from 'antd';
+import { Button, Col, Form, Input, Modal, Row, Spin, Upload } from 'antd';
 import { Upload as UploadIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { baseURL } from '../../utils/BaseURL';
@@ -9,7 +9,8 @@ const InstitutionFormModal = ({
   onCancel,
   onSubmit,
   initialValues = {},
-  loading
+  isLoading,
+  getDataLoading
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
@@ -129,7 +130,7 @@ const InstitutionFormModal = ({
       </Button>
       <Button
         type="primary"
-        loading={loading}
+        loading={isLoading}
         style={{ paddingLeft: "40px", paddingRight: "40px", fontSize: "16px" }}
         onClick={handleSubmit}
         className="bg-[#336C79]"
@@ -152,95 +153,97 @@ const InstitutionFormModal = ({
       closable={false}
       width={1000}
     >
-      <Form form={form} layout="vertical">
-        <Row gutter={24}>
-          <Col span={8}>
-            <Form.Item
-              name="name"
-              label="Institution Name"
-              rules={[{ required: true, message: 'Please input institution name!' }]}
-            >
-              <Input placeholder="Enter institution name" />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="address"
-              label="Address"
-              rules={[{ required: true, message: 'Please input address!' }]}
-            >
-              <Input placeholder="Enter address" />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[
-                { required: true, message: 'Please input email!' },
-                { type: 'email', message: 'Please enter a valid email!' }
-              ]}
-            >
-              <Input placeholder="Enter email" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={24}>
-          <Col span={8}>
-            <Form.Item
-              name="phone"
-              label="Phone Number"
-              rules={[{ required: true, message: 'Please input phone number!' }]}
-            >
-              <Input placeholder="Enter phone number" />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="website"
-              label="Institution Website Link"
-              rules={[{ required: true, message: 'Please input website!' }]}
-            >
-              <Input placeholder="Enter website link" />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="establishedYear"
-              label="Established Year"
-              rules={[{ required: true, message: 'Please input established year!' }]}
-            >
-              <Input placeholder="Enter year" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={24}>
-          <Col span={24}>
-            <Form.Item
-              name="logo"
-              label="Upload Logo"
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-            >
-              <Upload
-                {...uploadProps}
-                listType="picture-card"
-                maxCount={1}
-                className="institution-logo-uploader"
+      {
+        getDataLoading ? <div className='h-[300px] flex justify-center items-center'><Spin size='small' /></div> : <Form form={form} layout="vertical">
+          <Row gutter={24}>
+            <Col span={8}>
+              <Form.Item
+                name="name"
+                label="Institution Name"
+                rules={[{ required: true, message: 'Please input institution name!' }]}
               >
-                {fileList.length >= 1 ? null : (
-                  <div>
-                    <UploadIcon size={24} className="text-gray-400 ml-2" />
-                    <div className="mt-2">Upload</div>
-                  </div>
-                )}
-              </Upload>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+                <Input placeholder="Enter institution name" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="address"
+                label="Address"
+                rules={[{ required: true, message: 'Please input address!' }]}
+              >
+                <Input placeholder="Enter address" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  { required: true, message: 'Please input email!' },
+                  { type: 'email', message: 'Please enter a valid email!' }
+                ]}
+              >
+                <Input placeholder="Enter email" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={24}>
+            <Col span={8}>
+              <Form.Item
+                name="phone"
+                label="Phone Number"
+                rules={[{ required: true, message: 'Please input phone number!' }]}
+              >
+                <Input placeholder="Enter phone number" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="website"
+                label="Institution Website Link"
+                rules={[{ required: true, message: 'Please input website!' }]}
+              >
+                <Input placeholder="Enter website link" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="establishedYear"
+                label="Established Year"
+                rules={[{ required: true, message: 'Please input established year!' }]}
+              >
+                <Input placeholder="Enter year" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={24}>
+            <Col span={24}>
+              <Form.Item
+                name="logo"
+                label="Upload Logo"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+              >
+                <Upload
+                  {...uploadProps}
+                  listType="picture-card"
+                  maxCount={1}
+                  className="institution-logo-uploader"
+                >
+                  {fileList.length >= 1 ? null : (
+                    <div>
+                      <UploadIcon size={24} className="text-gray-400 ml-2" />
+                      <div className="mt-2">Upload</div>
+                    </div>
+                  )}
+                </Upload>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      }
     </Modal>
   );
 };

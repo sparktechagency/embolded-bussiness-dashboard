@@ -1,1 +1,1 @@
-export const Role = ["BUSINESS_OWNER", "HR", "DEPARTMENT_MANAGER", "SUPER_ADMIN"]
+export const Role = ["BUSINESS_OWNER", "HR", "DEPARTMENT_MANAGER"]

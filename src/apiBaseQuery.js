@@ -3,8 +3,24 @@ import { baseURL } from "./utils/BaseURL";
 import { getToken } from "./utils/storage";
 
 export const baseApi = createApi({
-  tagTypes: ["overview", "institueManagement", "empolyeeManagement", "location", "shiftManagement", "designation", "holidayManagement", "siftManagement", "LoginManagement", "subscription", "contact", "settings", "rules", "shiftAndLeave"],
   reducerPath: "baseApi",
+  tagTypes: [
+    "overview",
+    "instituteManagement",
+    "employeeManagement",
+    "location",
+    "shiftManagement",
+    "designation",
+    "holidayManagement",
+    "loginManagement",
+    "subscription",
+    "contact",
+    "settings",
+    "rules",
+    "shiftAndLeave",
+    "plan",
+    "notifications"
+  ],
   baseQuery: fetchBaseQuery({
     baseUrl: `${baseURL}/api/v1`,
     prepareHeaders: (headers) => {
@@ -16,5 +32,4 @@ export const baseApi = createApi({
     },
   }),
   endpoints: () => ({}),
-
 });

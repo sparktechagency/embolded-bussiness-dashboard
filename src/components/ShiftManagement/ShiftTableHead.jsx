@@ -1,4 +1,4 @@
-import { Pagination } from 'antd';
+import { Pagination, Spin } from 'antd';
 import { useState } from 'react';
 import { useGetAllShiftQuery } from '../../features/shiftManagement/shiftApi';
 import ShiftTableBody from "./ShiftTableBody";
@@ -39,7 +39,7 @@ const ShiftTableHead = ({ columns }) => {
 
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
-          {isLoading ? "isloading..." : data.length > 0 ? (
+          {isLoading ? <div className="py-10 text-center"><Spin size='small' /></div> : data.length > 0 ? (
             data?.map((item, index) => (
               <ShiftTableBody item={item} key={item._id} list={index + 1} />
             ))

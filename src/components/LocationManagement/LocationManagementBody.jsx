@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Switch } from "antd";
+import { Button, message, Modal, Switch, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetAllInstitutionsQuery } from '../../features/instituteManagement/instituteManagementApi';
@@ -154,13 +154,21 @@ const LocationManagementBody = ({ item, list }) => {
       {/* Table Row */}
       <div className={`grid grid-cols-9 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.locationName}</div>
+
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.locationName.length > 10 && (<Tooltip title={item.locationName}><span>{item.locationName.slice(0, 10)}...</span></Tooltip>)}
+          {item.locationName.length <= 10 && item.locationName}
+        </div>
+
         <div className="flex items-center justify-center py-3 ml-4">{item.latitude}</div>
         <div className="flex items-center justify-center py-3">{item.longitude}</div>
-        <div className="flex items-center justify-center py-3">{item.wifiSSID}</div>
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.wifiSSID.length > 10 && (<Tooltip title={item.wifiSSID}><span>{item.wifiSSID.slice(0, 10)}...</span></Tooltip>)}
+          {item.wifiSSID.length <= 10 && item.wifiSSID}
+        </div>
         <div className="flex items-center justify-center py-3">{item.wifiIPAddress}</div>
         <div className="flex items-center justify-center py-3">{item.radius}</div>
-        <div className="flex items-center justify-center py-3">{item.status}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
         <div className="flex items-center justify-center gap-2 border rounded border-primary py-1 px-2">
           <Button
             type="text"

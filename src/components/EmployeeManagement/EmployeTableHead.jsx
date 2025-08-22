@@ -1,4 +1,4 @@
-import { Pagination } from 'antd';
+import { Pagination, Spin } from 'antd';
 import { useState } from 'react';
 import { useGetAllEmployeeQuery } from '../../features/EmployeeManagement/employeeManagementApi';
 import EmployeTableBody from "./EmployeTableBody";
@@ -11,7 +11,7 @@ const EmployeTableHead = ({
 }) => {
 
   const [currentPage, setCurrentPage] = useState(1);
-  const { data: employeeData, isLoading , refetch } = useGetAllEmployeeQuery({
+  const { data: employeeData, isLoading, refetch } = useGetAllEmployeeQuery({
     page: currentPage,
     searchTerm: searchTerm,
     institutionName: institutionFilter === null || institutionFilter.label === "All Institutions" ? "" : institutionFilter?.label,  // Directly passing the ID
@@ -45,7 +45,7 @@ const EmployeTableHead = ({
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
           {isLoading ? (
-            <div className="py-10 text-center">Loading...</div>
+            <div className="py-10 text-center"><Spin size='small' /></div>
           ) : employees.length > 0 ? (
             employees.map((item, index) => (
               <EmployeTableBody

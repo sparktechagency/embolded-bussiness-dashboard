@@ -56,26 +56,18 @@ const ShiftTableBody = ({ item, list }) => {
 
   function convertTime(dateOrTime) {
     const date = new Date(dateOrTime);
-    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   }
+
 
   const handleUpdateShift = async (values) => {
     try {
-      // Ensure we have moment objects before formatting
-      const startTime = moment.isMoment(values.startTime)
-        ? values.startTime.format('HH:mm')
-        : moment(values.startTime, 'HH:mm').format('HH:mm');
-
-      const endTime = moment.isMoment(values.endTime)
-        ? values.endTime.format('HH:mm')
-        : moment(values.endTime, 'HH:mm').format('HH:mm');
-
       const response = await updateShift({
         id: item._id,
         data: {
           shiftName: values.name,
-          shiftStartTime: startTime,
-          shiftEndTime: endTime
+          shiftStartTime: convertTime(values.startTime),
+          shiftEndTime: convertTime(values.endTime)
         }
       });
       message.success(response.data?.message || "Shift updated successfully");
@@ -87,7 +79,7 @@ const ShiftTableBody = ({ item, list }) => {
 
   // Helper function to format date and time
   const formatDateTime = (dateString) => {
-    return moment(dateString).format('MMMM DD, YYYY - hh:mm A');
+    return moment(dateString).format('hh:mm A');
   };
 
   // Helper function to calculate shift duration
@@ -109,7 +101,7 @@ const ShiftTableBody = ({ item, list }) => {
         <div className="flex items-center justify-center py-3 ml-4">{convertTime(item?.shiftStartTime)}</div>
         <div className="flex items-center justify-center py-3">{convertTime(item?.shiftEndTime)}</div>
         <div className="flex items-center justify-center py-3">{item?.totalEmployee}</div>
-        <div className="flex items-center justify-center py-3">{item?.status}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
         <div className="flex items-center justify-center gap-5 border rounded border-primary py-1 px-2">
           <Button
             type="text"
@@ -182,7 +174,7 @@ const ShiftTableBody = ({ item, list }) => {
             <Button
               loading={isLoading}
               type="primary"
-              onClick={() => handleConfirmSwift(item._id)}
+              onClick={() => handleConfirmSwitch(item._id)}
               className="px-8 bg-primary"
             >
               Yes
@@ -226,12 +218,8 @@ const ShiftTableBody = ({ item, list }) => {
                   {item?.status}
                 </Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Total Employees">
-                <span className="font-medium">{item?.totalEmployee || 'N/A'}</span>
-              </Descriptions.Item>
-              <Descriptions.Item label="Shift ID" span={2}>
-                <span className="text-gray-600 font-mono text-sm">{item?._id}</span>
-              </Descriptions.Item>
+
+
             </Descriptions>
           </div>
 
@@ -290,9 +278,6 @@ const ShiftTableBody = ({ item, list }) => {
                 </Descriptions.Item>
                 <Descriptions.Item label="Role">
                   <Tag color="blue">{item?.createdBy?.role?.replace('_', ' ')}</Tag>
-                </Descriptions.Item>
-                <Descriptions.Item label="Creator ID">
-                  <span className="text-gray-600 font-mono text-sm">{item?.createdBy?._id}</span>
                 </Descriptions.Item>
               </Descriptions>
             </div>

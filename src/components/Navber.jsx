@@ -1,24 +1,21 @@
-import { BellOutlined, CheckCircleOutlined } from "@ant-design/icons";
+// src/components/Navber.jsx
+import { BellOutlined } from "@ant-design/icons";
 import { Avatar, Badge, Button, Card, Input, Spin, Tag } from "antd";
 import { motion } from "framer-motion";
+import moment from "moment";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { useLocation, useNavigate } from "react-router-dom";
-
-
-// import Avator from "../assets/avator2.png";
-import moment from "moment";
-import 'moment-timezone';
 import io from "socket.io-client";
 import {
   useGetNotificationQuery,
-  useReadNotificationMutation,
+  useReadAllNotificationMutation,
 } from "../features/notification/notification";
-import { useGetProfileQuery } from '../features/settings/settingApi';
+import { useGetProfileQuery } from "../features/settings/settingApi";
 import { baseURL } from "../utils/BaseURL";
 
-const NotificationPopup = () => {
-  const path = useLocation();
+const Navber = ({ toggleSidebar }) => {
+  const location = useLocation();
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -30,7 +27,6 @@ const NotificationPopup = () => {
 
   const { data: profile } = useGetProfileQuery();
 
-
   const {
     data: notifications,
     refetch,
@@ -40,72 +36,57 @@ const NotificationPopup = () => {
     refetchOnReconnect: true,
   });
 
-  const [readNotification, { isLoading: updateLoading }] =
-    useReadNotificationMutation();
+  const [readAllNotification, { isLoading: readAllLoading }] =
+    useReadAllNotificationMutation();
 
-  // Update current time periodically for accurate relative time display
+  // Update current time every minute
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 60000); // Update every minute
-
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Socket connection for real-time notifications
+  // Socket connection
   useEffect(() => {
     socketRef.current = io(baseURL);
+    socketRef.current.on("connect", () => console.log("Socket connected"));
 
-    socketRef.current.on("connect", () => {
-      // console.log("Socket connected");
-    });
-
-    const handleNewNotification = (notification) => {
-      // Force immediate refetch when new notification arrives
+    const handleNewNotification = () => {
       refetch();
-      setCurrentTime(new Date()); // Update current time for accurate relative time
-
-      // When a new notification arrives, scroll to top
+      setCurrentTime(new Date());
       if (notificationContainerRef.current && visible) {
         notificationContainerRef.current.scrollTop = 0;
       }
     };
 
-    socketRef.current.on(
-      `notification::${localStorage.getItem("businessLoginId")}`,
-      handleNewNotification
-    );
+    const userId = localStorage.getItem("businessLoginId");
+    if (userId) {
+      socketRef.current.on(`notification::${userId}`, handleNewNotification);
+    }
 
     return () => {
       if (socketRef.current) {
-        socketRef.current.off("connect");
-        socketRef.current.off(
-          `notification::${localStorage.getItem("businessLoginId")}`,
-          handleNewNotification
-        );
         socketRef.current.disconnect();
       }
     };
   }, [refetch, visible]);
 
-  // Update loading state when query completes
   useEffect(() => {
-    if (!isLoading) {
-      setLoading(false);
-    }
+    if (!isLoading) setLoading(false);
   }, [isLoading]);
 
-  // Scroll to top when notifications panel opens
   useEffect(() => {
-    if (visible && notificationContainerRef.current) {
-      notificationContainerRef.current.scrollTop = 0;
-      // Refetch notifications when panel opens to ensure fresh data
+    if (visible) {
       refetch();
-      setCurrentTime(new Date()); // Update current time for accurate relative time
+      setCurrentTime(new Date());
+      if (notificationContainerRef.current) {
+        notificationContainerRef.current.scrollTop = 0;
+      }
     }
   }, [visible, refetch]);
 
-  // Click outside to close popup
+  // Click outside to close
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -117,130 +98,111 @@ const NotificationPopup = () => {
         setVisible(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSearch = (e) => {
     const searchQuery = encodeURIComponent(e.target.value);
+    const path = location.pathname;
     if (!e.target.value) {
-      if (path.pathname === "/reservation") {
-        navigate("/reservation");
-      } else if (path.pathname === "/earning") {
-        navigate("/earning");
-      }
-      else if (path.pathname === "/employee-management") {
-        navigate("/employee-management");
-      }
+      navigate(path);
     } else {
-      if (path.pathname === "/reservation") {
-        navigate(`/reservation?search=${searchQuery}`);
-      } else if (path.pathname === "/earning") {
-        navigate(`/earning?search=${searchQuery}`);
-      }
-      else if (path.pathname === "/employee-management") {
-        navigate(`/employee-management?search=${searchQuery}`);
-      }
+      navigate(`${path}?search=${searchQuery}`);
     }
   };
 
   const handleNotificationClick = async (notification) => {
-    try {
-      if (!notification.read) {
-        await readNotification(notification._id);
-        refetch();
-      }
-    } catch (error) {
-      console.error("Error updating notification:", error);
-    }
+    console.log("Notification clicked:", notification);
   };
 
-  // Function to handle See Details button click
-  const handleSeeDetailsClick = () => {
-    setVisible(false); // Close the modal
-    navigate("/notification"); // Navigate to notification settings
+  const handleViewAllNotifications = () => {
+    setVisible(false);
+    navigate("/notification");
   };
 
-  // Updated formatTime function with explicit timezone offset
   const formatTime = useCallback((timestamp) => {
     if (!timestamp) return "Just now";
-
-    const bangladeshTime = moment(timestamp).add(6, 'hours');
-
-    return bangladeshTime.fromNow();
+    return moment(timestamp).add(6, "hours").fromNow(); // BD Time
   }, []);
-
-
-
 
   const getTypeColor = (type) => {
     switch (type) {
-      case "ALERT":
-        return "red";
-      case "INFO":
-        return "blue";
-      case "SUCCESS":
-        return "green";
-      default:
-        return "gray";
+      case "ALERT": return "red";
+      case "INFO": return "blue";
+      case "SUCCESS": return "green";
+      case "BUSINESS_OWNER": return "purple";
+      default: return "gray";
     }
   };
 
-  const unreadCount =
-    notifications?.data?.result.filter((notif) => !notif.read).length || 0;
+  const unreadCount = notifications?.data?.unreadCount || 0;
 
   const markAllAsRead = async () => {
     try {
-      await Promise.all(
-        notifications.data.result.map((notif) =>
-          !notif.read ? readNotification(notif._id) : Promise.resolve()
-        )
-      );
+      await readAllNotification().unwrap();
       refetch();
     } catch (error) {
       console.error("Error marking all as read:", error);
     }
   };
 
-  // Ensure notifications are sorted by createdAt (newest first)
   const sortedNotifications = notifications?.data?.result
     ? [...notifications.data.result].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     )
     : [];
-
+  const popupNotifications = sortedNotifications.slice(0, 3);
+  const totalNotifications = sortedNotifications.length;
+  const hasMoreNotifications = totalNotifications > 3;
 
   return (
-    <div className="flex items-center justify-between">
-      {path.pathname === "/employee-management" || path.pathname === "/all-user" ? (
-        <div className="flex items-center justify-between w-7/12">
+    <div className="flex items-center justify-between border-b py-5 px-6 bg-white  relative">
+      {/* Hamburger Menu for Mobile */}
+      <button
+        className="lg:hidden p-2 text-2xl text-gray-700"
+        onClick={toggleSidebar}
+        aria-label="Toggle Sidebar"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+
+      {/* Search Bar (Conditional) */}
+      {["/employee-management", "/all-user"].includes(location.pathname) && (
+        <div className="flex-1 mx-4 lg:mx-0 lg:w-7/12">
           <Input
             size="large"
             onChange={handleSearch}
             placeholder="Search Here..."
-            style={{
-              borderColor: "#336C79",
-              color: "#333",
-            }}
+            style={{ borderColor: "#336C79", color: "#333" }}
             suffix={
               <CiSearch className="text-2xl text-opacity-50 text-textPrimary" />
             }
           />
         </div>
-      ) : (
-        <div className="flex items-center justify-between w-7/12"></div>
       )}
 
-      <div className="relative z-40 flex items-center justify-end gap-5 px-5">
+      {/* User & Notification */}
+      <div className="flex items-center justify-end gap-5 flex-1">
         <div
           onClick={() => navigate("/settings")}
-          className="cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="mr-2 text-gray-700">
-            Hello, <b>{profile?.data?.name || "Pranab"}</b>
+          <span className="hidden sm:inline text-gray-700">
+            Hello, <b>{profile?.data?.name || "User"}</b>
           </span>
           <Avatar
             src={
@@ -254,13 +216,14 @@ const NotificationPopup = () => {
 
         <Badge
           count={unreadCount}
-          className="ml-3 cursor-pointer"
+          className="cursor-pointer"
           onClick={() => setVisible(!visible)}
           ref={iconRef}
         >
-          <BellOutlined className="text-2xl text-gray-600 transition duration-300 hover:text-gray-800" />
+          <BellOutlined className="text-2xl text-gray-600 hover:text-gray-800 transition duration-300" />
         </Badge>
 
+        {/* Notification Dropdown */}
         {visible && (
           <motion.div
             ref={popupRef}
@@ -268,89 +231,82 @@ const NotificationPopup = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="absolute overflow-hidden bg-white border border-gray-200 shadow-xl right-4 top-10 w-72 rounded-xl"
+            className="absolute right-4 top-16 bg-white border border-gray-200 shadow-xl w-80 rounded-xl overflow-hidden z-50 lg:right-6 lg:top-14"
           >
             <Card
-              title="Notifications"
+              title={
+                <div className="flex justify-between items-center">
+                  <span>Notifications</span>
+                  {totalNotifications > 0 && (
+                    <span className="text-sm text-gray-500">
+                      {hasMoreNotifications
+                        ? `3 of ${totalNotifications}`
+                        : `${totalNotifications} total`}
+                    </span>
+                  )}
+                </div>
+              }
               className="p-0"
               extra={
                 unreadCount > 0 && (
-                  <Button size="small" type="link" onClick={markAllAsRead}>
-                    Mark all as read
+                  <Button size="small" type="link" onClick={markAllAsRead} loading={readAllLoading}>
+                    Mark all read
                   </Button>
                 )
               }
             >
               <div
                 ref={notificationContainerRef}
-                className="overflow-y-auto cursor-pointer max-h-96 custom-scrollbar"
+                className="max-h-80 overflow-y-auto custom-scrollbar"
               >
-                {loading || updateLoading ? (
-                  <div className="flex justify-center py-4">
-                    <Spin size="small" />
-                  </div>
-                ) : sortedNotifications.length === 0 ? (
-                  <div className="text-center text-gray-500">
-                    <div className="flex justify-center">
-                      <img
-                        src={"/icons/notification.png"}
-                        width={150}
-                        height={150}
-                        alt="Notification Icon"
-                      />
-                    </div>
-                    <h3 className="font-bold text-lg leading-[26px] pb-[5px]">
-                      There`s no notifications
-                    </h3>
-                    <p className="pb-[5px]">
-                      Your notifications will appear on this page.
-                    </p>
-                    <Button
-                      onClick={handleSeeDetailsClick}
-                      type="primary"
-                      className="w-full"
-                      size="large"
-
-                    >
-                      See details
-                    </Button>
+                {loading ? (
+                  <div className="flex justify-center py-4"><Spin /></div>
+                ) : popupNotifications.length === 0 ? (
+                  <div className="text-center text-gray-500 py-6">
+                    <img src="/icons/notification.png" width={80} alt="No notifications" className="mx-auto mb-2" />
+                    <p className="text-sm">No notifications yet</p>
                   </div>
                 ) : (
-                  sortedNotifications.map((notif, index) => {
-                    const time = formatTime(notif.createdAt)
-                    return (<div
-                      key={notif._id || index}
-                      className={`flex items-start p-3 transition duration-300 border-b border-gray-100 hover:bg-gray-50 ${!notif.read ? "bg-blue-50" : ""
-                        }`}
+                  popupNotifications.map((notif) => (
+                    <div
+                      key={notif._id}
+                      className={`p-3 border-b border-gray-100 hover:bg-gray-50 ${!notif.read ? "bg-blue-50" : ""}`}
                       onClick={() => handleNotificationClick(notif)}
                     >
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          {notif.showAlert && notif.type && (
-                            <Tag color={getTypeColor(notif.type)}>
-                              {notif.type}
-                            </Tag>
-                          )}
-                          <span className="ml-auto text-xs text-gray-500">
-                            {time}
-                          </span>
-                        </div>
-                        <p
-                          className={`text-sm ${!notif.read ? "font-medium" : "text-gray-600"
-                            }`}
-                        >
-                          {notif.text}
-                        </p>
-                        {notif.read && !notif.showAlert && (
-                          <div className="flex items-center mt-1 text-xs text-gray-500">
-                            <CheckCircleOutlined className="mr-1" /> Read
-                          </div>
-                        )}
+                      <div className="flex justify-between mb-1">
+                        <h4 className={`text-sm font-medium ${!notif.read ? "text-blue-600" : "text-gray-800"}`}>
+                          {notif.title}
+                        </h4>
+                        <span className="text-xs text-gray-500">{formatTime(notif.createdAt)}</span>
                       </div>
-                    </div>)
-                  })
+                      <p className={`text-sm mb-2 ${!notif.read ? "font-medium" : "text-gray-600"}`}>
+                        {notif.message}
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <div>{!notif.read && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}</div>
+                        <Tag color={getTypeColor(notif.type)} style={{ fontSize: "10px" }}>
+                          {notif.type?.replace('_', ' ') || 'INFO'}
+                        </Tag>
+                      </div>
+                    </div>
+                  ))
                 )}
               </div>
+
+              {(popupNotifications.length > 0 || hasMoreNotifications) && (
+                <div className="border-t bg-gray-50 p-3">
+                  <Button
+                    type="primary"
+                    block
+                    size="large"
+                    onClick={handleViewAllNotifications}
+                  >
+                    {hasMoreNotifications
+                      ? `View All (${totalNotifications})`
+                      : "View All"}
+                  </Button>
+                </div>
+              )}
             </Card>
           </motion.div>
         )}
@@ -359,4 +315,4 @@ const NotificationPopup = () => {
   );
 };
 
-export default NotificationPopup;
+export default Navber;

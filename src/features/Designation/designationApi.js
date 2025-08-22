@@ -13,8 +13,16 @@ export const designationApi = baseApi.injectEndpoints({
     }),
 
     getAllDesignation: builder.query({
-      query: (page) => ({
-        url: `/designations?page=${page || 1}`,
+      query: ({ page, searchTerm }) => ({
+        url: `/designations?page=${page || 1}&&searchTerm=${searchTerm || ""}`,
+        method: "GET",
+      }),
+      providesTags: ["designation"]
+    }),
+
+    getDesignation: builder.query({
+      query: () => ({
+        url: `/designations`,
         method: "GET",
       }),
       providesTags: ["designation"]
@@ -63,5 +71,6 @@ export const {
   useGetDesignationByIdQuery,
   useUpdateDesignationMutation,
   useUpdateDesignationStatusMutation,
-  useDeleteDesignationMutation
+  useDeleteDesignationMutation,
+  useGetDesignationQuery
 } = designationApi;

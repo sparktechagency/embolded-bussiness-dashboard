@@ -1,4 +1,4 @@
-import { Pagination } from 'antd';
+import { Pagination, Spin } from 'antd';
 import { useState } from 'react';
 import { useGetAllHolidayQuery } from '../../features/holiday/holidayApi';
 import HolidayTableBody from "./HolidayTableBody";
@@ -35,7 +35,7 @@ const HolidayTableHead = ({ columns, filterValue }) => {
 
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
-          {isLoading ? "Loading.." : Holiday.length > 0 ? (
+          {isLoading ? <div className="py-10 text-center"><Spin size='small' /></div> : Holiday.length > 0 ? (
             Holiday.map((item, index) => (
               <HolidayTableBody item={item} key={item._id} list={index + 1} />
             ))

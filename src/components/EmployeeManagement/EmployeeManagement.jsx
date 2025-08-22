@@ -1,4 +1,4 @@
-import { Button, message, Select } from 'antd';
+import { Button, message } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateDesignationMutation } from '../../features/Designation/designationApi';
@@ -9,7 +9,6 @@ import EmployeTableHead from './EmployeTableHead';
 import RoleManageModal from './RoleManageModal';
 import RoleTableHead from './RoleTableHead';
 
-const { Option } = Select;
 
 function EmployeeManagement() {
   const search = new URLSearchParams(window.location.search);
@@ -61,12 +60,6 @@ function EmployeeManagement() {
 
   const handleDepartmentChange = (value) => {
     setSelectedDepartment(value === 'all' ? null : value);
-  };
-
-  const handleResetFilters = () => {
-    setSelectedInstitution(null);
-    setSelectedDepartment(null);
-    setSearchTerm('');
   };
 
   return (
@@ -160,6 +153,7 @@ function EmployeeManagement() {
             columns={departmentColumns}
             institutions={institutionData?.data?.data || []}
             departments={departmentData?.data?.data || []}
+            searchTerm={searchValue}
           />
         )}
       </div>

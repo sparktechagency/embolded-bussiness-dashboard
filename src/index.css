@@ -220,8 +220,20 @@ input[type="number"] {
 /* Custom CSS to change error text size */
 .custom-error .ant-form-item-explain {
   font-size: 12px;
-  color: red; /* You can customize the color if needed */
+  color: red;
+  /* You can customize the color if needed */
 }
 
 
+.time-picker-popup .ant-picker-time-panel-cell-inner {
+  padding: 8px 0;
+  line-height: 1.5;
+}
 
+.time-picker-popup .ant-picker-time-panel-column {
+  width: 80px;
+}
+
+.time-picker-popup .ant-picker-time-panel-cell {
+  padding: 4px 0;
+}

@@ -2,7 +2,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, Input, Select, Upload, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetAllDesignationQuery } from '../../features/Designation/designationApi';
+import { useGetDesignationQuery } from '../../features/Designation/designationApi';
 import { useCreateEmployeeMutation, useGetEmployeeByIdQuery, useUpdateEmployeeMutation } from '../../features/EmployeeManagement/employeeManagementApi';
 import { useGetAllDepartmentQuery } from '../../features/instituteManagement/DepartmentManagementApi';
 import { useGetAllInstitutionsQuery } from '../../features/instituteManagement/instituteManagementApi';
@@ -12,13 +12,14 @@ import { baseURL } from '../../utils/BaseURL';
 export default function NewEmploye() {
   const { id } = useParams();
   const router = useNavigate();
+
   const [selectedDays, setSelectedDays] = useState(['Sun']);
   const { data: institutionData, isLoading: instituteLoading } = useGetAllInstitutionsQuery();
   const { data: shiftData, isLoading: shiftLoading } = useGetAllShiftQuery();
   const { data: departmentData, isLoading: departmentLoading } = useGetAllDepartmentQuery();
-  const { data: designationData, isLoading: designationLoading } = useGetAllDesignationQuery();
+  const { data: designationData, isLoading: designationLoading } = useGetDesignationQuery();
   const [createEmployee, { isLoading: createEmployeeLoading }] = useCreateEmployeeMutation();
-  const { data: spesicData, isLoading } = useGetEmployeeByIdQuery(id, { skip: !id });
+  const { data: spesicData, isLoading, refetch: refetchEmployee } = useGetEmployeeByIdQuery(id, { skip: !id });
   const [updateEmployee, { isLoading: updateEmployeeLoading }] = useUpdateEmployeeMutation();
 
   const [selectedInstitutionId, setSelectedInstitutionId] = useState(null);
@@ -61,7 +62,6 @@ export default function NewEmploye() {
     'SATURDAY': 'Sat'
   };
 
-  // useEffect to populate form when editing
   useEffect(() => {
     if (spesicData?.data && !isLoading) {
       const employeeData = spesicData.data;
@@ -90,14 +90,13 @@ export default function NewEmploye() {
         setSelectedDays(mappedDays.length > 0 ? mappedDays : ['Sun']);
       }
 
-      console.log(employeeData.profileImage)
       // Set profile image if exists
-      if (employeeData.profileImage) {
+      if (employeeData?.createdBy?.profileImage) {
         setFileList([{
           uid: '-1',
           name: 'profile-image',
           status: 'done',
-          url: baseURL+employeeData.profileImage,
+          url: baseURL + employeeData?.createdBy?.profileImage,
         }]);
       }
     }
@@ -177,11 +176,67 @@ export default function NewEmploye() {
     });
   };
 
+  // Comprehensive validation function
+  const validateForm = () => {
+    const errors = [];
+
+    if (!formData.employeeId.trim()) {
+      errors.push('Employee ID is required');
+    }
+
+    if (!formData.employeeName.trim()) {
+      errors.push('Employee Name is required');
+    }
+
+    if (!formData.institution.trim()) {
+      errors.push('Institution is required');
+    }
+
+    if (!formData.department.trim()) {
+      errors.push('Department is required');
+    }
+
+    if (!formData.role.trim()) {
+      errors.push('Designation is required');
+    }
+
+    if (!formData.phone.trim()) {
+      errors.push('Phone number is required');
+    }
+
+    if (!formData.email.trim()) {
+      errors.push('Email is required');
+    } else {
+      // Email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        errors.push('Please enter a valid email address');
+      }
+    }
+
+    if (!formData.shiftSchedule) {
+      errors.push('Shift Schedule is required');
+    }
+
+    if (selectedDays.length === 0) {
+      errors.push('At least one weekend day must be selected');
+    }
+
+    if (fileList.length === 0 && !id) {
+      errors.push('Profile picture is required');
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async () => {
     try {
-      // Validate required fields
-      if (!formData.employeeName) {
-        message.error('Employee name is required!');
+      // Validate all required fields
+      const validationErrors = validateForm();
+
+      if (validationErrors.length > 0) {
+        // Show first validation error
+        message.error(validationErrors[0]);
         return;
       }
 
@@ -209,10 +264,10 @@ export default function NewEmploye() {
       const apiFormData = new FormData();
 
       // Add basic fields
-      if (formData.employeeId) apiFormData.append('employeeID', formData.employeeId);
+      apiFormData.append('employeeID', formData.employeeId);
       apiFormData.append('name', formData.employeeName);
-      if (formData.email) apiFormData.append('email', formData.email);
-      if (formData.phone) apiFormData.append('phone', formData.phone);
+      apiFormData.append('email', formData.email);
+      apiFormData.append('phone', formData.phone);
 
       // Add IDs instead of names
       if (selectedInstitution) apiFormData.append('institutionID', selectedInstitution._id);
@@ -234,16 +289,20 @@ export default function NewEmploye() {
 
       if (id) {
         // Update existing employee
-        const result = await updateEmployee({ id, formData: apiFormData }).unwrap();
+        result = await updateEmployee({ id, formData: apiFormData }).unwrap();
         console.log('Employee updated successfully:', result);
-        // console.log('Employee updated successfully:', result);
+
+        // Manually refetch the employee data after successful update
+        await refetchEmployee();
+
       } else {
         // Create new employee
-        const result = await createEmployee(apiFormData).unwrap();
+        result = await createEmployee(apiFormData).unwrap();
+        console.log('Employee created successfully:', result);
       }
-      message.success(result?.message || `Employee ${id ? 'updated' : 'created'} successfully!`);
-      router('/employee-management');
 
+      router('/employee-management');
+      message.success(result?.message || `Employee ${id ? 'updated' : 'created'} successfully!`);
     } catch (error) {
       console.error('Error creating/updating employee:', error);
       message.error(error?.data?.message || `Failed to ${id ? 'update' : 'create'} employee. Please try again.`);
@@ -317,11 +376,12 @@ export default function NewEmploye() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-6 border p-6 rounded-lg border-primary">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Employee ID*</label>
             <Input
               placeholder="Set Employee ID"
               value={formData.employeeId}
               onChange={(e) => handleChange('employeeId', e.target.value)}
+              status={!formData.employeeId.trim() ? 'error' : ''}
             />
           </div>
 
@@ -331,17 +391,19 @@ export default function NewEmploye() {
               placeholder="Dr. John Doe"
               value={formData.employeeName}
               onChange={(e) => handleChange('employeeName', e.target.value)}
+              status={!formData.employeeName.trim() ? 'error' : ''}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Select Institution</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Select Institution*</label>
             <Select
               className="w-full"
               placeholder="Select Institution"
               value={formData.institution || undefined}
               onChange={handleInstitutionChange}
               loading={instituteLoading}
+              status={!formData.institution.trim() ? 'error' : ''}
             >
               {institutionData?.data?.data?.map((institution) => (
                 <Select.Option
@@ -355,7 +417,7 @@ export default function NewEmploye() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Select Department</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Select Department*</label>
             <Select
               className="w-full"
               placeholder={selectedInstitutionId ? "Select Department" : "First select Institution"}
@@ -363,6 +425,7 @@ export default function NewEmploye() {
               onChange={(value) => handleChange('department', value)}
               loading={departmentLoading}
               disabled={!selectedInstitutionId}
+              status={!formData.department.trim() ? 'error' : ''}
             >
               {filteredDepartments.map((department) => (
                 <Select.Option
@@ -376,7 +439,7 @@ export default function NewEmploye() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Select Designation</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Select Designation*</label>
             <Select
               className="w-full"
               placeholder={selectedInstitutionId ? "Select Designation" : "First select Institution"}
@@ -384,6 +447,7 @@ export default function NewEmploye() {
               onChange={(value) => handleChange('role', value)}
               loading={designationLoading}
               disabled={!selectedInstitutionId}
+              status={!formData.role.trim() ? 'error' : ''}
             >
               {filteredDesignations.map((designation) => (
                 <Select.Option
@@ -397,22 +461,25 @@ export default function NewEmploye() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone*</label>
             <Input
               placeholder="+123 456 7890"
               value={formData.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
+              status={!formData.phone.trim() ? 'error' : ''}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Select Shift Schedule</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Select Shift Schedule*</label>
             <Select
               className="w-full"
               placeholder="Select Shift"
-              value={formData.shiftSchedule || undefined}
+              value={formData.shiftSchedule || null}
               onChange={(value) => handleChange('shiftSchedule', value)}
               loading={shiftLoading}
+              allowClear
+
             >
               {shiftData?.data?.data?.map((shift) => (
                 <Select.Option
@@ -426,17 +493,18 @@ export default function NewEmploye() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
             <Input
               placeholder="john.doe@example.com"
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
+              status={!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ? 'error' : ''}
             />
           </div>
 
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Weekend</label>
-            <div className="flex flex-wrap gap-2 border rounded-lg p-[5px]">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Weekend*</label>
+            <div className={`flex flex-wrap gap-2 border rounded-lg p-[5px] ${selectedDays.length === 0 ? 'border-red-500' : ''}`}>
               {days.map(day => (
                 <button
                   key={day}
@@ -454,7 +522,7 @@ export default function NewEmploye() {
           </div>
 
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Picture</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Picture*</label>
             <Upload {...uploadProps}>
               {fileList.length >= 1 ? null : (
                 <div className="flex flex-col items-center">

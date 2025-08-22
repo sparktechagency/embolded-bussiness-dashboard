@@ -94,7 +94,7 @@ const HolidayTableBody = ({ item, list }) => {
         <div className="flex items-center justify-center py-3">{convertDateTime(item.startDate)}</div>
         <div className="flex items-center justify-center py-3">{convertDateTime(item.endDate)}</div>
         <div className="flex items-center justify-center py-3">{item.totalDay}</div>
-        <div className="flex items-center justify-center py-3">{item.status}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
         <div className="flex items-center justify-center gap-5 border rounded border-primary py-1 px-2">
           <Button
             type="text"

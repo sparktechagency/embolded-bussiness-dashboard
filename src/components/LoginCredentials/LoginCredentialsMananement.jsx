@@ -58,7 +58,6 @@ function LoginCredentialsMananement() {
           Add New Role
         </Button>
       </div>
-
       <LoginCredentialTableHead filterValue={selectedHolidayType} columns={loginColumns} />
     </div>
   );

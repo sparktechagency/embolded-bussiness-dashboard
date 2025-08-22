@@ -1,4 +1,4 @@
-import { Button, Select } from 'antd';
+import { Button, message, Select } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateHolidayMutation } from '../../features/holiday/holidayApi';
@@ -58,7 +58,8 @@ function HolidayManagement() {
         institutionID: values.instituteName
       };
       const response = await createHoliday(holidayData).unwrap();
-      console.log(response)
+      setIsNewHolidayModalVisible(false);
+      message.success(response?.data?.message || 'Holiday created successfully');
     } catch (error) {
       console.error('Error creating holiday:', error);
       message.error(error?.data?.message || 'Failed to create holiday');
@@ -97,12 +98,6 @@ function HolidayManagement() {
     },
   ];
 
-
-
-
-
-
-
   return (
     <div className="p-6 bg-gray-50">
       <div className="mb-6 flex justify-end gap-3">
@@ -115,7 +110,7 @@ function HolidayManagement() {
             allOptionValue="all"
             onChange={handleHolidayTypeChange}
             labelKey="label"
-            valueKey="value"
+            valueKey="value" 
             width="100%"
             value={selectedHolidayType}
           />
@@ -129,14 +124,14 @@ function HolidayManagement() {
         </Button>
       </div>
 
-      <HolidayTableHead filterValue = {selectedHolidayType} data={HolidayData} columns={holidayColumns} />
+      <HolidayTableHead filterValue={selectedHolidayType} data={HolidayData} columns={holidayColumns} />
 
       <HolidayModal
         mode="create"
         visible={isNewHolidayModalVisible}
         onCancel={() => setIsNewHolidayModalVisible(false)}
         onSubmit={handleCreateHoliday}
-        loading={isCreatingHoliday}
+        createLoading={isCreatingHoliday}
       />
     </div>
   );

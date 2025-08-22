@@ -86,7 +86,7 @@ const DepertmentTableBody = ({ item, list }) => {
         <div className="flex items-center justify-center py-3">{item?.institutionID?.institutionName}</div>
         <div className="flex items-center justify-center py-3">{item?.departmentName}</div>
         <div className="flex items-center justify-center py-3">{item?.totalEmployee}</div>
-        <div className="flex items-center justify-center py-3">{item?.status}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
         <div className="flex items-center  border justify-center px-3 rounded border-primary">
           <Button
             type="text"

@@ -1,4 +1,4 @@
-import { Pagination } from 'antd';
+import { Pagination, Spin } from 'antd';
 import { useState } from 'react';
 import { useGetAllCredentialsQuery } from '../../features/LoginCredentials/LoginCredentialsApi';
 import LoginCredentialTableBody from "./LoginCredentialTableBody";
@@ -6,10 +6,10 @@ import LoginCredentialTableBody from "./LoginCredentialTableBody";
 const LoginCredentialTableHead = ({ columns, filterValue }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: userCredentials } = useGetAllCredentialsQuery({
+  const { data: userCredentials, isLoading } = useGetAllCredentialsQuery({
 
     page: currentPage,
-    role: filterValue === null || filterValue.label === "All Types" ? "" : filterValue?.value,
+    role: filterValue === null || filterValue.label === "All Role" ? "" : filterValue?.value,
   });
 
 
@@ -43,7 +43,7 @@ const LoginCredentialTableHead = ({ columns, filterValue }) => {
 
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
-          {data.length > 0 ? (
+          {isLoading ? <div className="py-10 text-center"><Spin size='small' /></div> : data.length > 0 ? (
             data.map((item, index) => (
               <LoginCredentialTableBody item={item} key={item._id} list={index + 1} />
             ))

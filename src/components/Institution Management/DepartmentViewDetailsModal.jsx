@@ -1,5 +1,4 @@
 import { Modal, Spin } from 'antd';
-import { baseURL } from '../../utils/BaseURL';
 
 const DepartmentViewDetailsModal = ({
   isOpen,
@@ -22,13 +21,13 @@ const DepartmentViewDetailsModal = ({
       centered
     >
       {
-        isLoading ? <Spin size='small' className='flex justify-center items-center' /> : (
+        isLoading ? <Spin size='small' className='flex justify-center items-center h-[200px]' /> : (
           <>
             <h1 className="text-2xl text-center font-bold text-gray-800 mb-6">
               {modalTitle}
             </h1>
 
-            
+
 
             <div className="border border-primary rounded-lg p-6">
               <h2 className="text-xl font-bold text-teal-700 mb-6">

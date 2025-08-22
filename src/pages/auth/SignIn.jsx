@@ -1,35 +1,37 @@
 import { Button, Form, Input, message, Select } from "antd";
-import { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../features/auth/authApi";
+import { useGetProfileQuery } from '../../features/settings/settingApi';
 import { baseURL } from "../../utils/BaseURL";
 import { Role } from '../../utils/RoleManage';
 import { saveToken } from '../../utils/storage';
 
-
-
 export default function LoginPage() {
   const route = useNavigate();
   const [Login, { isLoading }] = useLoginMutation();
-  const [loading, setLoading] = useState(false);
+  const { data: loginUser, isLoading: getProfileLoading, refetch } = useGetProfileQuery();
 
   const handleGoogleLogin = () => {
     window.location.href = `${baseURL}/api/v1/auth/google`;
   };
 
   const onFinish = async (values) => {
-    setLoading(true)
     try {
       const response = await Login(values).unwrap();
-      if (response.success) {
-        localStorage.setItem("role", response?.data?.user?.role)
-        saveToken(response?.data?.token);
-        localStorage.setItem("adminLoginId", response?.data?.user?._id);
-        setTimeout(() => {
-          route("/");
-          setLoading(false)
-        }, 1500);
+      localStorage.setItem("role", response?.data?.user?.role)
+      saveToken(response?.data?.token);
+      localStorage.setItem("adminLoginId", response?.data?.user?._id);
+
+      // Refetch the profile data after login
+      const profileResponse = await refetch();
+
+      // Check if user is subscribed and has access
+      if (profileResponse?.data?.data?.isSubscribed && profileResponse?.data?.data?.hasAccess) {
+        route("/"); // Redirect to dashboard
+      } else {
+        route(`/customers_account?stripeCustomerId=${response?.data?.token}`);
       }
+
     } catch (error) {
       message.error(error?.data?.message)
     }
@@ -45,19 +47,12 @@ export default function LoginPage() {
             className="object-contain w-full h-auto max-h-[90vh]"
             alt="Login Illustration"
           />
-
-
         </div>
 
         {/* Right Side - Login Form */}
         <div className="w-full md:w-1/2 lg:w-2/5 xl:w-1/3">
           <div className="w-full max-w-md p-6 mx-auto border rounded-lg border-primary md:p-8">
             <div className="flex flex-col items-center justify-center gap-4">
-              {/* <img
-                src={"/icons/dashboard_logo.png"}
-                alt="Ubuntu Bites Logo"
-                className="w-auto h-24"
-              /> */}
               <h3 className="text-4xl font-semibold text-center">Logo</h3>
               <h2 className="text-sm font-normal text-center text-gray-800 md:text-base">
                 Welcome back! Please enter your details.
@@ -109,13 +104,12 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-
               <Button
                 type="primary"
                 htmlType="submit"
                 className="w-full"
                 size="large"
-                loading={loading}
+                loading={isLoading}
               >
                 Sign in
               </Button>

@@ -67,10 +67,17 @@ const RequestTableBody = ({ item, list, refetch }) => {
     return date.toLocaleDateString();
   };
 
-  const formatTime = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    // Handle both time formats: HH:mm and full date strings
+    if (timeString.includes('T') || timeString.length > 5) {
+      const date = new Date(timeString);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+      // If it's already in HH:mm format
+      const date = new Date(`1970-01-01T${timeString}`);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
   };
 
   const getStatusColor = (status) => {
@@ -94,27 +101,27 @@ const RequestTableBody = ({ item, list, refetch }) => {
           {formatDate(item.createdAt)}
         </div>
         <div className="flex items-center justify-center py-3">
-          {item.userID?.name}
+          {item?.userID?.name || 'Unknown'}
         </div>
         <div className="flex items-center justify-center py-3">
-          {item.userID?.departmentID || 'N/A'}
+          {item?.userID?.departmentID?.departmentName || 'N/A'}
         </div>
         <div className="flex items-center justify-center py-3">
-          {item.requestType}
+          {item?.requestType || 'N/A'}
         </div>
         <div className="flex flex-col gap-1">
-          {item.requestType === 'VACATION' ? (
+          {item?.requestType === 'VACATION' ? (
             <>
               <div className="flex items-center gap-1">
                 <span className="font-semibold">Start:</span>
                 <span className="p-[2px] border border-primary rounded">
-                  {formatDate(item.vacationStartDate)}
+                  {formatDate(item?.vacationStartDate)}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-semibold">End:</span>
                 <span className="p-[2px] ml-[5px] border border-primary rounded">
-                  {formatDate(item.vacationEndDate)}
+                  {formatDate(item?.vacationEndDate)}
                 </span>
               </div>
             </>
@@ -123,35 +130,41 @@ const RequestTableBody = ({ item, list, refetch }) => {
           )}
         </div>
         <div className="flex items-center justify-center py-3">
-          {item.totalDays || 'N/A'}
+          {item?.totalDays || 'N/A'}
         </div>
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-1">
-            <span className="font-semibold">Start:</span>
-            <span className="p-[2px] border border-primary rounded">
-              {formatTime(item.currentShiftID?.shiftStartTime)}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="font-semibold">End:</span>
-            <span className="p-[2px] ml-[6px] border border-primary rounded">
-              {formatTime(item.currentShiftID?.shiftEndTime)}
-            </span>
-          </div>
-        </div>
-        <div className="flex flex-col gap-1">
-          {item.requestType === 'SHIFT_CHANGE' ? (
+          {item?.currentShiftID ? (
             <>
               <div className="flex items-center gap-1">
                 <span className="font-semibold">Start:</span>
                 <span className="p-[2px] border border-primary rounded">
-                  {formatTime(item.requestedShiftID?.shiftStartTime)}
+                  {formatTime(item?.currentShiftID?.shiftStartTime)}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="font-semibold">End:</span>
+                <span className="p-[2px] ml-[6px] border border-primary rounded">
+                  {formatTime(item?.currentShiftID?.shiftEndTime)}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="text-center">N/A</div>
+          )}
+        </div>
+        <div className="flex flex-col gap-1">
+          {item.requestType === 'SHIFT_CHANGE' && item?.requestedShiftID ? (
+            <>
+              <div className="flex items-center gap-1">
+                <span className="font-semibold">Start:</span>
+                <span className="p-[2px] border border-primary rounded">
+                  {formatTime(item?.requestedShiftID?.shiftStartTime)}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-semibold">End:</span>
                 <span className="p-[2px] ml-[7px] border border-primary rounded">
-                  {formatTime(item.requestedShiftID?.shiftEndTime)}
+                  {formatTime(item?.requestedShiftID?.shiftEndTime)}
                 </span>
               </div>
             </>
@@ -160,11 +173,11 @@ const RequestTableBody = ({ item, list, refetch }) => {
           )}
         </div>
         <div className="flex items-center justify-center py-3">
-          <span className={`px-2 py-1 rounded ${item.status === 'APPROVE' ? 'bg-green-200 text-green-800' :
-            item.status === 'REJECT' ? 'bg-gray-300 text-gray-800' :
+          <span className={`px-2 py-1 rounded ${item?.status === 'APPROVE' ? 'bg-green-200 text-green-800' :
+            item?.status === 'REJECT' ? 'bg-gray-300 text-gray-800' :
               'bg-yellow-100 text-yellow-800'
             }`}>
-            {item.status}
+            {item?.status || 'PENDING'}
           </span>
         </div>
         <div className="flex items-center justify-center gap-2 border rounded border-primary py-1 px-2">

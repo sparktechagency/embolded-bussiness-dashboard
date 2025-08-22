@@ -3,20 +3,20 @@ import { baseApi } from "../../apiBaseQuery";
 export const notificationApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getNotification: builder.query({
-      query: () => "/notification",
-      providesTags: ["notification"],
+      query: () => "/notifications",
+      providesTags: ["notifications"],
     }),
-    readNotification: builder.mutation({
-      query: (id) => ({
-        url: `/notification/${id}`,
+    readAllNotification: builder.mutation({
+      query: () => ({
+        url: `/notifications`,
         method: 'PATCH',
       }),
-      invalidatesTags: ['notification'],
+      invalidatesTags: ['notifications'],
     }),
   }),
 });
 
 export const {
   useGetNotificationQuery,
-  useReadNotificationMutation
+  useReadAllNotificationMutation
 } = notificationApi;

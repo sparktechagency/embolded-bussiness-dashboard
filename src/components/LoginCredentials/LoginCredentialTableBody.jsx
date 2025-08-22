@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Switch } from "antd";
+import { Button, message, Modal, Switch, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDeleteCredentialsMutation, useUpdateCredentialStatusMutation } from '../../features/LoginCredentials/LoginCredentialsApi';
@@ -78,11 +78,23 @@ const LoginCredentialTableBody = ({ item, list }) => {
       {/* Table Row */}
       <div className={`grid grid-cols-7 items-center gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
-        <div className="flex items-center justify-center py-3 mr-3">{item.name}</div>
-        <div className="flex items-center justify-center py-3 ml-4">{item.email}</div>
-        <div className="flex items-center justify-center py-3">{item.role}</div>
+
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.name.length > 10 && (<Tooltip title={item.name}><span>{item.name.slice(0, 10)}...</span></Tooltip>)}
+          {item.name.length <= 10 && item.name}
+        </div>
+
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.email.length > 10 && (<Tooltip title={item.email}><span>{item.email.slice(0, 10)}...</span></Tooltip>)}
+          {item.email.length <= 10 && item.email}
+        </div>
+
+        <div className="flex items-center justify-center py-3 mr-3">
+          {item.role.length > 15 && (<Tooltip title={item.role}><span>{item.role.slice(0, 15)}...</span></Tooltip>)}
+          {item.role.length <= 15 && item.role}
+        </div>
         <div className="flex items-center justify-center py-3">{convertDateTime(item.createdAt)}</div>
-        <div className="flex items-center justify-center py-3">{item.status}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
         <div className="flex items-center justify-center gap-2 border rounded border-primary py-1 px-2">
           <Button
             type="text"

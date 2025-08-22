@@ -37,7 +37,7 @@ const LateTableBody = ({ item, list }) => {
         <div className="flex items-center justify-center py-3">{item?.departmentID?.departmentName}</div>
         <div className="flex items-center justify-center py-3">{convertTime(item?.shiftID?.shiftStartTime)} - {convertTime(item?.shiftID?.shiftEndTime)}</div>
         <div className="flex items-center justify-center py-3">{item.minutesLate} minute</div>
-        <div className="flex items-center justify-center py-2 font-medium">{item.status}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
 
       </div>
 

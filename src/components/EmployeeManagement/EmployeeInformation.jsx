@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetAttendanceQuery } from '../../features/attendance/attendanceApi';
+import { baseURL } from '../../utils/BaseURL';
 
 const { Title, Text } = Typography;
 const { MonthPicker } = DatePicker;
@@ -18,6 +19,8 @@ const EmployeeInformation = () => {
     { skip: !id }
   );
 
+  console.log(data?.data?.data)
+
   // Handle month change
   const handleMonthChange = (date) => {
     setSelectedMonth(date || dayjs());
@@ -30,6 +33,8 @@ const EmployeeInformation = () => {
     email: 'Loading...',
     phone: 'Loading...'
   };
+
+
 
   // Extract institution and department data
   const institutionData = data?.data?.data[0]?.institutionID || {
@@ -173,6 +178,8 @@ const EmployeeInformation = () => {
     );
   }
 
+  console.log("employeeData", employeeData);
+
   return (
     <div className="container h-5/6 mx-auto ">
       {/* Header */}
@@ -191,10 +198,15 @@ const EmployeeInformation = () => {
         <div className="w-4/12">
           <div className="flex items-start mb-4">
             <Avatar
-              src={employeeData.profileImage || `https://api.dicebear.com/6.x/initials/svg?seed=${employeeData.name}`}
+              src={
+                employeeData?.profileImage
+                  ? `${baseURL}${employeeData.profileImage}`
+                  : `https://api.dicebear.com/6.x/initials/svg?seed=${employeeData?.name}`
+              }
               size={64}
               className="mr-4"
             />
+
             <div className='border border-primary rounded-xl p-4'>
               <div className="mb-1"><span className="font-bold">Employee ID:</span> {employeeData.employeeID || 'N/A'}</div>
               <div className="mb-1"><span className="font-bold">Name:</span> {employeeData.name}</div>
@@ -285,11 +297,11 @@ const EmployeeInformation = () => {
                       <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-bold text-gray-800">{entry.date}</h2>
                         <span className={`px-3 py-1 rounded-md text-sm ${entry.status === 'PRESENT' ? 'bg-green-500' :
-                            entry.status === 'ABSENT' ? 'bg-red-500' :
-                              entry.status === 'LEAVE' ? 'bg-orange-500' :
-                                entry.status === 'LATE' ? 'bg-yellow-500' :
-                                  entry.status === 'HOLIDAY' ? 'bg-blue-500' :
-                                    'bg-gray-500'
+                          entry.status === 'ABSENT' ? 'bg-red-500' :
+                            entry.status === 'LEAVE' ? 'bg-orange-500' :
+                              entry.status === 'LATE' ? 'bg-yellow-500' :
+                                entry.status === 'HOLIDAY' ? 'bg-blue-500' :
+                                  'bg-gray-500'
                           } text-white`}>
                           {entry.status}
                         </span>

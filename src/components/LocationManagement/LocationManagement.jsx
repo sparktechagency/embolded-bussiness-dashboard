@@ -24,7 +24,6 @@ function LocationManagement() {
     setStatus(null);
   };
 
-
   const handleStatusChage = (value) => {
     setStatus(value === 'all' ? null : value)
     setSelectedInstitution(null)
@@ -32,14 +31,13 @@ function LocationManagement() {
 
   // Handle location creation with API
   const handleCreateLocation = async (values) => {
-
     try {
       // Map form values to API payload format
       const locationPayload = {
         locationName: values.name,
         institutionID: values.institutionId,
-        latitude: String(values.latitude),
-        longitude: String(values.longitude),
+        latitude: values.latitude,
+        longitude: values.longitude,
         wifiSSID: values.ssid,
         wifiIPAddress: values.ipAddress,
         radius: parseInt(values.radius)
@@ -48,10 +46,10 @@ function LocationManagement() {
       // Handle successful creation
       if (response.success) {
         message.success(response.message || 'Location created successfully');
-        setIsNewHolidayModalVisible(false);
       } else {
         message.error('Failed to create location');
       }
+      setIsNewHolidayModalVisible(false);
     } catch (error) {
       console.error('Error creating location:', error);
 
@@ -107,8 +105,8 @@ function LocationManagement() {
   ];
 
   return (
-    <div className="p-6 bg-gray-50">
-      <div className="mb-6 flex justify-end gap-3">
+    <div className="p-6 bg-gray-50 min-w-full">
+      <div className="mb-6 w-full flex justify-end gap-3">
         <div className='w-2/12'>
           <CustomFilterDropdown
             options={institutionData?.data.data}
@@ -142,12 +140,24 @@ function LocationManagement() {
           className="bg-[#336C79]"
           onClick={() => setIsNewHolidayModalVisible(true)}
           loading={creatingLoading}
+          classNames={"text-sm sm:text-base md:text-base lg:text-base"}
         >
           Create New Location
         </Button>
       </div>
 
-      <LocationManagementHead status={status} selectedInstitution={selectedInstitution} institutionFilter={selectedInstitution} data={HolidayData} columns={LocationColumns} />
+      {/* Fixed container for horizontal scrolling */}
+
+      <div className="p-2 overflow-x-auto">
+        <LocationManagementHead
+          status={status}
+          selectedInstitution={selectedInstitution}
+          institutionFilter={selectedInstitution}
+          data={HolidayData}
+          columns={LocationColumns}
+        />
+
+      </div>
 
       <LocationModal
         mode="create"

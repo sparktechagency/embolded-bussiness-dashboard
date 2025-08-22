@@ -11,7 +11,6 @@ const Profile = () => {
   const { data: user, isLoading: getProfileLoading, refetch } = useGetProfileQuery();
   const [updateProfile, { isLoading: updateProfileLoading }] = useUpdateProfileMutation();
 
-
   console.log(user?.data?.profileImage)
 
   const [profile, setProfile] = useState({
@@ -93,15 +92,13 @@ const Profile = () => {
     formData.append("phone", profile.phone);
 
     if (profileImageFile) {
-      // Make sure the field name matches what your backend expects
       formData.append("profileImage", profileImageFile);
     }
 
     try {
       const result = await updateProfile(formData).unwrap();
-      console.log("Update result:", result); // Debug log
+      console.log("Update result:", result);
 
-      // Refetch the user profile data to get the updated information
       await refetch();
 
       message.success("Profile updated successfully");
@@ -115,14 +112,12 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
-    // Reset to original values when canceling
     setProfile({
       name: user?.data?.name || "",
       email: user?.data?.email || "",
       phone: user?.data?.phone || "",
     });
 
-    // Fixed the BaseURL reference (should be baseURL)
     setPreviewImage(
       user?.data?.profileImage ? `${baseURL}${user?.data?.profileImage}` :
         "https://i.ibb.co.com/fYrFP06M/images-1.png"
@@ -133,94 +128,133 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex flex-col items-start justify-center pt-5">
-      <div className="rounded-xl w-full max-w-[800px]">
-        <div className="flex items-end justify-between space-x-4">
-          <div className="flex items-center gap-3">
-            <div className="w-[140px] h-[140px] rounded-full border-2 border-primary mx-auto flex flex-col items-center relative">
-              <div className="w-full h-full rounded-full">
-                <img
-                  src={previewImage}
-                  alt="Profile"
-                  loading={getProfileLoading}
-                  className="object-cover w-full h-full rounded-full"
-                />
-              </div>
+    <div className="w-full bg-gray-50 p-2 sm:p-4 lg:p-6">
+      <div className="w-full max-w-6xl mx-auto bg-white p-4 sm:p-6 lg:p-8 rounded-xl shadow-sm">
 
-              {isEditing && (
-                <div className="absolute flex items-center justify-center w-8 h-8 p-2 text-center rounded-full cursor-pointer bg-[#FF991C] bottom-1 right-5">
-                  <Upload
-                    showUploadList={false}
-                    onChange={handleFileChange}
-                    beforeUpload={() => false} // Prevent auto upload
-                    accept="image/*"
-                  >
-                    <MdEdit className="mt-1 text-xl text-white" />
-                  </Upload>
+        {/* Header Section - Responsive Profile Image and Name */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
+
+          {/* Profile Image and Name Container */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 w-full sm:w-auto">
+
+            {/* Profile Image */}
+            <div className="relative">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 xl:w-40 xl:h-40 rounded-full border-2 border-primary mx-auto flex flex-col items-center relative">
+                <div className="w-full h-full rounded-full overflow-hidden">
+                  <img
+                    src={previewImage}
+                    alt="Profile"
+                    loading={getProfileLoading ? "lazy" : "eager"}
+                    className="object-cover w-full h-full rounded-full"
+                  />
                 </div>
-              )}
+
+                {isEditing && (
+                  <div className="absolute flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 p-1 sm:p-2 text-center rounded-full cursor-pointer bg-[#FF991C] -bottom-1 -right-1 sm:bottom-1 sm:right-2">
+                    <Upload
+                      showUploadList={false}
+                      onChange={handleFileChange}
+                      beforeUpload={() => false}
+                      accept="image/*"
+                    >
+                      <MdEdit className="text-sm sm:text-lg lg:text-xl text-white" />
+                    </Upload>
+                  </div>
+                )}
+              </div>
             </div>
-            <h2 className="text-4xl font-semibold text-gray-800">
-              {profile.name}
-            </h2>
+
+            {/* Name Section */}
+            <div className="text-center sm:text-left">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-semibold text-gray-800 break-words">
+                {profile.name || "User Name"}
+              </h2>
+              <p className="text-sm sm:text-base text-gray-500 mt-1 sm:hidden">
+                {profile.email}
+              </p>
+            </div>
           </div>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            className="mt-2 border border-primary w-[150px]"
-            onClick={() => {
-              if (isEditing) {
-                handleCancel();
-              } else {
-                setIsEditing(true);
-              }
-            }}
-          >
-            {isEditing ? "Cancel" : "Edit Profile"}
-          </Button>
+
+          {/* Edit Button */}
+          <div className="flex justify-center sm:justify-end w-full sm:w-auto">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              className="border border-primary w-full sm:w-auto sm:min-w-[140px] lg:min-w-[150px] h-10 sm:h-10"
+              onClick={() => {
+                if (isEditing) {
+                  handleCancel();
+                } else {
+                  setIsEditing(true);
+                }
+              }}
+            >
+              {isEditing ? "Cancel" : "Edit Profile"}
+            </Button>
+          </div>
         </div>
 
-        <div className="mt-6 space-y-4">
-          <label className="block text-gray-600">Full Name</label>
-          <Input
-            name="name"
-            value={profile.name}
-            onChange={handleChange}
-            disabled={!isEditing}
-            className="border rounded-lg border-primary p-2 h-[44px]"
-          />
+        {/* Form Section */}
+        <div className="space-y-4 sm:space-y-6">
 
-          <label className="block text-gray-600">Email</label>
-          <Input
-            name="email"
-            type="email"
-            readOnly
-            value={profile.email}
-            disabled
-            className="border rounded-lg border-primary p-2 h-[44px]"
-          />
+          {/* Full Name Field */}
+          <div className="space-y-2">
+            <label className="block text-sm sm:text-base font-medium text-gray-600">
+              Full Name
+            </label>
+            <Input
+              name="name"
+              value={profile.name}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className="border rounded-lg border-primary h-10 sm:h-11 lg:h-12 text-sm sm:text-base"
+              placeholder="Enter your full name"
+            />
+          </div>
 
-          <label className="block text-gray-600">Contact Number</label>
-          <Input
-            name="phone"
-            value={profile.phone}
-            onChange={handleChange}
-            disabled={isPhoneReadOnly || !isEditing}
-            className="border rounded-lg border-primary p-2 h-[44px]"
-            placeholder="Enter your phone number"
-          />
+          {/* Email Field */}
+          <div className="space-y-2">
+            <label className="block text-sm sm:text-base font-medium text-gray-600">
+              Email
+            </label>
+            <Input
+              name="email"
+              type="email"
+              readOnly
+              value={profile.email}
+              disabled
+              className="border rounded-lg border-primary h-10 sm:h-11 lg:h-12 text-sm sm:text-base bg-gray-50"
+              placeholder="Email address"
+            />
+          </div>
+
+          {/* Contact Number Field */}
+          <div className="space-y-2">
+            <label className="block text-sm sm:text-base font-medium text-gray-600">
+              Contact Number
+            </label>
+            <Input
+              name="phone"
+              value={profile.phone}
+              onChange={handleChange}
+              disabled={isPhoneReadOnly || !isEditing}
+              className="border rounded-lg border-primary h-10 sm:h-11 lg:h-12 text-sm sm:text-base"
+              placeholder="Enter your phone number"
+            />
+          </div>
         </div>
 
-        <div className="flex justify-end">
+        {/* Save Button */}
+        <div className="flex justify-center sm:justify-end mt-6 sm:mt-8">
           <Button
             type="primary"
             loading={updateProfileLoading}
             icon={<SaveOutlined />}
-            className="mt-6 w-[200px] bg-primary"
+            className="bg-primary w-full sm:w-auto sm:min-w-[180px] lg:min-w-[200px] h-10 sm:h-10 lg:h-10 text-sm sm:text-base"
             onClick={handleSave}
             disabled={!isEditing}
           >
-            Save
+            Save Changes
           </Button>
         </div>
       </div>

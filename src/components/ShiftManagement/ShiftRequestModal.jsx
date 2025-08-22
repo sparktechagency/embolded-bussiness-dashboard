@@ -12,7 +12,8 @@ const ShiftRequestModal = ({ visible, onCancel }) => {
   const [updateSingleStatus, { isLoading: updateSingleStatusLoading }] = useUpdateSingleShiftAndLeaveMutation();
   const [updatingMultipul, { isLoading: updateMultipulUpdatingLoading }] = useUpdateMultipulShiftAndLeaveMutation();
   const [allIDS, setAllIDS] = useState([]);
-  const [processingId, setProcessingId] = useState(null); // Track which single request is being processed
+  const [approvingId, setApprovingId] = useState(null); // Track which request is being approved
+  const [rejectingId, setRejectingId] = useState(null); // Track which request is being rejected
 
   useEffect(() => {
     if (data?.data?.data) {
@@ -34,14 +35,17 @@ const ShiftRequestModal = ({ visible, onCancel }) => {
 
         return {
           id: item._id,
-          employeeName: item.userID?.name,
+          employeeName: item.userID?.name || 'Unknown Employee',
           date: date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
           day: days[date.getDay()],
-          department: item.userID?.departmentID || 'Not specified',
-          shiftTime: `${new Date(item.currentShiftID?.shiftStartTime).toLocaleTimeString()} - ${new Date(item.currentShiftID?.shiftEndTime).toLocaleTimeString()}`,
-          shiftType: item.currentShiftID?.shiftName,
+          // Fixed: Extract departmentName from the department object
+          department: item.userID?.departmentID?.departmentName || 'Not specified',
+          shiftTime: item.currentShiftID ?
+            `${new Date(`1970-01-01T${item.currentShiftID.shiftStartTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(`1970-01-01T${item.currentShiftID.shiftEndTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            : 'No shift assigned',
+          shiftType: item.currentShiftID?.shiftName || 'No shift',
           requestType: item.requestType === 'VACATION' ? 'Vacation' : 'Shift Change',
-          reason: item.reason,
+          reason: item.reason || 'No reason provided',
           status: item.status,
           rawData: item // Keep original data for reference
         };
@@ -51,32 +55,32 @@ const ShiftRequestModal = ({ visible, onCancel }) => {
   const requests = formatRequestData(data);
 
   const handleReject = async (id) => {
-    setProcessingId(id);
+    setRejectingId(id);
     const data = { status: "REJECT" }
     try {
       const response = await updateSingleStatus({ id: id, data: data });
       refetch();
-      message.success(response?.data?.message || "Request rejected successfully");
+      message.success("Request rejected successfully");
     } catch (error) {
       console.log(error.message);
       message.error(error?.message || "Failed to reject request");
     } finally {
-      setProcessingId(null);
+      setRejectingId(null);
     }
   };
 
   const handleApprove = async (id) => {
-    setProcessingId(id);
+    setApprovingId(id);
     const data = { status: "APPROVE" }
     try {
       const response = await updateSingleStatus({ id: id, data: data });
       refetch();
-      message.success(response?.data?.message || "Request approved successfully");
+      message.success("Request approved successfully");
     } catch (error) {
       console.log(error.message);
       message.error(error?.message || "Failed to approve request");
     } finally {
-      setProcessingId(null);
+      setApprovingId(null);
     }
   };
 
@@ -183,13 +187,17 @@ const ShiftRequestModal = ({ visible, onCancel }) => {
                           <p className="mb-3">Total Days: {request.rawData.totalDays}</p>
                         </>
                       ) : (
-                        <>
-                          <p className="mb-1">
-                            {new Date(request.rawData.requestedShiftID.shiftStartTime).toLocaleTimeString()} -
-                            {new Date(request.rawData.requestedShiftID.shiftEndTime).toLocaleTimeString()}
-                          </p>
-                          <p className="mb-3">{request.rawData.requestedShiftID.shiftName}</p>
-                        </>
+                        request.rawData.requestedShiftID ? (
+                          <>
+                            <p className="mb-1">
+                              {new Date(`1970-01-01T${request.rawData.requestedShiftID.shiftStartTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
+                              {new Date(`1970-01-01T${request.rawData.requestedShiftID.shiftEndTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                            <p className="mb-3">{request.rawData.requestedShiftID.shiftName}</p>
+                          </>
+                        ) : (
+                          <p className="mb-3">No shift details available</p>
+                        )
                       )}
 
                       <p className="mb-3">Reason: {request.reason}</p>
@@ -199,7 +207,8 @@ const ShiftRequestModal = ({ visible, onCancel }) => {
                           type="primary"
                           danger
                           className="w-1/2"
-                          loading={processingId === request.id && updateSingleStatusLoading}
+                          loading={rejectingId === request.id}
+                          disabled={approvingId === request.id}
                           onClick={() => handleReject(request.id)}
                         >
                           Reject
@@ -207,7 +216,8 @@ const ShiftRequestModal = ({ visible, onCancel }) => {
                         <Button
                           type="primary"
                           className="w-1/2 bg-[#336C79] hover:bg-teal-700"
-                          loading={processingId === request.id && updateSingleStatusLoading}
+                          loading={approvingId === request.id}
+                          disabled={rejectingId === request.id}
                           onClick={() => handleApprove(request.id)}
                         >
                           Approve

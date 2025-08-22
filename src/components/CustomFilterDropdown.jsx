@@ -17,11 +17,6 @@ export default function CustomFilterDropdown({
   allOptionLabel = 'All',
   allOptionValue = 'all'
 }) {
-
-
-
-
-
   // Transform options to standard format if needed
   const transformedOptions = options?.map(option => {
     // If option is already in correct format, use it
@@ -57,7 +52,10 @@ export default function CustomFilterDropdown({
     background: '#ffffff',
     selectedBackground: '#f0f7fa',
     selectedDot: '#3ca9c0',
-    hoverBackground: '#f5f5f5'
+    hoverBackground: '#f5f5f5',
+    scrollbarThumb: '#c1c1c1',
+    scrollbarTrack: '#f1f1f1',
+    scrollbarThumbHover: '#a8a8a8'
   };
 
   // Handle option selection
@@ -70,6 +68,31 @@ export default function CustomFilterDropdown({
     }
   };
 
+  // Custom scrollbar styles
+  const scrollbarStyles = {
+    /* For Webkit browsers (Chrome, Safari) */
+    '&::-webkit-scrollbar': {
+      width: '8px',
+    },
+    '&::-webkit-scrollbar-track': {
+      background: colors.scrollbarTrack,
+      borderRadius: '10px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: colors.scrollbarThumb,
+      borderRadius: '10px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+      background: colors.scrollbarThumbHover,
+    },
+    /* For Firefox */
+    scrollbarWidth: 'thin',
+    scrollbarColor: `${colors.scrollbarThumb} ${colors.scrollbarTrack}`,
+  };
+
+  // Calculate max height based on number of items (5 items = ~250px)
+  const maxHeight = finalOptions.length > 4 ? '250px' : 'auto';
+
   // Create menu items
   const menu = (
     <Menu
@@ -77,9 +100,10 @@ export default function CustomFilterDropdown({
       style={{
         border: `1px solid ${colors.border}`,
         borderRadius,
-        maxHeight: '300px',
-        overflowY: 'auto',
+        maxHeight: maxHeight,
+        overflowY: finalOptions.length > 4 ? 'auto' : 'hidden',
         padding: '4px 0',
+        ...scrollbarStyles
       }}
     >
       {finalOptions.map((option) => (
@@ -94,6 +118,9 @@ export default function CustomFilterDropdown({
             alignItems: 'center',
             backgroundColor: selectedOption?.value === option.value ? colors.selectedBackground : colors.background,
             color: colors.text,
+            '&:hover': {
+              backgroundColor: colors.hoverBackground,
+            },
           }}
         >
           <div className='flex items-center justify-between w-full'>

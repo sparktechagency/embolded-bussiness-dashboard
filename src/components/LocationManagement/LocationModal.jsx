@@ -247,6 +247,7 @@ const LocationModal = ({
           rules={radiusRules}
         >
           <InputNumber
+            type='number'
             placeholder="100"
             size="large"
             style={{ width: '100%' }}

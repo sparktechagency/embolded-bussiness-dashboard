@@ -9,6 +9,8 @@ import {
 import RoleManageModal from "./RoleManageModal";
 
 const RoleTableBody = ({ item, list, institutions, departments }) => {
+
+  console.log(item);
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
@@ -72,10 +74,10 @@ const RoleTableBody = ({ item, list, institutions, departments }) => {
       <div className={`grid items-center grid-cols-7 gap-2 px-2 my-3 text-sm bg-gray-100 space-x-5 rounded-lg whitespace-nowrap`}>
         <div className="flex items-center justify-center py-3">{list}</div>
         <div className="flex items-center justify-center py-3">{item?.designationName}</div>
-        <div className="flex items-center justify-center py-3">{item.institution}</div>
-        <div className="flex items-center justify-center py-3">{item.department}</div>
-        <div className="flex items-center justify-center py-3">{item.created}</div>
-        <div className="flex items-center justify-center py-3">{item.status}</div>
+        <div className="flex items-center justify-center py-3">{item?.institutionID?.institutionName}</div>
+        <div className="flex items-center justify-center py-3">{item?.departmentID?.departmentName}</div>
+        <div className="flex items-center justify-center py-3">{item?.createdBy?.name}</div>
+        <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>
         <div className="flex items-center border justify-between px-3 rounded border-primary">
           <Button
             type="text"

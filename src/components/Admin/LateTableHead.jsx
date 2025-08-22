@@ -1,3 +1,4 @@
+import { Spin } from 'antd';
 import { useGetLatesQuery } from '../../features/dashboardOverView/dashboardApi';
 import LateTableBody from "./LateTableBody";
 
@@ -19,15 +20,16 @@ const LateTableHead = ({ columns }) => {
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
           {isLoading ? (
-            <div className="py-10 text-center">Loading...</div>
-          ) : late?.length > 0 ? (
-            late.map((item, index) => (
+            <div className="py-10 h-[100px] flex items-center justify-center"><Spin size='small' /></div>
+          ) : late && late.length > 0 ? (
+            late.slice(0, 2).map((item, index) => (
               <LateTableBody item={item} key={item._id} list={index + 1} />
             ))
           ) : (
             <h3 className="py-10 text-center">No Data Available</h3>
           )}
         </div>
+
       </div>
     </div>
   );
