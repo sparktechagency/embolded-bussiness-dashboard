@@ -34,9 +34,9 @@ function LoginCredentialsMananement() {
 
 
   return (
-    <div className="p-6 bg-gray-50">
-      <div className="mb-6 flex justify-end gap-3">
-        <div className='w-[300px]'>
+    <div className="sm:p-6 p-1 bg-gray-50 sm:w-full w-screen">
+      <div className="mb-6 sm:flex justify-end gap-3">
+        <div className='sm:w-[300px] w-full mb-2 sm:mb-0'>
           <CustomFilterDropdown
             options={holidayTypes}
             placeholder="Select holiday type"
@@ -53,12 +53,14 @@ function LoginCredentialsMananement() {
         <Button
           onClick={() => router("/login-credentials/new-role")}
           type="primary"
-          className="bg-[#336C79]"
+          className="bg-[#336C79] w-full sm:w-auto"
         >
           Add New Role
         </Button>
       </div>
-      <LoginCredentialTableHead filterValue={selectedHolidayType} columns={loginColumns} />
+      <div className='sm:overflow-hidden overflow-x-auto'>
+        <LoginCredentialTableHead filterValue={selectedHolidayType} columns={loginColumns} />
+      </div>
     </div>
   );
 }

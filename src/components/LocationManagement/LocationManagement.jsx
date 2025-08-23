@@ -105,9 +105,9 @@ function LocationManagement() {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-w-full">
-      <div className="mb-6 w-full flex justify-end gap-3">
-        <div className='w-2/12'>
+    <div className="sm:p-6 p-1 bg-gray-50 sm:w-full w-screen overflow-hidden">
+      <div className="mb-6 sm:flex sm:justify-end justify-between gap-3">
+        <div className='w-full md:w-2/12 mb-2 md:mb-0'>
           <CustomFilterDropdown
             options={institutionData?.data.data}
             placeholder="Choose an institution"
@@ -121,7 +121,7 @@ function LocationManagement() {
             value={selectedInstitution}
           />
         </div>
-        <div className='w-2/12'>
+        <div className='w-full md:w-2/12 mb-2 md:mb-0'>
           <CustomFilterDropdown
             options={statusOptions}
             placeholder="Choose an institution"
@@ -137,7 +137,7 @@ function LocationManagement() {
         </div>
         <Button
           type="primary"
-          className="bg-[#336C79]"
+          className="bg-[#336C79] w-full sm:w-auto"
           onClick={() => setIsNewHolidayModalVisible(true)}
           loading={creatingLoading}
           classNames={"text-sm sm:text-base md:text-base lg:text-base"}
@@ -146,9 +146,7 @@ function LocationManagement() {
         </Button>
       </div>
 
-      {/* Fixed container for horizontal scrolling */}
-
-      <div className="p-2 overflow-x-auto">
+      <div className=" sm:overflow-hidden overflow-x-auto">
         <LocationManagementHead
           status={status}
           selectedInstitution={selectedInstitution}
@@ -156,8 +154,8 @@ function LocationManagement() {
           data={HolidayData}
           columns={LocationColumns}
         />
-
       </div>
+
 
       <LocationModal
         mode="create"

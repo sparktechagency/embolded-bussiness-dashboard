@@ -12,9 +12,10 @@ const AttendanceChart = () => {
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width < 640) setScreenSize('mobile');
-      else if (width < 768) setScreenSize('sm');
-      else if (width < 1024) setScreenSize('tablet');
+      if (width < 480) setScreenSize('mobile');
+      else if (width < 640) setScreenSize('sm');
+      else if (width < 768) setScreenSize('tablet');
+      else if (width < 1024) setScreenSize('lg');
       else setScreenSize('desktop');
     };
 
@@ -49,22 +50,59 @@ const AttendanceChart = () => {
   const getChartDimensions = () => {
     switch (screenSize) {
       case 'mobile':
-        return { innerRadius: 45, outerRadius: 70 };
+        return {
+          innerRadius: 35,
+          outerRadius: 55,
+          chartHeight: 220,
+          centerOffset: -25,
+          centerFontSize: '16px',
+          centerLabelFontSize: '10px'
+        };
       case 'sm':
-        return { innerRadius: 50, outerRadius: 75 };
+        return {
+          innerRadius: 40,
+          outerRadius: 65,
+          chartHeight: 240,
+          centerOffset: -30,
+          centerFontSize: '18px',
+          centerLabelFontSize: '11px'
+        };
       case 'tablet':
-        return { innerRadius: 55, outerRadius: 85 };
+        return {
+          innerRadius: 50,
+          outerRadius: 75,
+          chartHeight: 260,
+          centerOffset: -35,
+          centerFontSize: '20px',
+          centerLabelFontSize: '12px'
+        };
+      case 'lg':
+        return {
+          innerRadius: 55,
+          outerRadius: 85,
+          chartHeight: 280,
+          centerOffset: -40,
+          centerFontSize: '22px',
+          centerLabelFontSize: '13px'
+        };
       default:
-        return { innerRadius: 60, outerRadius: 90 };
+        return {
+          innerRadius: 60,
+          outerRadius: 90,
+          chartHeight: 311,
+          centerOffset: -45,
+          centerFontSize: '24px',
+          centerLabelFontSize: '14px'
+        };
     }
   };
 
   const renderCustomizedLegend = (props) => {
     const { payload } = props;
-    const isMobile = screenSize === 'mobile';
+    const isMobile = screenSize === 'mobile' || screenSize === 'sm';
 
     return (
-      <ul className={`flex flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4 mt-2 sm:mt-3 lg:mt-4 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+      <ul className={`flex flex-wrap justify-center gap-1 sm:gap-2 md:gap-3 mt-2 sm:mt-3 ${isMobile ? 'text-xs' : 'text-sm'}`}>
         {payload.map((entry, index) => (
           <li key={`item-${index}`} className="flex items-center gap-1">
             <div className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} rounded-full`} style={{ backgroundColor: entry.color }}></div>
@@ -75,14 +113,21 @@ const AttendanceChart = () => {
     );
   };
 
-  const { innerRadius, outerRadius } = getChartDimensions();
+  const {
+    innerRadius,
+    outerRadius,
+    chartHeight,
+    centerOffset,
+    centerFontSize,
+    centerLabelFontSize
+  } = getChartDimensions();
 
   return (
-    <div className="bg-white border border-[#336C79] rounded-lg p-3 sm:p-4 lg:p-6 shadow-sm w-full">
-      <h2 className="text-base sm:text-lg font-medium text-gray-800 mb-1">Attendance</h2>
-      <div className="h-px w-8 sm:w-12 bg-blue-500 mb-3 sm:mb-4"></div>
+    <div className="bg-white border border-[#336C79] rounded-lg p-3 sm:p-4 md:p-6 shadow-sm w-full">
+      <h2 className="text-sm sm:text-base md:text-lg font-medium text-gray-800 mb-1">Attendance</h2>
+      <div className="h-px w-6 sm:w-8 md:w-12 bg-blue-500 mb-2 sm:mb-3 md:mb-4"></div>
 
-      <div className="h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full relative">
+      <div className={`w-full relative`} style={{ height: `${chartHeight}px` }}>
         {isLoading ? (
           <div className="h-full flex items-center justify-center">
             <Spin size='small' />
@@ -93,15 +138,15 @@ const AttendanceChart = () => {
               <PieChart
                 margin={{
                   top: 10,
-                  right: 10,
-                  bottom: screenSize === 'mobile' ? 40 : 50,
-                  left: 10,
+                  right: 5,
+                  bottom: screenSize === 'mobile' || screenSize === 'sm' ? 30 : 50,
+                  left: 5,
                 }}
               >
                 <Pie
                   data={chartData}
                   cx="50%"
-                  cy={screenSize === 'mobile' ? "45%" : "50%"}
+                  cy={screenSize === 'mobile' || screenSize === 'sm' ? "50%" : "50%"}
                   innerRadius={innerRadius}
                   outerRadius={outerRadius}
                   paddingAngle={1}
@@ -147,11 +192,20 @@ const AttendanceChart = () => {
             </ResponsiveContainer>
 
             {/* Center text showing total */}
-            <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center ${screenSize === 'mobile' ? '-mt-4' : '-mt-6 sm:-mt-8'}`}>
-              <div className={`${screenSize === 'mobile' ? 'text-xl' : 'text-2xl sm:text-3xl'} font-bold text-gray-800`}>
+            <div
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center"
+              style={{ marginTop: `${centerOffset}px` }}
+            >
+              <div
+                className="font-bold text-gray-800"
+                style={{ fontSize: centerFontSize }}
+              >
                 {attendance?.data?.totalPresentCount}
               </div>
-              <div className={`${screenSize === 'mobile' ? 'text-xs' : 'text-xs sm:text-sm'} text-gray-500 mt-1`}>
+              <div
+                className="text-gray-500 mt-1"
+                style={{ fontSize: centerLabelFontSize }}
+              >
                 Total Present
               </div>
             </div>

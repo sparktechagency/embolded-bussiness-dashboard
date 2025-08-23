@@ -83,12 +83,12 @@ function ShiftManagement() {
   ];
 
   return (
-    <div className="p-6 bg-gray-50">
-      <div className="mb-6 flex justify-end gap-3">
+    <div className="sm:p-6 p-1 bg-gray-50 w-screen sm:w-full overflow-hidden">
+      <div className="mb-6 sm:flex sm:justify-end justify-between gap-3">
         {/* Request Modal Trigger */}
         <Button
           type="primary"
-          className="bg-[#336C79]"
+          className="bg-[#336C79] w-full sm:w-auto mb-2 sm:mb-0"
           onClick={() => setIsRequestModalVisible(true)}
         >
           Request ({findLength().length || 0})
@@ -97,7 +97,7 @@ function ShiftManagement() {
         {/* Create New Shift Modal Trigger */}
         <Button
           type="primary"
-          className="bg-[#336C79]"
+          className="bg-[#336C79] w-full sm:w-auto mb-2 sm:mb-0"
           onClick={() => setIsNewShiftModalVisible(true)}
         >
           Create New Shift
@@ -106,14 +106,16 @@ function ShiftManagement() {
         {/* Assign Shift Modal Trigger */}
         <Button
           type="primary"
-          className="bg-[#336C79]"
+          className="bg-[#336C79] w-full sm:w-auto"
           onClick={() => setIsAssignShiftModalVisible(true)}
         >
           Assign Employee Shift
         </Button>
       </div>
 
-      <ShiftTableHead columns={holidayColumns} />
+      <div className='sm:overflow-hidden overflow-x-auto'>
+        <ShiftTableHead columns={holidayColumns} />
+      </div>
 
       {/* Modals */}
       <NewShiftModal

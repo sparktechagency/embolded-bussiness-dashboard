@@ -99,9 +99,9 @@ function HolidayManagement() {
   ];
 
   return (
-    <div className="p-6 bg-gray-50">
-      <div className="mb-6 flex justify-end gap-3">
-        <div className='w-2/12'>
+    <div className="sm:p-6 p-1 bg-gray-50 sm:w-full w-screen overflow-hidden">
+      <div className="mb-6 sm:flex sm:justify-end justify-between gap-3">
+        <div className='sm:w-2/12 w-full mb-2 sm:mb-0'>
           <CustomFilterDropdown
             options={holidayTypes}
             placeholder="Select holiday type"
@@ -110,21 +110,23 @@ function HolidayManagement() {
             allOptionValue="all"
             onChange={handleHolidayTypeChange}
             labelKey="label"
-            valueKey="value" 
+            valueKey="value"
             width="100%"
             value={selectedHolidayType}
           />
         </div>
         <Button
           type="primary"
-          className="bg-[#336C79]"
+          className="bg-[#336C79] w-full sm:w-auto"
           onClick={() => setIsNewHolidayModalVisible(true)}
         >
           Create New Holiday
         </Button>
       </div>
 
-      <HolidayTableHead filterValue={selectedHolidayType} data={HolidayData} columns={holidayColumns} />
+      <div className='sm:overflow-hidden overflow-x-auto'>
+        <HolidayTableHead filterValue={selectedHolidayType} data={HolidayData} columns={holidayColumns} />
+      </div>
 
       <HolidayModal
         mode="create"

@@ -41,7 +41,7 @@ createRoot(document.getElementById('root')).render(
             // colorPrimary: 'linear-gradient(135deg, #4E9DAB, #336C79)',
             // colorPrimaryHover: 'linear-gradient(135deg, #3D8795, #2A5B66)',
             colorPrimaryActive: '#336C79',
-            controlHeight: 40,
+            controlHeight: 42,
             borderRadius: 6,
             fontWeight: 500,
           },

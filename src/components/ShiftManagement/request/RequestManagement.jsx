@@ -20,7 +20,9 @@ function RequestManagement() {
       <div onClick={() => window.history.back()} className='w-8 h-8 cursor-pointer'>
         <img src="/icons/PageBack.png" alt="" />
       </div>
-      <RequestTableHead columns={holidayColumns} />
+      <div className='sm:overflow-hidden overflow-x-auto sm:w-full w-screen overflow-hidden'>
+        <RequestTableHead columns={holidayColumns} />
+      </div>
     </div>
   );
 }

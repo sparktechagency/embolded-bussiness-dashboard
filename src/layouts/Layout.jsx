@@ -32,7 +32,7 @@ const Layout = () => {
       {/* Main Content Area */}
       <div className="flex-1 lg:ml-72 transition-all duration-300">
         <Navber toggleSidebar={toggleSidebar} />
-        <div className=" px-4 sm:px-6 md:px-8 py-5 overflow-y-auto">
+        <div className=" px-0 sm:px-6 md:px-8 pb-5 overflow-y-auto">
           <Outlet />
         </div>
       </div>

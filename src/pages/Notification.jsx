@@ -1,12 +1,17 @@
-import { CheckCircleOutlined } from "@ant-design/icons";
-import { Button, Spin, Tag } from "antd";
+import { CheckCircleOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Popconfirm, Spin, Tag, message } from "antd";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import moment from "moment";
 import io from "socket.io-client";
-import { useGetNotificationQuery, useReadAllNotificationMutation } from '../features/notification/notification';
+import {
+  useDeleteAllNotificationMutation,
+  useDeleteNotificationMutation,
+  useGetNotificationQuery,
+  useReadAllNotificationMutation
+} from '../features/notification/notification';
 import { useGetProfileQuery } from '../features/settings/settingApi';
 import { baseURL } from "../utils/BaseURL";
 
@@ -21,13 +26,12 @@ const NotificationPopup = () => {
 
   const { data: profile } = useGetProfileQuery();
 
-  const { data: notificationsData, refetch, isLoading } = useGetNotificationQuery(undefined, {
-    refetchOnFocus: true,
-    refetchOnReconnect: true,
-  });
+  const { data: notificationsData, refetch, isLoading } = useGetNotificationQuery();
 
-  console.log("Notifications Data:", notificationsData?.data?.result);
+  console.log("Notifications Data:", notificationsData);
   const [readAllNotification, { isLoading: readAllLoading }] = useReadAllNotificationMutation();
+  const [deleteAllNotification, { isLoading: deleteAllLoading }] = useDeleteAllNotificationMutation();
+  const [deleteNotification, { isLoading: deleteLoading }] = useDeleteNotificationMutation();
 
   // Extract notifications and unread count from API response
   const notifications = notificationsData?.data?.result || [];
@@ -141,11 +145,44 @@ const NotificationPopup = () => {
       console.log("Marking all notifications as read...");
       await readAllNotification().unwrap();
       console.log("All notifications marked as read");
+      message.success("All notifications marked as read");
 
       // Refetch to update the UI
       refetch();
     } catch (error) {
       console.error("Error marking all as read:", error);
+      message.error("Failed to mark all as read");
+    }
+  };
+
+  const deleteAllNotifications = async () => {
+    try {
+      console.log("Deleting all notifications...");
+      await deleteAllNotification().unwrap();
+      console.log("All notifications deleted");
+      message.success("All notifications deleted");
+
+      // Refetch to update the UI
+      refetch();
+    } catch (error) {
+      console.error("Error deleting all notifications:", error);
+      message.error("Failed to delete all notifications");
+    }
+  };
+
+  const deleteSingleNotification = async (id, e) => {
+    e.stopPropagation(); // Prevent triggering the notification click
+    try {
+      console.log("Deleting notification with ID:", id);
+      await deleteNotification(id).unwrap();
+      console.log("Notification deleted");
+      message.success("Notification deleted");
+
+      // Refetch to update the UI
+      refetch();
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      message.error("Failed to delete notification");
     }
   };
 
@@ -168,20 +205,41 @@ const NotificationPopup = () => {
         className="w-full p-10 bg-white border border-gray-200 rounded-xl"
       >
         <div>
-          {/* Header with Mark All as Read button */}
-          {notifications.length > 0 && unreadCount > 0 && (
+          {/* Header with action buttons */}
+          {notifications.length > 0 && (
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">
                 Notifications ({unreadCount} unread)
               </h3>
-              <Button
-                type="primary"
-                size="small"
-                onClick={markAllAsRead}
-                loading={readAllLoading}
-              >
-                Mark All as Read
-              </Button>
+              <div className="flex gap-2">
+                {unreadCount > 0 && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={markAllAsRead}
+                    loading={readAllLoading}
+                  >
+                    Mark All as Read
+                  </Button>
+                )}
+                <Popconfirm
+                  title="Delete all notifications"
+                  description="Are you sure you want to delete all notifications?"
+                  onConfirm={deleteAllNotifications}
+                  okText="Yes"
+                  cancelText="No"
+                  okButtonProps={{ loading: deleteAllLoading }}
+                >
+                  <Button
+                    type="default"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined />}
+                  >
+                    Delete All
+                  </Button>
+                </Popconfirm>
+              </div>
             </div>
           )}
 
@@ -243,6 +301,22 @@ const NotificationPopup = () => {
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         )}
                       </div>
+                      <Popconfirm
+                        title="Delete notification"
+                        description="Are you sure you want to delete this notification?"
+                        onConfirm={(e) => deleteSingleNotification(notif._id, e)}
+                        okText="Yes"
+                        cancelText="No"
+                        okButtonProps={{ loading: deleteLoading }}
+                      >
+                        <Button
+                          type="text"
+                          size="small"
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </Popconfirm>
                     </div>
                   </div>
                 </div>

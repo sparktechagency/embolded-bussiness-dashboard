@@ -40,7 +40,7 @@ const AttendanceBarChart = () => {
         </button>
       </div>
 
-      <div className="h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full">
+      <div className="h-48 sm:h-56 md:h-64 lg:h-72 xl:h-[298px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}

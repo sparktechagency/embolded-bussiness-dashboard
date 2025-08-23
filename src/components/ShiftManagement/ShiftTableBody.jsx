@@ -60,19 +60,28 @@ const ShiftTableBody = ({ item, list }) => {
   }
 
 
+  // Replace your handleUpdateShift function with this updated version
   const handleUpdateShift = async (values) => {
     try {
       const response = await updateShift({
         id: item._id,
         data: {
           shiftName: values.name,
-          shiftStartTime: convertTime(values.startTime),
-          shiftEndTime: convertTime(values.endTime)
+          shiftStartTime: values.startTime, // Direct time string like "09:00"
+          shiftEndTime: values.endTime      // Direct time string like "17:00"
         }
       });
-      message.success(response.data?.message || "Shift updated successfully");
-      setEditModalVisible(false);
+
+      console.log("Update response:", response);
+
+      if (response?.data) {
+        message.success(response.data?.message || "Shift updated successfully");
+        setEditModalVisible(false);
+      } else if (response?.error) {
+        throw response.error;
+      }
     } catch (error) {
+      console.log("Update error:", error);
       message.error(error?.data?.message || "Failed to update shift");
     }
   };

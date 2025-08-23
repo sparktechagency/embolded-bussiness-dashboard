@@ -1,4 +1,4 @@
-import { Button, message, Select } from 'antd';
+import { Button, Grid, message, Select } from 'antd';
 import { useState } from 'react';
 import { useCreateDepartmentMutation } from '../../features/instituteManagement/DepartmentManagementApi';
 import { useCreateInstitueMutation } from '../../features/instituteManagement/instituteManagementApi';
@@ -7,8 +7,8 @@ import DepertmentTableHead from './DepertmentTableHead';
 import InstitutionFormModal from './InstitutionFormModal';
 import InstitutionTableHead from './InstitutionTableHead';
 
-
 const { Option } = Select;
+const { useBreakpoint } = Grid;
 
 function App() {
   // State for active tab (Institution or Department)
@@ -18,7 +18,9 @@ function App() {
   const [createInstitution, { isLoading }] = useCreateInstitueMutation();
   const [createDepartment, { isLoading: creatingDepartment }] = useCreateDepartmentMutation();
 
-
+  // Use Ant Design's breakpoint utility for responsive design
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
   // Handle institution creation
   const handleCreateInstitution = async (values) => {
@@ -39,12 +41,9 @@ function App() {
       setIsNewInstitutionModalVisible(prev => !prev);
       message.success('Institution created successfully');
     } catch (error) {
-
       console.log('Error creating institution:', error);
       message.error('Failed to create institution');
     }
-
-
   };
 
   // Handle department creation
@@ -85,7 +84,6 @@ function App() {
     "Action"
   ];
 
-
   const departmentData = [
     {
       id: 1,
@@ -103,43 +101,47 @@ function App() {
     }
   ];
 
-
-
   return (
-    <div className="p-6 bg-gray-50">
-      <div className="mb-6 flex justify-between">
-        <div>
+    <div className="sm:p-6 p-1 bg-gray-50 sm:w-full w-screen overflow-hidden">
+      <div className={`mb-6 ${isMobile ? 'flex flex-col gap-4' : 'flex justify-between'}`}>
+        <div className={isMobile ? 'w-full' : ''}>
           <Button
             type={activeTab === 'institution' ? 'primary' : 'default'}
-            className={`mr-2 ${activeTab === 'institution' ? 'bg-[#336C79]' : ''}`}
+            className={`mr-2 ${activeTab === 'institution' ? 'bg-[#336C79]' : ''} ${isMobile ? 'w-full mb-2' : ''}`}
             onClick={() => setActiveTab('institution')}
+            size={isMobile ? 'large' : 'middle'}
           >
             Institution
           </Button>
           <Button
             type={activeTab === 'department' ? 'primary' : 'default'}
-            className={activeTab === 'department' ? 'bg-[#336C79]' : ''}
+            className={`${activeTab === 'department' ? 'bg-[#336C79]' : ''} ${isMobile ? 'w-full' : ''}`}
             onClick={() => setActiveTab('department')}
+            size={isMobile ? 'large' : 'middle'}
           >
             Department
           </Button>
         </div>
-        <div>
+        <div className={isMobile ? 'w-full mt-2' : ''}>
           {activeTab === 'department' && (
             <Button
               type="primary"
-              className="bg-[#336C79] mr-2"
+              className={`bg-[#336C79] ${isMobile ? 'w-full' : 'mr-2'}`}
               onClick={() => setIsNewDepartmentModalVisible(true)}
+              size={isMobile ? 'large' : 'middle'}
+              block={isMobile}
             >
               Create New Department
             </Button>
           )}
           {activeTab === 'institution' && (
-            <div className='flex items-center gap-3'>
+            <div className={`${isMobile ? 'flex flex-col' : 'flex items-center gap-3'}`}>
               <Button
                 type="primary"
                 className="bg-[#336C79]"
                 onClick={() => setIsNewInstitutionModalVisible(true)}
+                size={isMobile ? 'large' : 'middle'}
+                block={isMobile}
               >
                 Create New Institution
               </Button>
@@ -148,11 +150,20 @@ function App() {
         </div>
       </div>
 
-      <div className=" rounded-md">
+      <div className="rounded-md sm:overflow-hidden overflow-x-auto">
         {activeTab === 'institution' ? (
-          <InstitutionTableHead activeTab={activeTab} columns={institutionColumns} />
+          <InstitutionTableHead
+            activeTab={activeTab}
+            columns={institutionColumns}
+            isMobile={isMobile}
+          />
         ) : (
-          <DepertmentTableHead activeTab={activeTab} data={departmentData} columns={departmentColumns} />
+          <DepertmentTableHead
+            activeTab={activeTab}
+            data={departmentData}
+            columns={departmentColumns}
+            isMobile={isMobile}
+          />
         )}
       </div>
 
@@ -163,6 +174,7 @@ function App() {
         onCancel={() => setIsNewInstitutionModalVisible(false)}
         onSubmit={handleCreateInstitution}
         loading={isLoading}
+        isMobile={isMobile}
       />
 
       <DepartmentFormModal
@@ -171,6 +183,7 @@ function App() {
         onCancel={() => setIsNewDepartmentModalVisible(false)}
         onSubmit={handleCreateDepartment}
         loading={creatingDepartment}
+        isMobile={isMobile}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 import { CalendarOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Form, Input, Modal, Select, Spin } from 'antd';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { useGetAllInstitutionsQuery } from '../../features/instituteManagement/instituteManagementApi';
 
@@ -18,18 +18,49 @@ const HolidayModal = ({
   const [form] = Form.useForm();
   const { data: institutes, isLoading: institutesLoading } = useGetAllInstitutionsQuery();
 
+  // Function to convert date string to dayjs object
+  const convertToDayjs = (dateString) => {
+    if (!dateString) return null;
+
+    // If it's already a dayjs object, return as is
+    if (dayjs.isDayjs(dateString)) return dateString;
+
+    // Convert ISO string or any date string to dayjs
+    return dayjs(dateString);
+  };
+
   useEffect(() => {
-    if (mode === 'edit' && visible) {
-      form.setFieldsValue(initialValues);
-    } else if (mode === 'create' && visible) {
-      form.resetFields();
+    if (visible) {
+      if (mode === 'edit' && initialValues) {
+        console.log("Setting form values for edit mode:", initialValues);
+
+        form.setFieldsValue({
+          instituteName: initialValues.instituteName,
+          type: initialValues.type,
+          name: initialValues.name,
+          startDate: convertToDayjs(initialValues.startDate),
+          endDate: convertToDayjs(initialValues.endDate)
+        });
+      } else if (mode === 'create') {
+        form.resetFields();
+      }
     }
   }, [mode, visible, initialValues, form]);
 
   const handleSubmit = () => {
     form.validateFields()
       .then(values => {
-        onSubmit(values);
+        console.log("Form values before submission:", values);
+
+        // Format dates for API
+        const formattedValues = {
+          ...values,
+          startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
+          endDate: values.endDate ? values.endDate.format('YYYY-MM-DD') : null
+        };
+
+        console.log("Formatted values being sent:", formattedValues);
+        onSubmit(formattedValues);
       })
       .catch(info => {
         console.log('Validate Failed:', info);
@@ -79,6 +110,7 @@ const HolidayModal = ({
       closable={true}
       width={500}
       maskClosable={!createLoading}
+      destroyOnClose={true}
     >
       {
         institutesLoading ? <div className='h-[300px] flex justify-center items-center'><Spin size='small' /></div> : <>
@@ -87,11 +119,10 @@ const HolidayModal = ({
             layout="vertical"
             initialValues={{
               type: "GOVERNMENT",
-              instituteName: undefined, // Changed from "" to undefined
+              instituteName: undefined,
               name: "",
               startDate: null,
-              endDate: null,
-              ...initialValues
+              endDate: null
             }}
           >
             <Form.Item
@@ -152,7 +183,8 @@ const HolidayModal = ({
                   size="large"
                   suffixIcon={<CalendarOutlined />}
                   format="YYYY-MM-DD"
-                  disabledDate={current => current && current < moment().startOf('day')}
+                  disabledDate={current => current && current < dayjs().startOf('day')}
+                  getPopupContainer={(triggerNode) => triggerNode.parentElement || document.body}
                 />
               </Form.Item>
 
@@ -180,8 +212,9 @@ const HolidayModal = ({
                   format="YYYY-MM-DD"
                   disabledDate={current => {
                     const startDate = form.getFieldValue('startDate');
-                    return startDate ? current && current < startDate : current && current < moment().startOf('day');
+                    return startDate ? current && current < startDate : current && current < dayjs().startOf('day');
                   }}
+                  getPopupContainer={(triggerNode) => triggerNode.parentElement || document.body}
                 />
               </Form.Item>
             </Form.Item>

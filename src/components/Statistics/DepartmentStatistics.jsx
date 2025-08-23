@@ -6,7 +6,7 @@ const DepartmentStatistics = () => {
   const { data, isLoading } = useStatisticsForHrAndDepQuery();
 
   return (
-    <div className="border border-primary rounded-lg p-3 sm:p-4 bg-white shadow-sm">
+    <div className="border border-primary rounded-lg p-3 sm:p-4  bg-white shadow-sm">
       <div className="w-full rounded-xl flex flex-col gap-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

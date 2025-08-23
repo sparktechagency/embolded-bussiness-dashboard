@@ -1,7 +1,9 @@
-import { Button, Col, Form, Input, Modal, Row, Spin, Upload } from 'antd';
+import { Button, Col, Form, Grid, Input, Modal, Row, Spin, Upload } from 'antd';
 import { Upload as UploadIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { baseURL } from '../../utils/BaseURL';
+
+const { useBreakpoint } = Grid;
 
 const InstitutionFormModal = ({
   mode = 'create',
@@ -10,10 +12,15 @@ const InstitutionFormModal = ({
   onSubmit,
   initialValues = {},
   isLoading,
-  getDataLoading
+  getDataLoading,
+  isMobile // Added isMobile prop
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
+
+  // Use Ant Design's breakpoint utility as fallback
+  const screens = useBreakpoint();
+  const mobileView = isMobile !== undefined ? isMobile : !screens.md;
 
   // Separate effect for handling modal opening
   useEffect(() => {
@@ -121,9 +128,15 @@ const InstitutionFormModal = ({
   };
 
   const modalFooter = (
-    <div>
+    <div className={mobileView ? 'flex flex-col-reverse gap-2' : ''}>
       <Button
-        style={{ paddingLeft: "30px", paddingRight: "30px", fontSize: "16px", marginRight: 8 }}
+        style={{
+          paddingLeft: mobileView ? "15px" : "30px",
+          paddingRight: mobileView ? "15px" : "30px",
+          fontSize: mobileView ? "14px" : "16px",
+          marginRight: mobileView ? 0 : 8,
+          width: mobileView ? '100%' : 'auto'
+        }}
         onClick={handleCancel}
       >
         Cancel
@@ -131,7 +144,12 @@ const InstitutionFormModal = ({
       <Button
         type="primary"
         loading={isLoading}
-        style={{ paddingLeft: "40px", paddingRight: "40px", fontSize: "16px" }}
+        style={{
+          paddingLeft: mobileView ? "15px" : "40px",
+          paddingRight: mobileView ? "15px" : "40px",
+          fontSize: mobileView ? "14px" : "16px",
+          width: mobileView ? '100%' : 'auto'
+        }}
         onClick={handleSubmit}
         className="bg-[#336C79]"
       >
@@ -146,103 +164,135 @@ const InstitutionFormModal = ({
 
   return (
     <Modal
-      title={<span style={{ fontWeight: "bold", color: "#336C79", paddingTop: "20px", fontSize: "20px" }}>{modalTitle}</span>}
+      title={
+        <span style={{
+          fontWeight: "bold",
+          color: "#336C79",
+          paddingTop: mobileView ? "10px" : "20px",
+          fontSize: mobileView ? "18px" : "20px"
+        }}>
+          {modalTitle}
+        </span>
+      }
       open={visible}
       onCancel={handleCancel}
       footer={modalFooter}
       closable={false}
-      width={1000}
+      width={mobileView ? '90%' : 1000}
+      className={mobileView ? 'top-5' : ''}
     >
       {
-        getDataLoading ? <div className='h-[300px] flex justify-center items-center'><Spin size='small' /></div> : <Form form={form} layout="vertical">
-          <Row gutter={24}>
-            <Col span={8}>
-              <Form.Item
-                name="name"
-                label="Institution Name"
-                rules={[{ required: true, message: 'Please input institution name!' }]}
-              >
-                <Input placeholder="Enter institution name" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                name="address"
-                label="Address"
-                rules={[{ required: true, message: 'Please input address!' }]}
-              >
-                <Input placeholder="Enter address" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  { required: true, message: 'Please input email!' },
-                  { type: 'email', message: 'Please enter a valid email!' }
-                ]}
-              >
-                <Input placeholder="Enter email" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={24}>
-            <Col span={8}>
-              <Form.Item
-                name="phone"
-                label="Phone Number"
-                rules={[{ required: true, message: 'Please input phone number!' }]}
-              >
-                <Input placeholder="Enter phone number" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                name="website"
-                label="Institution Website Link"
-                rules={[{ required: true, message: 'Please input website!' }]}
-              >
-                <Input placeholder="Enter website link" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                name="establishedYear"
-                label="Established Year"
-                rules={[{ required: true, message: 'Please input established year!' }]}
-              >
-                <Input placeholder="Enter year" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={24}>
-            <Col span={24}>
-              <Form.Item
-                name="logo"
-                label="Upload Logo"
-                valuePropName="fileList"
-                getValueFromEvent={normFile}
-              >
-                <Upload
-                  {...uploadProps}
-                  listType="picture-card"
-                  maxCount={1}
-                  className="institution-logo-uploader"
+        getDataLoading ?
+          <div className='h-[300px] flex justify-center items-center'>
+            <Spin size='small' />
+          </div> :
+          <Form form={form} layout="vertical">
+            <Row gutter={mobileView ? 0 : 24}>
+              <Col span={mobileView ? 24 : 8}>
+                <Form.Item
+                  name="name"
+                  label="Institution Name"
+                  rules={[{ required: true, message: 'Please input institution name!' }]}
                 >
-                  {fileList.length >= 1 ? null : (
-                    <div>
-                      <UploadIcon size={24} className="text-gray-400 ml-2" />
-                      <div className="mt-2">Upload</div>
-                    </div>
-                  )}
-                </Upload>
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
+                  <Input
+                    placeholder="Enter institution name"
+                    size={mobileView ? 'large' : 'middle'}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={mobileView ? 24 : 8}>
+                <Form.Item
+                  name="address"
+                  label="Address"
+                  rules={[{ required: true, message: 'Please input address!' }]}
+                >
+                  <Input
+                    placeholder="Enter address"
+                    size={mobileView ? 'large' : 'middle'}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={mobileView ? 24 : 8}>
+                <Form.Item
+                  name="email"
+                  label="Email"
+                  rules={[
+                    { required: true, message: 'Please input email!' },
+                    { type: 'email', message: 'Please enter a valid email!' }
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter email"
+                    size={mobileView ? 'large' : 'middle'}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={mobileView ? 0 : 24}>
+              <Col span={mobileView ? 24 : 8}>
+                <Form.Item
+                  name="phone"
+                  label="Phone Number"
+                  rules={[{ required: true, message: 'Please input phone number!' }]}
+                >
+                  <Input
+                    placeholder="Enter phone number"
+                    size={mobileView ? 'large' : 'middle'}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={mobileView ? 24 : 8}>
+                <Form.Item
+                  name="website"
+                  label="Institution Website Link"
+                  rules={[{ required: true, message: 'Please input website!' }]}
+                >
+                  <Input
+                    placeholder="Enter website link"
+                    size={mobileView ? 'large' : 'middle'}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={mobileView ? 24 : 8}>
+                <Form.Item
+                  name="establishedYear"
+                  label="Established Year"
+                  rules={[{ required: true, message: 'Please input established year!' }]}
+                >
+                  <Input
+                    placeholder="Enter year"
+                    size={mobileView ? 'large' : 'middle'}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={mobileView ? 0 : 24}>
+              <Col span={24}>
+                <Form.Item
+                  name="logo"
+                  label="Upload Logo"
+                  valuePropName="fileList"
+                  getValueFromEvent={normFile}
+                >
+                  <Upload
+                    {...uploadProps}
+                    listType="picture-card"
+                    maxCount={1}
+                    className="institution-logo-uploader"
+                  >
+                    {fileList.length >= 1 ? null : (
+                      <div>
+                        <UploadIcon size={mobileView ? 20 : 24} className="text-gray-400 ml-2" />
+                        <div className={`${mobileView ? 'mt-1 text-sm' : 'mt-2'}`}>Upload</div>
+                      </div>
+                    )}
+                  </Upload>
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
       }
     </Modal>
   );

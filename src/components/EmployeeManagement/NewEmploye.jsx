@@ -1,5 +1,5 @@
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Input, Select, Upload, message } from 'antd';
+import { Button, Input, Select, Upload, message, Grid } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetDesignationQuery } from '../../features/Designation/designationApi';
@@ -9,9 +9,13 @@ import { useGetAllInstitutionsQuery } from '../../features/instituteManagement/i
 import { useGetAllShiftQuery } from '../../features/shiftManagement/shiftApi';
 import { baseURL } from '../../utils/BaseURL';
 
+const { useBreakpoint } = Grid;
+
 export default function NewEmploye() {
   const { id } = useParams();
   const router = useNavigate();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
   const [selectedDays, setSelectedDays] = useState(['Sun']);
   const { data: institutionData, isLoading: instituteLoading } = useGetAllInstitutionsQuery();
@@ -354,7 +358,7 @@ export default function NewEmploye() {
   // Show loading state while fetching employee data for edit
   if (id && isLoading) {
     return (
-      <div className="w-full p-6 flex justify-center items-center">
+      <div className="w-full p-4 sm:p-6 flex justify-center items-center">
         <div>Loading employee data...</div>
       </div>
     );
@@ -362,19 +366,19 @@ export default function NewEmploye() {
 
   return (
     <div className="">
-      <div className="w-full p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className={`w-full ${isMobile ? 'p-4' : 'p-6'}`}>
+        <div className={`flex justify-between items-center ${isMobile ? 'mb-4' : 'mb-6'}`}>
           <div className="flex items-center">
             <div onClick={() => window.history.back()} className="h-7 w-7 cursor-pointer rounded-sm flex items-center justify-center mr-2">
               <img src="/icons/PageBack.png" alt="" />
             </div>
-            <h5 className="m-0 font-medium">
+            <h5 className={`m-0 font-medium ${isMobile ? 'text-base' : ''}`}>
               {id ? 'Edit Employee' : 'Add New Employee'}
             </h5>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-6 border p-6 rounded-lg border-primary">
+        <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'md:grid-cols-3 gap-x-6 gap-y-6'} border p-4 sm:p-6 rounded-lg border-primary`}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Employee ID*</label>
             <Input
@@ -382,6 +386,7 @@ export default function NewEmploye() {
               value={formData.employeeId}
               onChange={(e) => handleChange('employeeId', e.target.value)}
               status={!formData.employeeId.trim() ? 'error' : ''}
+              size={isMobile ? 'large' : 'middle'}
             />
           </div>
 
@@ -392,6 +397,7 @@ export default function NewEmploye() {
               value={formData.employeeName}
               onChange={(e) => handleChange('employeeName', e.target.value)}
               status={!formData.employeeName.trim() ? 'error' : ''}
+              size={isMobile ? 'large' : 'middle'}
             />
           </div>
 
@@ -404,6 +410,7 @@ export default function NewEmploye() {
               onChange={handleInstitutionChange}
               loading={instituteLoading}
               status={!formData.institution.trim() ? 'error' : ''}
+              size={isMobile ? 'large' : 'middle'}
             >
               {institutionData?.data?.data?.map((institution) => (
                 <Select.Option
@@ -426,6 +433,7 @@ export default function NewEmploye() {
               loading={departmentLoading}
               disabled={!selectedInstitutionId}
               status={!formData.department.trim() ? 'error' : ''}
+              size={isMobile ? 'large' : 'middle'}
             >
               {filteredDepartments.map((department) => (
                 <Select.Option
@@ -448,6 +456,7 @@ export default function NewEmploye() {
               loading={designationLoading}
               disabled={!selectedInstitutionId}
               status={!formData.role.trim() ? 'error' : ''}
+              size={isMobile ? 'large' : 'middle'}
             >
               {filteredDesignations.map((designation) => (
                 <Select.Option
@@ -467,6 +476,7 @@ export default function NewEmploye() {
               value={formData.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
               status={!formData.phone.trim() ? 'error' : ''}
+              size={isMobile ? 'large' : 'middle'}
             />
           </div>
 
@@ -479,7 +489,7 @@ export default function NewEmploye() {
               onChange={(value) => handleChange('shiftSchedule', value)}
               loading={shiftLoading}
               allowClear
-
+              size={isMobile ? 'large' : 'middle'}
             >
               {shiftData?.data?.data?.map((shift) => (
                 <Select.Option
@@ -499,6 +509,7 @@ export default function NewEmploye() {
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
               status={!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ? 'error' : ''}
+              size={isMobile ? 'large' : 'middle'}
             />
           </div>
 
@@ -510,7 +521,7 @@ export default function NewEmploye() {
                   key={day}
                   type="button"
                   onClick={() => toggleDay(day)}
-                  className={`w-12 h-8 border rounded-md flex items-center justify-center ${selectedDays.includes(day)
+                  className={`${isMobile ? 'w-10 h-7 text-xs' : 'w-12 h-8'} border rounded-md flex items-center justify-center ${selectedDays.includes(day)
                     ? 'bg-blue-100 border-blue-400 text-blue-600'
                     : 'bg-white border-gray-300 text-gray-600'
                     }`}
@@ -526,19 +537,21 @@ export default function NewEmploye() {
             <Upload {...uploadProps}>
               {fileList.length >= 1 ? null : (
                 <div className="flex flex-col items-center">
-                  <UploadOutlined className="text-2xl" />
-                  <div className="mt-2">Upload</div>
+                  <UploadOutlined className={isMobile ? "text-xl" : "text-2xl"} />
+                  <div className={`${isMobile ? 'mt-1 text-xs' : 'mt-2'}`}>Upload</div>
                 </div>
               )}
             </Upload>
           </div>
 
-          <div className="col-span-2 flex justify-end items-end mt-4">
+          <div className={`${isMobile ? 'col-span-1' : 'col-span-2'} flex justify-end items-end mt-4`}>
             <Button
               type="primary"
               onClick={handleSubmit}
               loading={id ? updateEmployeeLoading : createEmployeeLoading}
               className="bg-[#336C79] hover:bg-[#336C79]"
+              size={isMobile ? 'large' : 'middle'}
+              block={isMobile}
             >
               {id ? 'Update Employee' : 'Create New Employee'}
             </Button>

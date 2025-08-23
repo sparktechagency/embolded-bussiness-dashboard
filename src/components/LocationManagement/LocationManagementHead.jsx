@@ -19,12 +19,13 @@ const LocationManagementHead = ({ columns, status, selectedInstitution }) => {
     totalPage: 1
   };
 
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   return (
-    <div className="">
+    <div className="w-full">
       {/* Inner container (forces horizontal scroll on small screen) */}
       <div className="min-w-[1200px] w-full bg-transparent rounded-lg space-y-3">
 

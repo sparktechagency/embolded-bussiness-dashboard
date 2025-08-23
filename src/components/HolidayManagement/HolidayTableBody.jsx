@@ -1,12 +1,15 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, message, Modal, Switch } from "antd";
-import moment from 'moment'; // Add this import
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDeleteHolidayMutation, useUpdateDHolidayStatusMutation, useUpdateHolidayMutation } from '../../features/holiday/holidayApi';
 import HolidayModal from "./HolidayModal";
 
 const HolidayTableBody = ({ item, list }) => {
+
+  console.log("items ", item)
+
+
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
@@ -58,18 +61,29 @@ const HolidayTableBody = ({ item, list }) => {
 
   const handleUpdateHoliday = async (values) => {
     try {
+      console.log("Values received in handleUpdateHoliday:", values);
+
       const response = await updateHoliday({
         id: item._id,
         data: {
-          ...values,
-          instituteId: values.instituteName, // Map to your API expected field
-          startDate: values.startDate.format('YYYY-MM-DD'),
-          endDate: values.endDate.format('YYYY-MM-DD')
+          name: values.name,
+          holidayType: values.type, // Map to your API expected field
+          institutionID: values.instituteName, // Map to your API expected field
+          startDate: values.startDate, // Already formatted as YYYY-MM-DD
+          endDate: values.endDate      // Already formatted as YYYY-MM-DD
         }
       });
-      message.success(response.data?.message || "Holiday updated successfully");
-      setEditModalVisible(false);
+
+      console.log("Update response:", response);
+
+      if (response?.data) {
+        message.success(response.data?.message || "Holiday updated successfully");
+        setEditModalVisible(false);
+      } else if (response?.error) {
+        throw response.error;
+      }
     } catch (error) {
+      console.log("Update error:", error);
       message.error(error?.data?.message || "Failed to update holiday");
     }
   };
@@ -184,11 +198,11 @@ const HolidayTableBody = ({ item, list }) => {
         onCancel={() => setEditModalVisible(false)}
         onSubmit={handleUpdateHoliday}
         initialValues={{
-          instituteName: item?.institutionID?._id, // Assuming your API returns instituteId
+          instituteName: item?.institutionID?._id,
           type: item.holidayType,
           name: item.name,
-          startDate: item.startDate ? moment(item.startDate) : null,
-          endDate: item.endDate ? moment(item.endDate) : null
+          startDate: item.startDate,
+          endDate: item.endDate
         }}
         loading={updatingLoading}
       />

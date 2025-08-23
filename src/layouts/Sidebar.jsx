@@ -150,10 +150,10 @@ const Sidebar = ({ closeSidebar }) => {
               <Link
                 to={item.path}
                 onClick={closeSidebar}
-                className={`flex items-center gap-3 p-3 rounded-l-lg text-sm font-medium transition-colors ${location.pathname === item.path ||
-                    location.pathname.startsWith(item.path + "/")
-                    ? "bg-primary text-white"
-                    : "hover:bg-gray-100 text-gray-700"
+                className={`flex items-center gap-3 p-3 rounded-l-lg text-sm font-medium  ${location.pathname === item.path ||
+                  location.pathname.startsWith(item.path + "/")
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100 text-gray-700"
                   }`}
               >
                 <span className="text-lg">{item.icon}</span>
