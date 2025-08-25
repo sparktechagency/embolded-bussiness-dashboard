@@ -8,8 +8,10 @@ import { CiSearch } from "react-icons/ci";
 import { useLocation, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import {
-  useGetNotificationQuery,
-  useReadAllNotificationMutation,
+  useGetBusinessOwnerNotificationQuery,
+  useGetHRNotificationQuery,
+  useReadBusinessOwnerAllNotificationMutation,
+  useReadHRAllNotificationMutation,
 } from "../features/notification/notification";
 import { useGetProfileQuery } from "../features/settings/settingApi";
 import { baseURL } from "../utils/BaseURL";
@@ -25,19 +27,30 @@ const Navber = ({ toggleSidebar }) => {
   const notificationContainerRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  const role = localStorage.getItem("role"); // "BUSINESS_OWNER", "DEPARTMENT_MANAGER", "HR"
   const { data: profile } = useGetProfileQuery();
 
-  const {
-    data: notifications,
-    refetch,
-    isLoading,
-  } = useGetNotificationQuery(undefined, {
-    refetchOnFocus: true,
-    refetchOnReconnect: true,
-  });
+  // Conditionally fetch notifications based on role
+  const isBusinessOwner = role === "BUSINESS_OWNER";
+  const { data: businessOwnerNotifications, isLoading: businessOwnerLoading, refetch: refetchBusinessOwner } =
+    useGetBusinessOwnerNotificationQuery(undefined, { skip: !isBusinessOwner });
 
-  const [readAllNotification, { isLoading: readAllLoading }] =
-    useReadAllNotificationMutation();
+  const { data: hrNotifications, isLoading: hrLoading, refetch: refetchHR } =
+    useGetHRNotificationQuery(undefined, { skip: isBusinessOwner });
+
+  // Conditionally use the appropriate read all mutation based on role
+  const [readBusinessOwnerAll, { isLoading: readBusinessOwnerLoading }] = useReadBusinessOwnerAllNotificationMutation();
+  const [readHRAll, { isLoading: readHRAllLoading }] = useReadHRAllNotificationMutation();
+
+  // Determine which data to use based on role
+  const notificationsData = isBusinessOwner ? businessOwnerNotifications : hrNotifications;
+  const isLoading = isBusinessOwner ? businessOwnerLoading : hrLoading;
+  const refetch = isBusinessOwner ? refetchBusinessOwner : refetchHR;
+
+  // Extract notifications and calculate unread count
+  const notifications = notificationsData || [];
+
+  const unreadCount = notifications?.data?.result?.filter(notif => !notif.read).length;
 
   // Update current time every minute
   useEffect(() => {
@@ -136,24 +149,24 @@ const Navber = ({ toggleSidebar }) => {
     }
   };
 
-  const unreadCount = notifications?.data?.unreadCount || 0;
-
   const markAllAsRead = async () => {
     try {
-      await readAllNotification().unwrap();
+      if (isBusinessOwner) {
+        await readBusinessOwnerAll().unwrap();
+      } else {
+        await readHRAll().unwrap();
+      }
       refetch();
     } catch (error) {
       console.error("Error marking all as read:", error);
     }
   };
 
-  const sortedNotifications = notifications?.data?.result
-    ? [...notifications.data.result].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    )
-    : [];
-  const popupNotifications = sortedNotifications.slice(0, 3);
-  const totalNotifications = sortedNotifications.length;
+
+
+
+  const popupNotifications = notifications?.data?.result?.slice(0, 3);
+  const totalNotifications = popupNotifications?.length;
   const hasMoreNotifications = totalNotifications > 3;
 
   return (
@@ -249,7 +262,12 @@ const Navber = ({ toggleSidebar }) => {
               className="p-0"
               extra={
                 unreadCount > 0 && (
-                  <Button size="small" type="link" onClick={markAllAsRead} loading={readAllLoading}>
+                  <Button
+                    size="small"
+                    type="link"
+                    onClick={markAllAsRead}
+                    loading={isBusinessOwner ? readBusinessOwnerLoading : readHRAllLoading}
+                  >
                     Mark all read
                   </Button>
                 )

@@ -2,14 +2,29 @@ import { baseApi } from "../../apiBaseQuery";
 
 export const notificationApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getNotification: builder.query({
+    getBusinessOwnerNotification: builder.query({
       query: () => "/notifications/business-owner",
       providesTags: ["notifications"],
     }),
 
-    readAllNotification: builder.mutation({
+
+    getHRNotification: builder.query({
+      query: () => "/notifications/hr-department-manager",
+      providesTags: ["notifications"],
+    }),
+
+
+    readBusinessOwnerAllNotification: builder.mutation({
       query: () => ({
-        url: `/notifications`,
+        url: `/notifications/business-owner`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['notifications'],
+    }),
+
+    readHRAllNotification: builder.mutation({
+      query: () => ({
+        url: `/notifications/hr-department-manager`,
         method: 'PATCH',
       }),
       invalidatesTags: ['notifications'],
@@ -23,19 +38,22 @@ export const notificationApi = baseApi.injectEndpoints({
       invalidatesTags: ['notifications'],
     }),
 
-    deleteNotification: builder.mutation({
+    deleteSingleNotification: builder.mutation({
       query: (id) => ({
         url: `/notifications/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['notifications'],
     }),
+
   }),
 });
 
 export const {
-  useGetNotificationQuery,
-  useReadAllNotificationMutation,
   useDeleteAllNotificationMutation,
-  useDeleteNotificationMutation
+  useDeleteSingleNotificationMutation,
+  useGetBusinessOwnerNotificationQuery, 
+  useGetHRNotificationQuery, 
+  useReadBusinessOwnerAllNotificationMutation,
+  useReadHRAllNotificationMutation
 } = notificationApi;

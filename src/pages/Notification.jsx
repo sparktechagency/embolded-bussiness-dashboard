@@ -1,22 +1,24 @@
 import { CheckCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Button, Popconfirm, Spin, Tag, message } from "antd";
 import { motion } from "framer-motion";
+import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
-import moment from "moment";
 import io from "socket.io-client";
 import {
   useDeleteAllNotificationMutation,
-  useDeleteNotificationMutation,
-  useGetNotificationQuery,
-  useReadAllNotificationMutation
+  useDeleteSingleNotificationMutation,
+  useGetBusinessOwnerNotificationQuery,
+  useGetHRNotificationQuery,
+  useReadBusinessOwnerAllNotificationMutation,
+  useReadHRAllNotificationMutation
 } from '../features/notification/notification';
 import { useGetProfileQuery } from '../features/settings/settingApi';
 import { baseURL } from "../utils/BaseURL";
 
 const NotificationPopup = () => {
   const path = useLocation();
+  const role = localStorage.getItem("role"); // "BUSINESS_OWNER", "DEPARTMENT_MANAGER", "HR"
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -26,16 +28,30 @@ const NotificationPopup = () => {
 
   const { data: profile } = useGetProfileQuery();
 
-  const { data: notificationsData, refetch, isLoading } = useGetNotificationQuery();
+  // Conditionally fetch notifications based on role
+  const isBusinessOwner = role === "BUSINESS_OWNER";
+  const { data: businessOwnerNotifications, isLoading: businessOwnerLoading, refetch: refetchBusinessOwner } =
+    useGetBusinessOwnerNotificationQuery(undefined, { skip: !isBusinessOwner });
 
-  console.log("Notifications Data:", notificationsData);
-  const [readAllNotification, { isLoading: readAllLoading }] = useReadAllNotificationMutation();
+  const { data: hrNotifications, isLoading: hrLoading, refetch: refetchHR } =
+    useGetHRNotificationQuery(undefined, { skip: isBusinessOwner });
+
+  // Conditionally use the appropriate read all mutation based on role
+  const [readBusinessOwnerAll, { isLoading: readBusinessOwnerLoading }] = useReadBusinessOwnerAllNotificationMutation();
+  const [readHRAll, { isLoading: readHRAllLoading }] = useReadHRAllNotificationMutation();
+
   const [deleteAllNotification, { isLoading: deleteAllLoading }] = useDeleteAllNotificationMutation();
-  const [deleteNotification, { isLoading: deleteLoading }] = useDeleteNotificationMutation();
+  const [deleteSingleNotification, { isLoading: singleDeleteLoading }] = useDeleteSingleNotificationMutation();
 
-  // Extract notifications and unread count from API response
-  const notifications = notificationsData?.data?.result || [];
-  const unreadCount = notificationsData?.data?.unreadCount || 0;
+  // Determine which data to use based on role
+  const notificationsData = isBusinessOwner ? businessOwnerNotifications : hrNotifications;
+  const isLoading = isBusinessOwner ? businessOwnerLoading : hrLoading;
+  const refetch = isBusinessOwner ? refetchBusinessOwner : refetchHR;
+
+  // Extract notifications and calculate unread count
+  const notifications = notificationsData || [];
+  console.log(notifications)
+  const unreadCount = notifications?.data?.result?.filter(notif => !notif.read).length;
 
   useEffect(() => {
     socketRef.current = io(baseURL);
@@ -143,7 +159,13 @@ const NotificationPopup = () => {
   const markAllAsRead = async () => {
     try {
       console.log("Marking all notifications as read...");
-      await readAllNotification().unwrap();
+
+      if (isBusinessOwner) {
+        await readBusinessOwnerAll().unwrap();
+      } else {
+        await readHRAll().unwrap();
+      }
+
       console.log("All notifications marked as read");
       message.success("All notifications marked as read");
 
@@ -170,11 +192,11 @@ const NotificationPopup = () => {
     }
   };
 
-  const deleteSingleNotification = async (id, e) => {
+  const deleteSingleNotif = async (id, e) => {
     e.stopPropagation(); // Prevent triggering the notification click
     try {
       console.log("Deleting notification with ID:", id);
-      await deleteNotification(id).unwrap();
+      await deleteSingleNotification(id).unwrap();
       console.log("Notification deleted");
       message.success("Notification deleted");
 
@@ -217,7 +239,7 @@ const NotificationPopup = () => {
                     type="primary"
                     size="small"
                     onClick={markAllAsRead}
-                    loading={readAllLoading}
+                    loading={isBusinessOwner ? readBusinessOwnerLoading : readHRAllLoading}
                   >
                     Mark All as Read
                   </Button>
@@ -262,7 +284,7 @@ const NotificationPopup = () => {
                 </p>
               </div>
             ) : (
-              notifications.map((notif, index) => (
+              notifications?.data?.result?.map((notif, index) => (
                 <div
                   key={notif._id || index}
                   className={`flex items-start p-3 transition duration-300 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${!notif.read ? "bg-blue-50" : ""
@@ -304,10 +326,10 @@ const NotificationPopup = () => {
                       <Popconfirm
                         title="Delete notification"
                         description="Are you sure you want to delete this notification?"
-                        onConfirm={(e) => deleteSingleNotification(notif._id, e)}
+                        onConfirm={(e) => deleteSingleNotif(notif._id, e)}
                         okText="Yes"
                         cancelText="No"
-                        okButtonProps={{ loading: deleteLoading }}
+                        okButtonProps={{ loading: singleDeleteLoading }}
                       >
                         <Button
                           type="text"
