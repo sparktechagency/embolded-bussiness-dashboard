@@ -1,6 +1,5 @@
 // src/components/ShiftManagement/ShiftManagement.jsx
 import { Button, message, Select } from 'antd';
-import moment from 'moment';
 import { useState } from 'react';
 import { useGetAllShiftAndLeaveQuery } from '../../features/shiftAndLeave/ShiftAndLeave';
 import { useAssignEmployeeShiftMutation, useCreateShiftMutation } from '../../features/shiftManagement/shiftApi';
@@ -29,18 +28,10 @@ function ShiftManagement() {
   // Handle shift creation
   const handleCreateHoliday = async (values) => {
     try {
-      const startTime = moment.isMoment(values?.startTime) ? values.startTime : moment(values?.startTime);
-      const endTime = moment.isMoment(values?.endTime) ? values.endTime : moment(values?.endTime);
-
-      if (!startTime.isValid() || !endTime.isValid()) {
-        message.error("Please provide valid start and end times");
-        return;
-      }
-
       const shiftData = {
         shiftName: values?.name,
-        shiftStartTime: startTime.format("HH:mm"),
-        shiftEndTime: endTime.format("HH:mm")
+        shiftStartTime: values.startTime,
+        shiftEndTime: values.endTime
       };
 
       const result = await createNewShift(shiftData);
@@ -55,6 +46,10 @@ function ShiftManagement() {
       console.error("Error creating shift:", error);
       message.error(error?.message || "Something went wrong");
     }
+
+
+
+
   };
 
   const handleAssignShift = async (values) => {
@@ -83,7 +78,7 @@ function ShiftManagement() {
   ];
 
   return (
-    <div className="sm:p-6 p-1 bg-gray-50 w-screen sm:w-full overflow-hidden">
+    <div className="sm:p-6 p-2 bg-gray-50 w-screen sm:w-full overflow-hidden">
       <div className="mb-6 sm:flex sm:justify-end justify-between gap-3">
         {/* Request Modal Trigger */}
         <Button

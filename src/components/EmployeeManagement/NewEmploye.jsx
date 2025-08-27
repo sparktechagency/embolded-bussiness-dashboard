@@ -1,5 +1,5 @@
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Input, Select, Upload, message, Grid } from 'antd';
+import { Button, Grid, Input, Select, Upload, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetDesignationQuery } from '../../features/Designation/designationApi';
@@ -22,6 +22,8 @@ export default function NewEmploye() {
   const { data: shiftData, isLoading: shiftLoading } = useGetAllShiftQuery();
   const { data: departmentData, isLoading: departmentLoading } = useGetAllDepartmentQuery();
   const { data: designationData, isLoading: designationLoading } = useGetDesignationQuery();
+  console.log(designationData?.data?.data)
+
   const [createEmployee, { isLoading: createEmployeeLoading }] = useCreateEmployeeMutation();
   const { data: spesicData, isLoading, refetch: refetchEmployee } = useGetEmployeeByIdQuery(id, { skip: !id });
   const [updateEmployee, { isLoading: updateEmployeeLoading }] = useUpdateEmployeeMutation();
@@ -75,7 +77,7 @@ export default function NewEmploye() {
         employeeId: employeeData.employeeID || '',
         employeeName: employeeData.name || '',
         department: employeeData.departmentID?.departmentName || '',
-        role: '', // Will be set after designations are filtered
+        role: employeeData.designationID?._id || '', // Use ID instead of name
         institution: employeeData.institutionID?.institutionName || '',
         email: employeeData.email || '',
         phone: employeeData.phone || '',
@@ -106,7 +108,7 @@ export default function NewEmploye() {
     }
   }, [spesicData, isLoading]);
 
-  // useEffect to filter departments and designations when institution changes or data loads
+  // useEffect to filter departments when institution changes or data loads
   useEffect(() => {
     if (selectedInstitutionId && departmentData?.data?.data) {
       const filtered = departmentData.data.data.filter(
@@ -115,26 +117,11 @@ export default function NewEmploye() {
       setFilteredDepartments(filtered);
     }
 
-    if (selectedInstitutionId && designationData?.data?.data) {
-      const filteredDesig = designationData.data.data.filter(
-        designation => designation?.institutionID?._id === selectedInstitutionId
-      );
-      setFilteredDesignations(filteredDesig);
-
-      // Set designation name after filtering (for edit mode)
-      if (spesicData?.data?.designationID?.designationName) {
-        const designationExists = filteredDesig.find(
-          desig => desig.designationName === spesicData.data.designationID.designationName
-        );
-        if (designationExists) {
-          setFormData(prev => ({
-            ...prev,
-            role: spesicData.data.designationID.designationName
-          }));
-        }
-      }
+    // Always show all designations initially - no filtering by institution
+    if (designationData?.data?.data) {
+      setFilteredDesignations(designationData.data.data);
     }
-  }, [selectedInstitutionId, departmentData, designationData, spesicData]);
+  }, [selectedInstitutionId, departmentData, designationData]);
 
   const toggleDay = (day) => {
     if (selectedDays.includes(day)) {
@@ -167,7 +154,7 @@ export default function NewEmploye() {
     // Filter designations based on selected institution
     if (designationData?.data?.data) {
       const filteredDesig = designationData?.data?.data?.filter(
-        designation => designation?.institutionID?._id === option?.key
+        designation => designation?.institution?._id === option?.key
       );
       setFilteredDesignations(filteredDesig);
     }
@@ -218,9 +205,9 @@ export default function NewEmploye() {
       }
     }
 
-    if (!formData.shiftSchedule) {
-      errors.push('Shift Schedule is required');
-    }
+    // if (!formData.shiftSchedule) {
+    //   errors.push('Shift Schedule is required');
+    // }
 
     if (selectedDays.length === 0) {
       errors.push('At least one weekend day must be selected');
@@ -256,8 +243,9 @@ export default function NewEmploye() {
         dept => dept.departmentName === formData.department
       );
 
+      // For designation, formData.role already contains the ID
       const selectedDesignation = filteredDesignations.find(
-        desig => desig.designationName === formData.role
+        desig => desig._id === formData.role
       );
 
       const selectedShift = shiftData?.data?.data?.find(
@@ -450,18 +438,17 @@ export default function NewEmploye() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Select Designation*</label>
             <Select
               className="w-full"
-              placeholder={selectedInstitutionId ? "Select Designation" : "First select Institution"}
+              placeholder="Select Designation"
               value={formData.role || undefined}
               onChange={(value) => handleChange('role', value)}
               loading={designationLoading}
-              disabled={!selectedInstitutionId}
               status={!formData.role.trim() ? 'error' : ''}
               size={isMobile ? 'large' : 'middle'}
             >
               {filteredDesignations.map((designation) => (
                 <Select.Option
                   key={designation._id}
-                  value={designation.designationName}
+                  value={designation._id}
                 >
                   {designation.designationName}
                 </Select.Option>
@@ -481,7 +468,7 @@ export default function NewEmploye() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Select Shift Schedule*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Select Shift Schedule</label>
             <Select
               className="w-full"
               placeholder="Select Shift"

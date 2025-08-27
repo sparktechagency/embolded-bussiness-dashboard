@@ -25,6 +25,7 @@ const Sidebar = ({ closeSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const router = useNavigate();
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
   const role = localStorage.getItem("role");
@@ -133,7 +134,7 @@ const Sidebar = ({ closeSidebar }) => {
   return (
     <div className="w-72 h-full bg-white flex flex-col border-r border-gray-200">
       {/* Logo Section */}
-      <div className="h-52 border-b border-primary flex flex-col justify-center items-center gap-3 bg-white">
+      <div onClick={() => router("/")} className="h-52 border-b border-primary flex flex-col justify-center items-center gap-3 bg-white">
         <img
           src="/icons/dashboard_logo.png"
           alt="Company Logo"

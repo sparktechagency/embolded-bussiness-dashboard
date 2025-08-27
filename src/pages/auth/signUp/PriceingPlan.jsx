@@ -263,6 +263,7 @@ const PricingPlans = () => {
 
 
 
+
   // Default features for each plan type
   const planFeatures = {
     UNIONIZED: [

@@ -42,7 +42,7 @@ function App() {
       message.success('Institution created successfully');
     } catch (error) {
       console.log('Error creating institution:', error);
-      message.error('Failed to create institution');
+      message.error(error.message || 'Failed to create institution');
     }
   };
 

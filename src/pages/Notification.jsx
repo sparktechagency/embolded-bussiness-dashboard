@@ -50,7 +50,8 @@ const NotificationPopup = () => {
 
   // Extract notifications and calculate unread count
   const notifications = notificationsData || [];
-  console.log(notifications)
+
+
   const unreadCount = notifications?.data?.result?.filter(notif => !notif.read).length;
 
   useEffect(() => {
@@ -66,12 +67,12 @@ const NotificationPopup = () => {
       refetch();
     };
 
-    socketRef.current.on(`notification::${localStorage.getItem("businessLoginId")}`, handleNewNotification);
+    socketRef.current.on(`notification::${localStorage.getItem("adminLoginId")}`, handleNewNotification);
 
     return () => {
       if (socketRef.current) {
         socketRef.current.off("connect");
-        socketRef.current.off(`notification::${localStorage.getItem("businessLoginId")}`, handleNewNotification);
+        socketRef.current.off(`notification::${localStorage.getItem("adminLoginId")}`, handleNewNotification);
         socketRef.current.disconnect();
       }
     };
@@ -224,11 +225,11 @@ const NotificationPopup = () => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
-        className="w-full p-10 bg-white border border-gray-200 rounded-xl"
+        className="w-full p-10 bg-white border border-gray-2 rounded-xl"
       >
         <div>
           {/* Header with action buttons */}
-          {notifications.length > 0 && (
+          {notifications?.data?.result.length > 0 && (
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">
                 Notifications ({unreadCount} unread)
@@ -266,7 +267,7 @@ const NotificationPopup = () => {
           )}
 
           <div className="w-full cursor-pointer">
-            {notifications.length === 0 ? (
+            {notifications?.data?.result.length === 0 ? (
               <div className="text-center text-gray-500">
                 <div className="flex justify-center">
                   <img
@@ -284,7 +285,7 @@ const NotificationPopup = () => {
                 </p>
               </div>
             ) : (
-              notifications?.data?.result?.map((notif, index) => (
+              [...notifications?.data?.result]?.reverse()?.map((notif, index) => (
                 <div
                   key={notif._id || index}
                   className={`flex items-start p-3 transition duration-300 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${!notif.read ? "bg-blue-50" : ""

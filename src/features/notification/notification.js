@@ -11,6 +11,7 @@ export const notificationApi = baseApi.injectEndpoints({
     getHRNotification: builder.query({
       query: () => "/notifications/hr-department-manager",
       providesTags: ["notifications"],
+
     }),
 
 
@@ -52,8 +53,8 @@ export const notificationApi = baseApi.injectEndpoints({
 export const {
   useDeleteAllNotificationMutation,
   useDeleteSingleNotificationMutation,
-  useGetBusinessOwnerNotificationQuery, 
-  useGetHRNotificationQuery, 
+  useGetBusinessOwnerNotificationQuery,
+  useGetHRNotificationQuery,
   useReadBusinessOwnerAllNotificationMutation,
   useReadHRAllNotificationMutation
 } = notificationApi;

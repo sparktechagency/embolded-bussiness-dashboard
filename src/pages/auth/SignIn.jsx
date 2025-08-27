@@ -10,6 +10,8 @@ export default function LoginPage() {
   const route = useNavigate();
   const [Login, { isLoading }] = useLoginMutation();
   const { data: loginUser, isLoading: getProfileLoading, refetch } = useGetProfileQuery();
+  const userRole = localStorage.getItem("role");
+
 
   const handleGoogleLogin = () => {
     window.location.href = `${baseURL}/api/v1/auth/google`;
@@ -18,28 +20,32 @@ export default function LoginPage() {
   const onFinish = async (values) => {
     try {
       const response = await Login(values).unwrap();
-      localStorage.setItem("role", response?.data?.user?.role)
+
+      // Save token and user data
+      localStorage.setItem("role", response?.data?.user?.role);
       saveToken(response?.data?.token);
       localStorage.setItem("adminLoginId", response?.data?.user?._id);
 
-      // Refetch the profile data after login
-      const profileResponse = await refetch();
-
       // Check if user is subscribed and has access
-      if (profileResponse?.data?.data?.isSubscribed && profileResponse?.data?.data?.hasAccess) {
+      if (response?.data?.user?.role === "HR" || response?.data?.user?.role === "DEPARTMENT_MANAGER") {
         route("/"); // Redirect to dashboard
+
+      }
+
+      if (response?.data?.user?.role === "BUSINESS_OWNER" && Boolean(response.data.user.stripeCustomerId)) {
+        route("/")
       } else {
         route(`/customers_account?stripeCustomerId=${response?.data?.token}`);
       }
 
     } catch (error) {
-      message.error(error?.data?.message)
+      message.error(error?.data?.message);
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-white ">
-      <div className="flex w-full max-w-[1500px] md:flex-row md:items-center md:gap-8 lg:gap-20 border">
+      <div className="flex w-full max-w-[1500px] md:flex-row md:items-center md:gap-8 lg:gap-20">
         {/* Left Side - Image (Hidden on mobile) */}
         <div className="hidden md:flex md:w-1/2 lg:w-3/5 xl:w-2/3">
           <img

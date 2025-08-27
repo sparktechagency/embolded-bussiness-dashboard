@@ -7,6 +7,8 @@ import { useDeleteEmployeeMutation, useUpdateEmplyeeStatusMutation } from '../..
 // import InstitutionFormModal from "./InstitutionFormModal";
 
 const EmployeTableBody = ({ item, list, refetch }) => {
+
+  console.log(item)
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [viewdetailsModalVisible, setViewdetailsModalVisible] = useState(false);
@@ -123,7 +125,11 @@ const EmployeTableBody = ({ item, list, refetch }) => {
             ))}
           </Select>
         </div>
-        <div className="flex items-center justify-center py-3">{convertTime(item?.shiftSchedule?.shiftStartTime)} - {convertTime(item?.shiftSchedule?.shiftEndTime)}</div>
+        <div className="flex items-center justify-center py-3">
+          {item?.shiftSchedule
+            ? `${convertTime(item?.shiftSchedule?.shiftStartTime)} - ${convertTime(item?.shiftSchedule?.shiftEndTime)}`
+            : "Not Assign"}
+        </div>
 
 
         <div className={`flex items-center justify-center ${item.status === "ACTIVE" ? "text-green-500 font-bold" : "text-red-500 font-medium"} py-3`}>{item.status}</div>

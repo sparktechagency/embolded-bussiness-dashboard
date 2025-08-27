@@ -47,10 +47,11 @@ const Navber = ({ toggleSidebar }) => {
   const isLoading = isBusinessOwner ? businessOwnerLoading : hrLoading;
   const refetch = isBusinessOwner ? refetchBusinessOwner : refetchHR;
 
-  // Extract notifications and calculate unread count
-  const notifications = notificationsData || [];
+  // Extract notifications and calculate unread count - with proper null checking
+  const notifications = notificationsData || {};
+  const notificationList = notifications?.data?.result || [];
 
-  const unreadCount = notifications?.data?.result?.filter(notif => !notif.read).length;
+  const unreadCount = notificationList?.filter(notif => !notif.read).length || 0;
 
   // Update current time every minute
   useEffect(() => {
@@ -73,7 +74,7 @@ const Navber = ({ toggleSidebar }) => {
       }
     };
 
-    const userId = localStorage.getItem("businessLoginId");
+    const userId = localStorage.getItem("adminLoginId");
     if (userId) {
       socketRef.current.on(`notification::${userId}`, handleNewNotification);
     }
@@ -162,11 +163,12 @@ const Navber = ({ toggleSidebar }) => {
     }
   };
 
+  // Fixed the problematic line with proper null checking
+  const popupNotifications = Array.isArray(notificationList)
+    ? [...notificationList].reverse().slice(0, 4)
+    : [];
 
-
-
-  const popupNotifications = notifications?.data?.result?.slice(0, 3);
-  const totalNotifications = popupNotifications?.length;
+  const totalNotifications = popupNotifications?.length || 0;
   const hasMoreNotifications = totalNotifications > 3;
 
   return (
@@ -250,13 +252,6 @@ const Navber = ({ toggleSidebar }) => {
               title={
                 <div className="flex justify-between items-center">
                   <span>Notifications</span>
-                  {totalNotifications > 0 && (
-                    <span className="text-sm text-gray-500">
-                      {hasMoreNotifications
-                        ? `3 of ${totalNotifications}`
-                        : `${totalNotifications} total`}
-                    </span>
-                  )}
                 </div>
               }
               className="p-0"
@@ -320,7 +315,7 @@ const Navber = ({ toggleSidebar }) => {
                     onClick={handleViewAllNotifications}
                   >
                     {hasMoreNotifications
-                      ? `View All (${totalNotifications})`
+                      ? `View All`
                       : "View All"}
                   </Button>
                 </div>

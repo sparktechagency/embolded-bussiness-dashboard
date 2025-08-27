@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Only redirect to pricing if user is NOT subscribed AND doesn't have access
-  if (data?.data && !data.data.isSubscribed && !data.data.hasAccess) {
+  if (data?.data && !data.data.isSubscribed && !data.data.hasAccess && data.data.role === "BUSINESS_OWNER") {
     return <Navigate to="/pricing-plans" replace />;
   }
 

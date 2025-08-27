@@ -1,4 +1,4 @@
-import { Button, message, Select } from 'antd';
+import { Button, Select } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateHolidayMutation } from '../../features/holiday/holidayApi';
@@ -49,11 +49,13 @@ function HolidayManagement() {
 
   // Handle holiday creation
   const handleCreateHoliday = async (values) => {
+
+    console.log(values?.startDate)
     try {
       const holidayData = {
         name: values.name,
-        startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
-        endDate: values.endDate ? values.endDate.format('YYYY-MM-DD') : null,
+        startDate: values.startDate ? values?.startDate : null,
+        endDate: values.endDate ? values?.endDate : null,
         holidayType: values.type,
         institutionID: values.instituteName
       };

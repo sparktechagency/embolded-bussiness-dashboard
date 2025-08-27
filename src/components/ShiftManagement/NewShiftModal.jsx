@@ -12,17 +12,15 @@ const NewShiftModal = ({
 }) => {
   const [form] = Form.useForm();
 
-  console.log("NewShiftModal initialValues:", initialValues);
-
   // Function to convert ISO date string to time only
   const convertToTimeOnly = (isoString) => {
     if (!isoString) return null;
-    
+
     // If it's already in HH:mm format, use it directly
     if (typeof isoString === 'string' && isoString.includes(':') && !isoString.includes('T')) {
       return dayjs(isoString, 'HH:mm');
     }
-    
+
     // If it's ISO string, extract time part
     const date = new Date(isoString);
     const hours = date.getHours().toString().padStart(2, '0');
@@ -35,7 +33,7 @@ const NewShiftModal = ({
     if (visible) {
       if (mode === 'edit' && initialValues) {
         console.log("Setting form values for edit mode:", initialValues);
-        
+
         form.setFieldsValue({
           name: initialValues.name,
           startTime: convertToTimeOnly(initialValues.startTime),
@@ -50,14 +48,14 @@ const NewShiftModal = ({
   const handleSubmit = () => {
     form.validateFields().then(values => {
       console.log("Form values before formatting:", values);
-      
+
       // Convert dayjs objects to time strings
       const formattedValues = {
         ...values,
         startTime: values.startTime ? values.startTime.format('HH:mm') : null,
         endTime: values.endTime ? values.endTime.format('HH:mm') : null
       };
-      
+
       console.log("Formatted values being sent:", formattedValues);
       onSubmit(formattedValues);
     }).catch(errorInfo => {
