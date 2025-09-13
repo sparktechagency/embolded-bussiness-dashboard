@@ -1,3 +1,4 @@
+import { Spin } from 'antd';
 import { Navigate } from "react-router-dom";
 import { isAuthenticated } from "../features/auth/authService";
 import { useGetProfileQuery } from '../features/settings/settingApi';
@@ -15,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (profileGetLoading) {
-    return <div>Loading...</div>;
+    return <div className='flex justify-center items-center h-[400px]'><Spin size='small' /></div>;
   }
 
   return children;
