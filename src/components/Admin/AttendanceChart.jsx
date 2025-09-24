@@ -1,7 +1,8 @@
 import { Spin } from 'antd';
 import { useEffect, useState } from 'react';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
-import { useGetChartsQuery } from '../../features/dashboardOverView/dashboardApi';
+import { useGetChartsQuery } from '../../features/dashboardOverview/dashboardApi';
+
 
 const AttendanceChart = () => {
   const { data: attendance, isLoading } = useGetChartsQuery();

@@ -1,6 +1,6 @@
 // src/components/Statistics/DepartmentStatistics.jsx
 import { Spin } from 'antd';
-import { useStatisticsForHrAndDepQuery } from '../../features/dashboardOverView/dashboardApi';
+import { useStatisticsForHrAndDepQuery } from '../../features/dashboardOverview/dashboardApi';
 
 const DepartmentStatistics = () => {
   const { data, isLoading } = useStatisticsForHrAndDepQuery();
