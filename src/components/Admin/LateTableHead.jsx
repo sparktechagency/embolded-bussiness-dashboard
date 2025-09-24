@@ -1,5 +1,6 @@
 import { Spin } from 'antd';
-import { useGetLatesQuery } from '../../features/dashboardOverView/dashboardApi';
+
+import { useGetLatesQuery } from '../../features/dashboardOverview/dashboardApi';
 import LateTableBody from "./LateTableBody";
 
 const LateTableHead = ({ columns }) => {

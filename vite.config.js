@@ -5,7 +5,8 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host:"10.10.7.109",
-    port: 4000, // change to your desired port
+    host: "0.0.0.0", // allow access from external IP/domains
+    port: 4000,      // your port
+    allowedHosts: ["business.dutyhourapp.com", "www.business.dutyhourapp.com", "www.api.dutyhourapp.com", "api.dutyhourapp.com"], // 👈 add your domain here
   },
 })
