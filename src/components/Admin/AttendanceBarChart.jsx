@@ -1,7 +1,8 @@
 import { Spin } from 'antd';
 import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { useGetChartsQuery } from '../../features/dashboardOverView/dashboardApi';
+import { useGetChartsQuery } from '../../features/dashboardOverview/dashboardApi';
+
 
 const AttendanceBarChart = () => {
   const { data: attendance, isLoading } = useGetChartsQuery();
