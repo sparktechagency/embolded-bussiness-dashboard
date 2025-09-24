@@ -1,5 +1,6 @@
 import { Spin } from 'antd';
-import { useGetAbesntsQuery } from '../../features/dashboardOverView/dashboardApi';
+
+import { useGetAbesntsQuery } from '../../features/dashboardOverview/dashboardApi';
 import AbsentTableBody from "./AbsentTableBody";
 
 const AbsentTableHead = ({ columns }) => {
